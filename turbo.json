@@ -3,6 +3,13 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "env": [
+        "RELEASE_MODE",
+        "CONTENT_RELEASE_DIR",
+        "SITE_ORIGIN",
+        "ENABLE_ANALYTICS",
+        "ENABLE_ADS"
+      ],
       "outputs": ["dist/**", ".next/**", "out/**"]
     },
     "lint": {
