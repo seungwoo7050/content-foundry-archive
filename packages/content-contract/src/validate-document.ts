@@ -79,6 +79,20 @@ export function validateContractDocument<K extends ContractDocumentKind>(
   kind: K,
   value: unknown,
 ): ContractDocuments[K] {
+  if (
+    kind === "release" &&
+    typeof value === "object" &&
+    value !== null &&
+    "contractVersion" in value &&
+    value.contractVersion !== SUPPORTED_CONTRACT_VERSION
+  ) {
+    throw new ContractError(
+      "CONTRACT_UNSUPPORTED",
+      `Unsupported contract version: ${String(value.contractVersion)}`,
+      [{ path: "/contractVersion", message: `expected ${SUPPORTED_CONTRACT_VERSION}` }],
+    );
+  }
+
   const validator = validators.get(kind);
   if (!validator?.(value)) {
     throw new ContractError(

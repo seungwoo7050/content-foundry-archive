@@ -47,4 +47,12 @@ describe("validateContractDocument", () => {
     ).toThrowError(ContractError);
   });
 
+  it("rejects a supported-looking but unknown version first", () => {
+    expect(() =>
+      validateContractDocument(
+        "release",
+        readFixture("invalid/release-unsupported-version.json"),
+      ),
+    ).toThrowError(expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }));
+  });
 });
