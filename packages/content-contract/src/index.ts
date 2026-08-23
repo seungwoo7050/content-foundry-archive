@@ -28,3 +28,4 @@ export {
   type ContractDocumentKind,
   validateContractDocument,
 } from "./validate-document.js";
+export { verifyReleaseIntegrity } from "./verify-integrity.js";
