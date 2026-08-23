@@ -2,7 +2,7 @@ import type { PublishedContentBlock } from "@content-foundry/content-contract";
 
 export type TextContentBlock = Extract<
   PublishedContentBlock,
-  { type: "heading" | "paragraph" | "list" }
+  { type: "heading" | "paragraph" | "list" | "quote" }
 >;
 
 interface ContentBlocksProps {
@@ -32,6 +32,15 @@ export function ContentBlocks({ blocks }: ContentBlocksProps) {
           </List>
         );
       }
+      case "quote":
+        return (
+          <figure key={`quote-${index}`}>
+            <blockquote>
+              <p>{block.markdown}</p>
+            </blockquote>
+            {block.attribution ? <figcaption>{block.attribution}</figcaption> : null}
+          </figure>
+        );
     }
   });
 }
