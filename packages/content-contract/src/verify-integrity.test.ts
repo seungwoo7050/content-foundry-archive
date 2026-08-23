@@ -37,6 +37,23 @@ describe("verifyReleaseIntegrity", () => {
     expect(release.releaseId).toBe("REL-2026-000042");
   });
 
+  it("detects a modified article", () => {
+    const root = copyFixture();
+    const article = join(root, "articles", "ART-000123.json");
+    writeFileSync(article, readFileSync(article, "utf8").replace("발급 방법", "변조"));
+    expect(() => verifyReleaseIntegrity(root)).toThrowError(
+      expect.objectContaining({ code: "INTEGRITY_FAILED" }),
+    );
+  });
+
+  it("detects an unlisted file", () => {
+    const root = copyFixture();
+    writeFileSync(join(root, "unexpected.json"), "{}\n");
+    expect(() => verifyReleaseIntegrity(root)).toThrowError(
+      expect.objectContaining({ code: "INTEGRITY_FAILED" }),
+    );
+  });
+
   it("rejects an unsupported version before checksum validation", () => {
     const root = copyFixture();
     const manifest = join(root, "release.json");

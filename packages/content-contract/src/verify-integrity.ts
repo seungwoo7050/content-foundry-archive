@@ -1,5 +1,10 @@
-import { readFileSync } from "node:fs";
-import { join, posix } from "node:path";
+import {
+  lstatSync,
+  readFileSync,
+  readdirSync,
+} from "node:fs";
+import { createHash } from "node:crypto";
+import { join, posix, relative, sep } from "node:path";
 
 import { ContractError } from "./errors.js";
 import type { PublicSiteReleaseManifest } from "./generated/release.js";
@@ -66,6 +71,18 @@ function parseChecksums(bytes: Buffer): readonly ChecksumEntry[] {
   return entries;
 }
 
+function collectFiles(root: string, directory = root): readonly string[] {
+  return readdirSync(directory).flatMap((name) => {
+    const absolute = join(directory, name);
+    const stat = lstatSync(absolute);
+    const path = relative(root, absolute).split(sep).join("/");
+    if (stat.isSymbolicLink()) fail(`Symbolic link is forbidden: ${path}`);
+    if (stat.isDirectory()) return collectFiles(root, absolute);
+    if (!stat.isFile()) fail(`Non-regular bundle entry: ${path}`);
+    return [path];
+  });
+}
+
 export function verifyReleaseIntegrity(
   root: string,
 ): PublicSiteReleaseManifest {
@@ -89,6 +106,21 @@ export function verifyReleaseIntegrity(
   }
 
   const checksums = readFileSync(join(root, "checksums.txt"));
-  parseChecksums(checksums);
+  const entries = parseChecksums(checksums);
+  const listed = entries.map((entry) => entry.path);
+  const actual = collectFiles(root)
+    .filter((path) => path !== "release.json" && path !== "checksums.txt")
+    .sort((a, b) => Buffer.compare(Buffer.from(a), Buffer.from(b)));
+  if (JSON.stringify(actual) !== JSON.stringify(listed)) {
+    fail("Bundle file set does not match checksums.txt");
+  }
+
+  for (const entry of entries) {
+    const hash = createHash("sha256")
+      .update(readFileSync(join(root, entry.path)))
+      .digest("hex");
+    if (hash !== entry.hash) fail(`Checksum mismatch: ${entry.path}`);
+  }
+
   return validateContractDocument("release", release);
 }
