@@ -7,6 +7,7 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint . && stylelint \"app/**/*.css\" --allow-empty-input",
+    "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
@@ -24,6 +25,7 @@
     "eslint-config-next": "16.3.2",
     "stylelint": "17.14.1",
     "stylelint-config-standard": "40.0.0",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "vitest": "4.1.11"
   }
 }
