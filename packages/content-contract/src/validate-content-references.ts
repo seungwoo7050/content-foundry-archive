@@ -1,4 +1,5 @@
 import { ContractError, type ContractIssue } from "./errors.js";
+import type { PublishedContentBlock } from "./generated/content-block.js";
 import type { ReleaseBundleDocuments } from "./read-bundle-documents.js";
 
 function addMissing(
@@ -13,6 +14,25 @@ function addMissing(
   }
 }
 
+function validateMediaBlocks(
+  issues: ContractIssue[],
+  mediaIds: ReadonlySet<string>,
+  content: readonly PublishedContentBlock[],
+  base: string,
+) {
+  content.forEach((block, index) => {
+    if (block.type === "image") {
+      addMissing(
+        issues,
+        mediaIds,
+        block.mediaId,
+        `${base}/${index}/mediaId`,
+        "media ID",
+      );
+    }
+  });
+}
+
 export function validateContentReferences(
   bundle: ReleaseBundleDocuments,
 ): ReleaseBundleDocuments {
@@ -20,6 +40,7 @@ export function validateContentReferences(
   const categoryIds = new Set(bundle.taxonomy.categories.map(({ id }) => id));
   const tagIds = new Set(bundle.taxonomy.tags.map(({ id }) => id));
   const articleIds = new Set(bundle.articles.map(({ id }) => id));
+  const mediaIds = new Set(bundle.mediaManifest.items.map(({ id }) => id));
 
   bundle.articles.forEach((article, articleIndex) => {
     const base = `/articles/${articleIndex}`;
@@ -36,6 +57,25 @@ export function validateContentReferences(
         "article ID",
       );
     });
+    if (article.heroMediaId !== null) {
+      addMissing(
+        issues,
+        mediaIds,
+        article.heroMediaId,
+        `${base}/heroMediaId`,
+        "media ID",
+      );
+    }
+    validateMediaBlocks(issues, mediaIds, article.content, `${base}/content`);
+  });
+
+  bundle.pages.forEach((page, pageIndex) => {
+    validateMediaBlocks(
+      issues,
+      mediaIds,
+      page.content,
+      `/pages/${pageIndex}/content`,
+    );
   });
 
   if (issues.length > 0) {

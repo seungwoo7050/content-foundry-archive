@@ -45,4 +45,17 @@ describe("validateContentReferences", () => {
     expectInvalidPaths(bundle, ["/articles/0/relatedArticleIds/0"]);
   });
 
+  it("reports unresolved hero and content media", () => {
+    const bundle = structuredClone(reference);
+    const article = bundle.articles[0]!;
+    article.heroMediaId = "missing-hero";
+    article.content.push({ type: "image", mediaId: "missing-image" });
+    bundle.pages[0]!.content.push({ type: "image", mediaId: "missing-page-image" });
+
+    expectInvalidPaths(bundle, [
+      "/articles/0/heroMediaId",
+      "/articles/0/content/2/mediaId",
+      "/pages/0/content/1/mediaId",
+    ]);
+  });
 });
