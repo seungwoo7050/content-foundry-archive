@@ -8,7 +8,8 @@
     "dev": "next dev",
     "lint": "eslint . && stylelint \"app/**/*.css\" --allow-empty-input",
     "test": "vitest run",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "verify:static": "node scripts/verify-static.mjs"
   },
   "dependencies": {
     "@content-foundry/content-contract": "workspace:*",
