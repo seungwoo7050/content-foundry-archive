@@ -23,6 +23,39 @@ export function validateContentSemantics(
       });
     }
 
+    const headings = new Map<
+      string,
+      { readonly index: number; readonly level: number; readonly text: string }
+    >();
+    article.content.forEach((block, blockIndex) => {
+      if (block.type !== "heading") return;
+      const first = headings.get(block.id);
+      if (first) {
+        issues.push({
+          path: `${base}/content/${blockIndex}/id`,
+          message: `duplicate heading ID; first declared at ${base}/content/${first.index}/id`,
+        });
+      } else {
+        headings.set(block.id, {
+          index: blockIndex,
+          level: block.level,
+          text: block.text,
+        });
+      }
+    });
+
+    article.toc.forEach((entry, tocIndex) => {
+      const heading = headings.get(entry.id);
+      const path = `${base}/toc/${tocIndex}`;
+      if (!heading) {
+        issues.push({ path: `${path}/id`, message: `unknown heading ID: ${entry.id}` });
+      } else if (entry.text !== heading.text || entry.level !== heading.level) {
+        issues.push({
+          path,
+          message: `TOC entry must match heading ${entry.id}`,
+        });
+      }
+    });
   });
 
   bundle.pages.forEach((page, pageIndex) => {

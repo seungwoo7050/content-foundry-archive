@@ -47,4 +47,17 @@ describe("validateContentSemantics", () => {
     ]);
   });
 
+  it("rejects duplicate or inconsistent heading anchors", () => {
+    const bundle = structuredClone(reference);
+    const article = bundle.articles[0]!;
+    article.content.push({ type: "heading", id: "prepare", level: 3, text: "Again" });
+    article.toc[0]!.text = "Wrong text";
+    article.toc.push({ id: "missing", level: 2, text: "Missing" });
+
+    expectInvalidPaths(bundle, [
+      "/articles/0/content/2/id",
+      "/articles/0/toc/0",
+      "/articles/0/toc/1/id",
+    ]);
+  });
 });
