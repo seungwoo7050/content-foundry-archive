@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+import {
+  createReleaseIdentity,
+  createReleaseIdentityMetadata,
+} from "../lib/release-identity";
 import { getSiteReleaseContext } from "../lib/site-release";
 import "./globals.css";
 
 export function generateMetadata(): Metadata {
   const { bundle, canonicalOrigin, config } = getSiteReleaseContext();
   const noindex = config.noindex;
+  const identity = createReleaseIdentity(bundle);
 
   return {
     metadataBase: new URL(canonicalOrigin),
@@ -20,6 +25,7 @@ export function generateMetadata(): Metadata {
       index: !noindex,
       follow: !noindex,
     },
+    other: createReleaseIdentityMetadata(identity),
   };
 }
 
