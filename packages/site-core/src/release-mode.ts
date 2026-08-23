@@ -57,19 +57,26 @@ export function resolveBuildTargetConfig(
 
   const origin = environment.SITE_ORIGIN?.trim() || null;
   if (mode === "production") {
-    return fail("production release policy is not configured");
+    if (!origin) return fail("SITE_ORIGIN is required in production mode");
+    if (!options.allowedProductionOrigins.includes(origin)) {
+      return fail(`SITE_ORIGIN is not allowed for ${options.siteId}: ${origin}`);
+    }
   }
 
-  readFlag("ENABLE_ANALYTICS", environment.ENABLE_ANALYTICS);
-  readFlag("ENABLE_ADS", environment.ENABLE_ADS);
+  const production = mode === "production";
+  const requestedAnalytics = readFlag(
+    "ENABLE_ANALYTICS",
+    environment.ENABLE_ANALYTICS,
+  );
+  const requestedAds = readFlag("ENABLE_ADS", environment.ENABLE_ADS);
 
   return {
     siteId: options.siteId,
     mode,
     releaseDirectory,
     origin,
-    noindex: true,
-    analyticsEnabled: false,
-    adsEnabled: false,
+    noindex: !production,
+    analyticsEnabled: production && requestedAnalytics,
+    adsEnabled: production && requestedAds,
   };
 }

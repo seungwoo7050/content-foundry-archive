@@ -41,22 +41,42 @@ describe("resolveBuildTargetConfig", () => {
     });
   });
 
+  it("allows requested production integrations on an approved origin", () => {
+    const config = resolveBuildTargetConfig(
+      {
+        RELEASE_MODE: "production",
+        CONTENT_RELEASE_DIR: "/releases/production",
+        SITE_ORIGIN: "https://site-a.example.org",
+        ENABLE_ANALYTICS: "true",
+        ENABLE_ADS: "true",
+      },
+      options,
+    );
+
+    expect(config).toMatchObject({
+      noindex: false,
+      analyticsEnabled: true,
+      adsEnabled: true,
+    });
+  });
+
   it("requires an explicit release outside template mode", () => {
     expect(() => resolveBuildTargetConfig({ RELEASE_MODE: "preview" }, options)).toThrow(
       "CONTENT_RELEASE_DIR is required in preview mode",
     );
   });
 
-  it("defers production policy to its own boundary", () => {
+  it("requires an approved production origin", () => {
     expect(() =>
       resolveBuildTargetConfig(
         {
           RELEASE_MODE: "production",
           CONTENT_RELEASE_DIR: "/releases/production",
+          SITE_ORIGIN: "https://wrong.example.org",
         },
         options,
       ),
-    ).toThrow("production release policy is not configured");
+    ).toThrow("SITE_ORIGIN is not allowed for site-a");
   });
 
   it("rejects unsupported modes", () => {
