@@ -1,0 +1,13 @@
+:root {
+  color-scheme: light;
+
+  --ink: #172033;
+  --muted: #59657a;
+  --accent: #1f5fae;
+  --accent-strong: #174a88;
+  --line: #cbd8e8;
+  --surface: #fff;
+  --surface-soft: #eef5fc;
+  --page: #f7f9fc;
+  --content-width: 70rem;
+}
