@@ -284,3 +284,19 @@ body > footer {
   color: var(--muted);
   font-size: 0.85rem;
 }
+
+.article-content aside {
+  margin-block: 1.75rem;
+  padding: 1rem 1.15rem;
+  background: var(--surface-soft);
+  border-left: 0.25rem solid var(--accent);
+}
+/* stylelint-disable-next-line no-descending-specificity -- Home and article scopes do not overlap. */
+.article-content aside > p {
+  margin-block: 0;
+}
+
+.article-content [data-tone="warning"],
+.article-content [data-tone="danger"] {
+  border-left-color: #b44b2a;
+}
