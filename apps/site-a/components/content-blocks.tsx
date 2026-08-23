@@ -6,7 +6,7 @@ export type TextContentBlock = Exclude<
 >;
 
 interface ContentBlocksProps {
-  blocks: readonly TextContentBlock[];
+  blocks: readonly (TextContentBlock | Extract<PublishedContentBlock, { type: "table" }>)[];
 }
 
 const toneLabels = {
@@ -53,6 +53,32 @@ export function ContentBlocks({ blocks }: ContentBlocksProps) {
           <aside aria-label={toneLabels[block.tone]} data-tone={block.tone} key={`callout-${index}`}>
             <p>{block.markdown}</p>
           </aside>
+        );
+      case "table":
+        return (
+          <div className="content-table-scroll" key={`table-${index}`}>
+            <table>
+              {block.caption ? <caption>{block.caption}</caption> : null}
+              <thead>
+                <tr>
+                  {block.columns.map((column, columnIndex) => (
+                    <th key={columnIndex} scope="col">
+                      {column}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {block.rows.map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {row.map((cell, cellIndex) => (
+                      <td key={cellIndex}>{cell}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         );
     }
   });

@@ -43,4 +43,23 @@ describe("ContentBlocks", () => {
     expect(html).toContain("**그대로**");
     expect(html).not.toContain("<script>");
   });
+
+  it("renders tables with semantic headers and rows", () => {
+    const html = renderToStaticMarkup(
+      createElement(ContentBlocks, {
+        blocks: [
+          {
+            type: "table",
+            caption: "준비 항목",
+            columns: ["항목", "상태"],
+            rows: [["인증서", "필수"]],
+          },
+        ],
+      }),
+    );
+
+    expect(html).toContain("<caption>준비 항목</caption><thead>");
+    expect(html).toContain('<th scope="col">항목</th>');
+    expect(html).toContain("<tbody><tr><td>인증서</td><td>필수</td></tr></tbody>");
+  });
 });
