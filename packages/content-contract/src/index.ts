@@ -29,3 +29,8 @@ export {
   validateContractDocument,
 } from "./validate-document.js";
 export { verifyReleaseIntegrity } from "./verify-integrity.js";
+export {
+  loadReleaseBundle,
+  type LoadedReleaseBundle,
+  type LoadReleaseBundleOptions,
+} from "./load-release-bundle.js";
