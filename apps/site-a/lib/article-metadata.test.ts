@@ -37,7 +37,8 @@ describe("createArticleMetadata", () => {
     expect(metadata.openGraph).toMatchObject({
       type: "article",
       url: "https://example.com/article/government24-resident-registration-guide",
+      images: [],
     });
-    expect(metadata.twitter).toMatchObject({ card: "summary" });
+    expect(metadata.twitter).toMatchObject({ card: "summary", images: [] });
   });
 });

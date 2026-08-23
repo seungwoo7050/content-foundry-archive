@@ -26,11 +26,13 @@ export function createArticleMetadata(
       url: canonical,
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt,
+      images: [],
     },
     twitter: {
       card: "summary",
       title: article.seo.title,
       description: article.seo.description,
+      images: [],
     },
   };
 }
