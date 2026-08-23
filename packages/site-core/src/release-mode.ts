@@ -48,14 +48,18 @@ export function resolveBuildTargetConfig(
   options: BuildTargetOptions,
 ): BuildTargetConfig {
   const mode = readMode(environment.RELEASE_MODE);
-  if (mode !== "template") {
-    return fail(`${mode} release policy is not configured`);
-  }
   const releaseDirectory =
     environment.CONTENT_RELEASE_DIR?.trim() ||
-    options.templateReleaseDirectory;
+    (mode === "template" ? options.templateReleaseDirectory : null);
+  if (!releaseDirectory) {
+    return fail(`CONTENT_RELEASE_DIR is required in ${mode} mode`);
+  }
 
   const origin = environment.SITE_ORIGIN?.trim() || null;
+  if (mode === "production") {
+    return fail("production release policy is not configured");
+  }
+
   readFlag("ENABLE_ANALYTICS", environment.ENABLE_ANALYTICS);
   readFlag("ENABLE_ADS", environment.ENABLE_ADS);
 

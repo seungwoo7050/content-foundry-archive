@@ -21,6 +21,44 @@ describe("resolveBuildTargetConfig", () => {
     });
   });
 
+  it("forces preview tracking and advertising off", () => {
+    const config = resolveBuildTargetConfig(
+      {
+        RELEASE_MODE: "preview",
+        CONTENT_RELEASE_DIR: "/releases/preview",
+        SITE_ORIGIN: "https://preview.example.org",
+        ENABLE_ANALYTICS: "true",
+        ENABLE_ADS: "true",
+      },
+      options,
+    );
+
+    expect(config).toMatchObject({
+      mode: "preview",
+      noindex: true,
+      analyticsEnabled: false,
+      adsEnabled: false,
+    });
+  });
+
+  it("requires an explicit release outside template mode", () => {
+    expect(() => resolveBuildTargetConfig({ RELEASE_MODE: "preview" }, options)).toThrow(
+      "CONTENT_RELEASE_DIR is required in preview mode",
+    );
+  });
+
+  it("defers production policy to its own boundary", () => {
+    expect(() =>
+      resolveBuildTargetConfig(
+        {
+          RELEASE_MODE: "production",
+          CONTENT_RELEASE_DIR: "/releases/production",
+        },
+        options,
+      ),
+    ).toThrow("production release policy is not configured");
+  });
+
   it("rejects unsupported modes", () => {
     expect(() =>
       resolveBuildTargetConfig({ RELEASE_MODE: "staging" }, options),
