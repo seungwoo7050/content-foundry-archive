@@ -62,4 +62,14 @@ describe("loadSiteRelease", () => {
     );
   });
 
+  it("rejects a production origin that differs from the bundle", () => {
+    expect(() =>
+      loadSiteRelease({
+        ...templateConfig(),
+        mode: "production",
+        origin: "https://site-a.example.org",
+        noindex: false,
+      }),
+    ).toThrow("Production origin does not match bundle origin");
+  });
 });

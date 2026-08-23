@@ -23,6 +23,15 @@ export function loadSiteRelease(
       `Bundle site origin must not contain a path: ${bundle.site.origin}`,
     );
   }
+  if (
+    config.mode === "production" &&
+    config.origin !== canonicalUrl.origin
+  ) {
+    throw new BuildTargetConfigError(
+      `Production origin does not match bundle origin: ${String(config.origin)}`,
+    );
+  }
+
   return {
     config,
     bundle,
