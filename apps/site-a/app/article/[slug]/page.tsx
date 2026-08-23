@@ -51,12 +51,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   });
 
   return (
-    <article>
-      <header>
+    <article className="article-page">
+      <header className="article-header">
         {category ? <p>{category.label}</p> : null}
         <h1>{article.title}</h1>
         <p>{article.summary}</p>
-        <dl>
+        <dl className="article-meta">
           <div>
             <dt>작성</dt>
             <dd>{article.author.displayName}</dd>
@@ -79,7 +79,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </div>
         </dl>
       </header>
-      <div>
+      <div className="article-content">
         <ContentBlocks blocks={article.content} />
       </div>
     </article>
