@@ -96,3 +96,83 @@ body > footer {
   padding-block: 1.5rem 2.5rem;
   border-top: 1px solid var(--line);
 }
+
+.home-intro,
+.home-feed {
+  max-width: 46rem;
+}
+
+.article-list h3,
+.article-list p {
+  margin-block: 0;
+}
+
+.home-intro {
+  margin-block-end: 3.5rem;
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+  background: var(--surface-soft);
+  border-left: 0.3rem solid var(--accent);
+}
+
+.home-intro > p:first-child {
+  margin-block: 0 0.35rem;
+  color: var(--accent-strong);
+  font-size: 0.82rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+}
+
+.home-intro h1 {
+  margin-block: 0;
+  font-size: clamp(2.2rem, 10vw, 4.5rem);
+  line-height: 1.08;
+}
+
+.home-intro > p:last-child {
+  max-width: 36rem;
+  margin-block: 1rem 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.home-feed > h2 {
+  margin-block: 0 1rem;
+  font-size: 1.35rem;
+}
+
+.article-list {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.article-list > li {
+  min-width: 0;
+  padding: 1.2rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.article-list h3 {
+  margin-block: 0.3rem;
+  font-size: 1.12rem;
+}
+
+.article-list time {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+@media (width >= 48rem) {
+  body > header {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .article-list > li {
+    padding: 1.5rem;
+  }
+}
