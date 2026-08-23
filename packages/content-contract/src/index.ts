@@ -18,3 +18,8 @@ export type {
   PublicSiteTaxonomy,
   Taxon,
 } from "./generated/taxonomy.js";
+export {
+  ContractError,
+  type ContractErrorCode,
+  type ContractIssue,
+} from "./errors.js";
