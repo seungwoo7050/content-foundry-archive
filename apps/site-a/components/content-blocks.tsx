@@ -2,7 +2,7 @@ import type { PublishedContentBlock } from "@content-foundry/content-contract";
 
 export type TextContentBlock = Extract<
   PublishedContentBlock,
-  { type: "heading" | "paragraph" }
+  { type: "heading" | "paragraph" | "list" }
 >;
 
 interface ContentBlocksProps {
@@ -22,6 +22,16 @@ export function ContentBlocks({ blocks }: ContentBlocksProps) {
       }
       case "paragraph":
         return <p key={`paragraph-${index}`}>{block.markdown}</p>;
+      case "list": {
+        const List = block.ordered ? "ol" : "ul";
+        return (
+          <List key={`list-${index}`}>
+            {block.items.map((item, itemIndex) => (
+              <li key={itemIndex}>{item}</li>
+            ))}
+          </List>
+        );
+      }
     }
   });
 }
