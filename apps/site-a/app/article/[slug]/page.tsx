@@ -1,6 +1,8 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ContentBlocks } from "../../../components/content-blocks";
+import { createArticleMetadata } from "../../../lib/article-metadata";
 import {
   findArticleBySlug,
   getArticleStaticParams,
@@ -15,6 +17,20 @@ interface ArticlePageProps {
 
 export function generateStaticParams() {
   return getArticleStaticParams(getSiteReleaseContext().bundle);
+}
+
+export async function generateMetadata({
+  params,
+}: ArticlePageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const context = getSiteReleaseContext();
+  const article = findArticleBySlug(context.bundle, slug);
+
+  if (!article) {
+    notFound();
+  }
+
+  return createArticleMetadata(context, article);
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
