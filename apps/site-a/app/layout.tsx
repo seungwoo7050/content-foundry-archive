@@ -27,7 +27,21 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
 
   return (
     <html lang={bundle.site.locale}>
-      <body>{children}</body>
+      <body>
+        <a href="#main-content">본문으로 바로가기</a>
+        <header>
+          {/* Static export intentionally uses native navigation without client code. */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a href="/" aria-label={`${bundle.site.name} 홈`}>
+            {bundle.site.name}
+          </a>
+          <p>{bundle.site.description}</p>
+        </header>
+        <main id="main-content">{children}</main>
+        <footer>
+          <small>© 2026 {bundle.site.name}</small>
+        </footer>
+      </body>
     </html>
   );
 }
