@@ -27,6 +27,14 @@ const fail = (message: string): never => {
   throw new ContractError("INTEGRITY_FAILED", message);
 };
 
+function readIntegrityFile(root: string, path: string): Buffer {
+  try {
+    return readFileSync(join(root, path));
+  } catch (error) {
+    return fail(`Cannot read ${path}: ${String(error)}`);
+  }
+}
+
 function parseChecksums(bytes: Buffer): readonly ChecksumEntry[] {
   const text = bytes.toString("utf8");
   if (!text.endsWith("\n") || text.includes("\r")) {
@@ -108,19 +116,25 @@ export function verifyReleaseIntegrity(
     );
   }
 
-  const checksums = readFileSync(join(root, "checksums.txt"));
+  const checksums = readIntegrityFile(root, "checksums.txt");
   const entries = parseChecksums(checksums);
   const listed = entries.map((entry) => entry.path);
-  const actual = collectFiles(root)
-    .filter((path) => path !== "release.json" && path !== "checksums.txt")
-    .sort((a, b) => Buffer.compare(Buffer.from(a), Buffer.from(b)));
+  let actual: readonly string[];
+  try {
+    actual = collectFiles(root)
+      .filter((path) => path !== "release.json" && path !== "checksums.txt")
+      .sort((a, b) => Buffer.compare(Buffer.from(a), Buffer.from(b)));
+  } catch (error) {
+    if (error instanceof ContractError) throw error;
+    return fail(`Cannot inspect bundle files: ${String(error)}`);
+  }
   if (JSON.stringify(actual) !== JSON.stringify(listed)) {
     fail("Bundle file set does not match checksums.txt");
   }
 
   for (const entry of entries) {
     const hash = createHash("sha256")
-      .update(readFileSync(join(root, entry.path)))
+      .update(readIntegrityFile(root, entry.path))
       .digest("hex");
     if (hash !== entry.hash) fail(`Checksum mismatch: ${entry.path}`);
   }

@@ -54,6 +54,14 @@ describe("verifyReleaseIntegrity", () => {
     );
   });
 
+  it("classifies a missing checksum manifest as an integrity failure", () => {
+    const root = copyFixture();
+    rmSync(join(root, "checksums.txt"));
+    expect(() => verifyReleaseIntegrity(root)).toThrowError(
+      expect.objectContaining({ code: "INTEGRITY_FAILED" }),
+    );
+  });
+
   it("rejects an unsupported version before checksum validation", () => {
     const root = copyFixture();
     const manifest = join(root, "release.json");
