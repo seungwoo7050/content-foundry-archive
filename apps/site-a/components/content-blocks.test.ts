@@ -44,7 +44,7 @@ describe("ContentBlocks", () => {
     expect(html).not.toContain("<script>");
   });
 
-  it("renders tables with semantic headers and rows", () => {
+  it("renders tables and embeds as semantic static fallbacks", () => {
     const html = renderToStaticMarkup(
       createElement(ContentBlocks, {
         blocks: [
@@ -54,6 +54,11 @@ describe("ContentBlocks", () => {
             columns: ["항목", "상태"],
             rows: [["인증서", "필수"]],
           },
+          {
+            type: "embed",
+            provider: "정부24 영상",
+            url: "https://example.com/video",
+          },
         ],
       }),
     );
@@ -61,5 +66,17 @@ describe("ContentBlocks", () => {
     expect(html).toContain("<caption>준비 항목</caption><thead>");
     expect(html).toContain('<th scope="col">항목</th>');
     expect(html).toContain("<tbody><tr><td>인증서</td><td>필수</td></tr></tbody>");
+    expect(html).toContain('href="https://example.com/video"');
+    expect(html).not.toContain("<iframe");
+  });
+
+  it("rejects unsafe embeds", () => {
+    expect(() =>
+      renderToStaticMarkup(
+        createElement(ContentBlocks, {
+          blocks: [{ type: "embed", provider: "unsafe", url: "javascript:alert(1)" }],
+        }),
+      ),
+    ).toThrow("Unsafe embed URL protocol");
   });
 });

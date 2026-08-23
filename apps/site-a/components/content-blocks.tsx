@@ -6,7 +6,10 @@ export type TextContentBlock = Exclude<
 >;
 
 interface ContentBlocksProps {
-  blocks: readonly (TextContentBlock | Extract<PublishedContentBlock, { type: "table" }>)[];
+  blocks: readonly (
+    | TextContentBlock
+    | Extract<PublishedContentBlock, { type: "table" | "embed" }>
+  )[];
 }
 
 const toneLabels = {
@@ -15,6 +18,13 @@ const toneLabels = {
   tip: "도움말",
   warning: "주의",
 } as const;
+
+function assertExternalHttpUrl(value: string) {
+  const url = new URL(value);
+  if (url.protocol !== "http:" && url.protocol !== "https:") {
+    throw new Error(`Unsafe embed URL protocol: ${url.protocol}`);
+  }
+}
 
 export function ContentBlocks({ blocks }: ContentBlocksProps) {
   return blocks.map((block, index) => {
@@ -79,6 +89,15 @@ export function ContentBlocks({ blocks }: ContentBlocksProps) {
               </tbody>
             </table>
           </div>
+        );
+      case "embed":
+        assertExternalHttpUrl(block.url);
+        return (
+          <p className="content-embed" key={`embed-${index}`}>
+            <a href={block.url} rel="noreferrer noopener" target="_blank">
+              {block.provider}에서 원본 보기 (새 창)
+            </a>
+          </p>
         );
     }
   });
