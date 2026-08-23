@@ -23,3 +23,8 @@ export {
   type ContractErrorCode,
   type ContractIssue,
 } from "./errors.js";
+export {
+  SUPPORTED_CONTRACT_VERSION,
+  type ContractDocumentKind,
+  validateContractDocument,
+} from "./validate-document.js";

@@ -12,10 +12,16 @@
     "generate:types": "node scripts/generate-types.mjs",
     "check:generated": "node scripts/generate-types.mjs --check",
     "lint": "node --check scripts/generate-types.mjs",
+    "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1"
   },
   "devDependencies": {
     "@types/node": "24.13.3",
-    "json-schema-to-typescript": "15.0.4"
+    "json-schema-to-typescript": "15.0.4",
+    "vitest": "4.1.11"
   }
 }
