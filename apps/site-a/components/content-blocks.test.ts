@@ -2,7 +2,11 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { ContentBlocks, type TextContentBlock } from "./content-blocks";
+import {
+  ContentBlocks,
+  type TextContentBlock,
+  UnsupportedContentBlockError,
+} from "./content-blocks";
 
 describe("ContentBlocks", () => {
   it("renders text blocks with semantic elements", () => {
@@ -70,7 +74,7 @@ describe("ContentBlocks", () => {
     expect(html).not.toContain("<iframe");
   });
 
-  it("rejects unsafe embeds", () => {
+  it("rejects unsafe embeds and unsupported images", () => {
     expect(() =>
       renderToStaticMarkup(
         createElement(ContentBlocks, {
@@ -78,5 +82,13 @@ describe("ContentBlocks", () => {
         }),
       ),
     ).toThrow("Unsafe embed URL protocol");
+
+    expect(() =>
+      renderToStaticMarkup(
+        createElement(ContentBlocks, {
+          blocks: [{ type: "image", mediaId: "MED-000045" }],
+        }),
+      ),
+    ).toThrow(UnsupportedContentBlockError);
   });
 });

@@ -6,10 +6,7 @@ export type TextContentBlock = Exclude<
 >;
 
 interface ContentBlocksProps {
-  blocks: readonly (
-    | TextContentBlock
-    | Extract<PublishedContentBlock, { type: "table" | "embed" }>
-  )[];
+  blocks: readonly PublishedContentBlock[];
 }
 
 const toneLabels = {
@@ -18,6 +15,15 @@ const toneLabels = {
   tip: "도움말",
   warning: "주의",
 } as const;
+
+export class UnsupportedContentBlockError extends Error {
+  readonly code = "CONTENT_BLOCK_UNSUPPORTED";
+
+  constructor(readonly blockType: PublishedContentBlock["type"]) {
+    super(`Unsupported content block: ${blockType}`);
+    this.name = "UnsupportedContentBlockError";
+  }
+}
 
 function assertExternalHttpUrl(value: string) {
   const url = new URL(value);
@@ -99,6 +105,8 @@ export function ContentBlocks({ blocks }: ContentBlocksProps) {
             </a>
           </p>
         );
+      case "image":
+        throw new UnsupportedContentBlockError(block.type);
     }
   });
 }
