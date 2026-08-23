@@ -333,3 +333,10 @@ body > footer {
 .content-table-scroll th {
   background: var(--surface-soft);
 }
+
+.content-embed {
+  margin-block: 1.75rem;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
