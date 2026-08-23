@@ -15,6 +15,7 @@ describe("ContentBlocks", () => {
         markdown: "공식 안내를 확인하세요.",
         attribution: "정부24",
       },
+      { type: "callout", tone: "warning", markdown: "마감일을 확인하세요." },
     ];
 
     const html = renderToStaticMarkup(createElement(ContentBlocks, { blocks }));
@@ -23,6 +24,7 @@ describe("ContentBlocks", () => {
     expect(html).toContain("<ol><li>로그인</li><li>신청</li></ol>");
     expect(html).toContain("<blockquote><p>공식 안내를 확인하세요.</p></blockquote>");
     expect(html).toContain("<figcaption>정부24</figcaption>");
+    expect(html).toContain('aria-label="주의" data-tone="warning"');
   });
 
   it("escapes markdown fields as plain text", () => {

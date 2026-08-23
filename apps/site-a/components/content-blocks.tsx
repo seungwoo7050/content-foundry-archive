@@ -1,13 +1,20 @@
 import type { PublishedContentBlock } from "@content-foundry/content-contract";
 
-export type TextContentBlock = Extract<
+export type TextContentBlock = Exclude<
   PublishedContentBlock,
-  { type: "heading" | "paragraph" | "list" | "quote" }
+  { type: "embed" | "image" | "table" }
 >;
 
 interface ContentBlocksProps {
   blocks: readonly TextContentBlock[];
 }
+
+const toneLabels = {
+  danger: "중요",
+  info: "안내",
+  tip: "도움말",
+  warning: "주의",
+} as const;
 
 export function ContentBlocks({ blocks }: ContentBlocksProps) {
   return blocks.map((block, index) => {
@@ -40,6 +47,12 @@ export function ContentBlocks({ blocks }: ContentBlocksProps) {
             </blockquote>
             {block.attribution ? <figcaption>{block.attribution}</figcaption> : null}
           </figure>
+        );
+      case "callout":
+        return (
+          <aside aria-label={toneLabels[block.tone]} data-tone={block.tone} key={`callout-${index}`}>
+            <p>{block.markdown}</p>
+          </aside>
         );
     }
   });
