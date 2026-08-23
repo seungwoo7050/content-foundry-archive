@@ -1,0 +1,5 @@
+{
+  "items": [
+    {"id": "external", "label": "외부", "path": "https://example.com", "children": []}
+  ]
+}

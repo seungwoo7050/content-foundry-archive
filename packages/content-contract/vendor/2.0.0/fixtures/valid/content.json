@@ -1,0 +1,15 @@
+[
+  {"type": "heading", "id": "prepare", "level": 2, "text": "준비하기"},
+  {"type": "paragraph", "markdown": "필요한 준비물을 확인합니다."},
+  {"type": "list", "ordered": true, "items": ["로그인", "신청"]},
+  {"type": "quote", "markdown": "공식 안내를 확인하세요.", "attribution": null},
+  {"type": "callout", "tone": "warning", "markdown": "마감일을 확인하세요."},
+  {"type": "image", "mediaId": "MED-000045", "caption": "신청 화면"},
+  {
+    "type": "table",
+    "caption": "준비물",
+    "columns": ["항목", "필수"],
+    "rows": [["인증 수단", "예"]]
+  },
+  {"type": "embed", "provider": "youtube", "url": "https://example.com/video"}
+]

@@ -1,0 +1,8 @@
+{
+  "contractVersion": "2.0.0",
+  "sourceRepository": "https://github.com/seungwoo7050/content-foundry-archive.git",
+  "sourceCommit": "ad5942e8a534b92d3af0779db359360bff5bb94b",
+  "releaseCommit": "e84e000ca0d1c21706eac86f1450701b5ed6a631",
+  "checksumsSha256": "0e3ae0a3561587f380dd1dce866ad9af2751c332266acee50549b7b888f5255e",
+  "manifestSha256": "53e6b40d4fc0f6cc840b343c3f20d4d4f7c43cb9a0cd0a8d41814b277c9b4e42"
+}

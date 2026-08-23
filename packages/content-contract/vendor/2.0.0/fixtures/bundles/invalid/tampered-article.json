@@ -1,0 +1,5 @@
+{
+  "overlayPath": "articles/ART-000123.json",
+  "operation": "replace-title-with-tampered-value",
+  "expectedError": "INTEGRITY_FAILED"
+}
