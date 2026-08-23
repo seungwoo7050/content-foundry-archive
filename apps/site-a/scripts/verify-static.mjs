@@ -3,8 +3,9 @@ import {
   existsSync,
   readFileSync,
   readdirSync,
+  statSync,
 } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -36,6 +37,48 @@ function assertCanonical(html, expected) {
     html,
     new RegExp(`<link rel="canonical" href="${escapePattern(expected)}"`),
   );
+}
+
+function assertSafeScripts(label, html) {
+  for (const match of html.matchAll(/<script\b[^>]*\bsrc="([^"]+)"[^>]*>/gi)) {
+    assert.ok(
+      match[1].startsWith("/_next/"),
+      `${label} includes an external script source: ${match[1]}`,
+    );
+  }
+
+  for (const match of html.matchAll(
+    /<script\b(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi,
+  )) {
+    const source = match[1].trim();
+    assert.match(
+      source,
+      /^(?:\(self\.__next_f=self\.__next_f\|\|\[\]\)\.push|self\.__next_f\.push)/,
+      `${label} includes a non-Next inline script`,
+    );
+  }
+}
+
+function assertSafeHtml(label, html) {
+  assert.doesNotMatch(html, /<iframe\b/i, `${label} includes an iframe`);
+  assert.doesNotMatch(html, /\son(?:click|error|load)=/i, `${label} includes an event handler`);
+  assert.doesNotMatch(html, /javascript:/i, `${label} includes a JavaScript URL`);
+  assert.doesNotMatch(
+    html,
+    /googletagmanager|google-analytics|doubleclick|adsbygoogle|data-ad-client/i,
+    `${label} includes ads or analytics`,
+  );
+  assertSafeScripts(label, html);
+}
+
+function listSourceFiles(root) {
+  return readdirSync(root).flatMap((entry) => {
+    const path = join(root, entry);
+    if (statSync(path).isDirectory()) {
+      return listSourceFiles(path);
+    }
+    return [".ts", ".tsx"].includes(extname(path)) ? [path] : [];
+  });
 }
 
 const home = readArtifact("index.html");
@@ -75,4 +118,20 @@ assert.ok(!existsSync(join(outRoot, "article", "missing-article.html")));
 
 assert.match(home, /property="og:image" content="https:\/\/example\.com\/og\.png"/);
 assert.doesNotMatch(article, /(?:og:image|twitter:image|og\.png)/);
+assertSafeHtml("home", home);
+assertSafeHtml("article", article);
+assertSafeHtml("404", notFound);
+
+for (const sourceRoot of ["app", "components", "lib"]) {
+  for (const sourcePath of listSourceFiles(join(appRoot, sourceRoot))) {
+    const source = readFileSync(sourcePath, "utf8");
+    assert.doesNotMatch(source, /^["']use client["'];/m, `${sourcePath} is a client module`);
+    assert.doesNotMatch(
+      source,
+      /dangerouslySetInnerHTML/,
+      `${sourcePath} executes raw HTML`,
+    );
+  }
+}
+
 console.log("Site A static export verified.");
