@@ -22,6 +22,15 @@ function escapePattern(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function readMeta(html, name) {
+  const pattern = new RegExp(
+    `<meta name="${escapePattern(name)}" content="([^"]+)"`,
+  );
+  const value = html.match(pattern)?.[1];
+  assert.ok(value, `Missing metadata: ${name}`);
+  return value;
+}
+
 function assertCanonical(html, expected) {
   assert.match(
     html,
@@ -32,7 +41,7 @@ function assertCanonical(html, expected) {
 const home = readArtifact("index.html");
 const article = readArtifact(articleRelativePath);
 const notFound = readArtifact("404.html");
-JSON.parse(readArtifact("_release.json"));
+const identity = JSON.parse(readArtifact("_release.json"));
 
 assert.match(home, /<h1 id="home-title">생활메모<\/h1>/);
 assert.match(article, /<h1>정부24 주민등록등본 발급 방법<\/h1>/);
@@ -45,6 +54,18 @@ assertCanonical(
   article,
   `https://example.com/article/${articleSlug}`,
 );
+
+const identityFields = {
+  releaseId: "content-foundry-release-id",
+  siteId: "content-foundry-site-id",
+  contractVersion: "content-foundry-contract-version",
+  bundleChecksum: "content-foundry-bundle-checksum",
+};
+assert.deepEqual(Object.keys(identity).sort(), Object.keys(identityFields).sort());
+for (const [field, metaName] of Object.entries(identityFields)) {
+  assert.equal(readMeta(home, metaName), identity[field]);
+  assert.equal(readMeta(article, metaName), identity[field]);
+}
 
 const articleArtifacts = readdirSync(join(outRoot, "article"))
   .filter((name) => name.endsWith(".html"))
