@@ -6,6 +6,8 @@ import {
 import { createHash } from "node:crypto";
 import { join, posix, relative, sep } from "node:path";
 
+import canonicalize from "canonicalize";
+
 import { ContractError } from "./errors.js";
 import type { PublicSiteReleaseManifest } from "./generated/release.js";
 import {
@@ -13,6 +15,7 @@ import {
   validateContractDocument,
 } from "./validate-document.js";
 
+const ZERO_CHECKSUM = `sha256:${"0".repeat(64)}`;
 const MANIFEST_LINE = /^([0-9a-f]{64})  ([^\\]+)$/;
 
 interface ChecksumEntry {
@@ -122,5 +125,22 @@ export function verifyReleaseIntegrity(
     if (hash !== entry.hash) fail(`Checksum mismatch: ${entry.path}`);
   }
 
+  const expected = release.bundleChecksum;
+  release.bundleChecksum = ZERO_CHECKSUM;
+  const normalized = canonicalize(release);
+  if (normalized === undefined) {
+    throw new ContractError(
+      "INTEGRITY_FAILED",
+      "release.json cannot be canonicalized",
+    );
+  }
+  const actualBundleChecksum = `sha256:${createHash("sha256")
+    .update(normalized)
+    .update("\n")
+    .update(checksums)
+    .digest("hex")}`;
+  if (actualBundleChecksum !== expected) fail("Bundle checksum mismatch");
+
+  release.bundleChecksum = expected;
   return validateContractDocument("release", release);
 }
