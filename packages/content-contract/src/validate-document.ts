@@ -1,8 +1,17 @@
-import { readFileSync } from "node:fs";
-
 import { Ajv2020, type ErrorObject, type ValidateFunction } from "ajv/dist/2020.js";
 import * as formatsModule from "ajv-formats";
 import type { FormatsPlugin } from "ajv-formats";
+
+import articleSchema from "../vendor/2.0.0/schemas/article.schema.json" with { type: "json" };
+import contentBlockSchema from "../vendor/2.0.0/schemas/content-block.schema.json" with { type: "json" };
+import contentSchema from "../vendor/2.0.0/schemas/content.schema.json" with { type: "json" };
+import mediaManifestSchema from "../vendor/2.0.0/schemas/media-manifest.schema.json" with { type: "json" };
+import navigationSchema from "../vendor/2.0.0/schemas/navigation.schema.json" with { type: "json" };
+import pageSchema from "../vendor/2.0.0/schemas/page.schema.json" with { type: "json" };
+import redirectsSchema from "../vendor/2.0.0/schemas/redirects.schema.json" with { type: "json" };
+import releaseSchema from "../vendor/2.0.0/schemas/release.schema.json" with { type: "json" };
+import siteSchema from "../vendor/2.0.0/schemas/site.schema.json" with { type: "json" };
+import taxonomySchema from "../vendor/2.0.0/schemas/taxonomy.schema.json" with { type: "json" };
 
 import { ContractError } from "./errors.js";
 import type {
@@ -35,7 +44,6 @@ interface ContractDocuments {
 
 export type ContractDocumentKind = keyof ContractDocuments;
 
-const schemaRoot = new URL("../vendor/2.0.0/schemas/", import.meta.url);
 const ajv = new Ajv2020({ allErrors: true, strict: true });
 const addFormats = formatsModule.default as unknown as FormatsPlugin;
 addFormats(ajv);
@@ -53,13 +61,23 @@ const schemaNames = [
   "taxonomy",
 ] as const satisfies readonly ContractDocumentKind[];
 
+const schemas: Record<ContractDocumentKind, object> = {
+  article: articleSchema,
+  "content-block": contentBlockSchema,
+  content: contentSchema,
+  "media-manifest": mediaManifestSchema,
+  navigation: navigationSchema,
+  page: pageSchema,
+  redirects: redirectsSchema,
+  release: releaseSchema,
+  site: siteSchema,
+  taxonomy: taxonomySchema,
+};
+
 const validators = new Map<ContractDocumentKind, ValidateFunction>();
 
 for (const name of schemaNames) {
-  const schema = JSON.parse(
-    readFileSync(new URL(`${name}.schema.json`, schemaRoot), "utf8"),
-  ) as object;
-  ajv.addSchema(schema, name);
+  ajv.addSchema(schemas[name], name);
 }
 
 for (const name of schemaNames) {
