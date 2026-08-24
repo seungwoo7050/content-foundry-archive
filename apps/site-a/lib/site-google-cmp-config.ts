@@ -18,10 +18,11 @@ const disabledConfig: SiteGoogleCmpConfig = Object.freeze({
 });
 
 export function resolveSiteGoogleCmpConfig(
+  production: boolean,
   consent: ConsentBuildConfig,
   releaseAdsIdentity: unknown,
 ): SiteGoogleCmpConfig {
-  if (consent.provider === "disabled") return disabledConfig;
+  if (!production || consent.provider === "disabled") return disabledConfig;
   if (
     typeof releaseAdsIdentity !== "object"
     || releaseAdsIdentity === null

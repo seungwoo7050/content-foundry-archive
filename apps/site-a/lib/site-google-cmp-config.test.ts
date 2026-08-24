@@ -10,7 +10,7 @@ const consent = {
 
 describe("Site A Google CMP bootstrap configuration", () => {
   it("keeps disabled consent identity-free", () => {
-    expect(resolveSiteGoogleCmpConfig(
+    expect(resolveSiteGoogleCmpConfig(true,
       { provider: "disabled", configRevision: null },
       "not-an-identity",
     )).toEqual({ provider: "disabled", publicClientId: null });
@@ -19,7 +19,7 @@ describe("Site A Google CMP bootstrap configuration", () => {
   it.each([false, true])(
     "binds a valid public identity independently of ad delivery %s",
     (enabled) => {
-      expect(resolveSiteGoogleCmpConfig(consent, {
+      expect(resolveSiteGoogleCmpConfig(true, consent, {
         provider: "adsense",
         enabled,
         publicClientId: "ca-pub-1234567890123456",
@@ -29,6 +29,14 @@ describe("Site A Google CMP bootstrap configuration", () => {
       });
     },
   );
+
+  it("keeps template and preview builds provider-free", () => {
+    expect(resolveSiteGoogleCmpConfig(false, consent, {
+      provider: "adsense",
+      enabled: true,
+      publicClientId: "ca-pub-1234567890123456",
+    })).toEqual({ provider: "disabled", publicClientId: null });
+  });
 
   it.each([
     undefined,
@@ -43,7 +51,7 @@ describe("Site A Google CMP bootstrap configuration", () => {
       extra: true,
     },
   ])("fails closed for a mismatched release identity %#", (identity) => {
-    expect(() => resolveSiteGoogleCmpConfig(consent, identity)).toThrow(
+    expect(() => resolveSiteGoogleCmpConfig(true, consent, identity)).toThrow(
       AdvertisingConfigError,
     );
   });
