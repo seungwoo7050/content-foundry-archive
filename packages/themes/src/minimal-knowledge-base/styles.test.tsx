@@ -48,4 +48,18 @@ describe("Minimal Knowledge Base styles", () => {
       /ranking|popular|reading.?time|verified|newsletter|save/i,
     );
   });
+
+  it("limits the home surface card to the final top-level about section", () => {
+    const aboutSelector =
+      ".kb-home-route>section[aria-labelledby]:last-child";
+
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(`${aboutSelector}{`);
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(`${aboutSelector} h2{`);
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      `${aboutSelector} p:last-child{`,
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).not.toContain(
+      ".kb-home-route>section[aria-labelledby]{",
+    );
+  });
 });
