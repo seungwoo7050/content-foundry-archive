@@ -1,8 +1,18 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-import { loadV3ReleaseBundle } from "@content-foundry/content-contract";
+import {
+  loadV3ReleaseBundle,
+  type MediaManifest,
+} from "@content-foundry/content-contract";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { getGeneratedRoutes } from "./generated-routes";
@@ -19,6 +29,15 @@ const bundle = loadV3ReleaseBundle(fixture, {
     nicheComponentRegistry: { "site-a": [] },
   }),
 });
+const v2Manifest: MediaManifest = {
+  items: [
+    {
+      ...bundle.mediaManifest.items[0]!,
+      source: "bundle",
+      path: "media/v2-source.png",
+    },
+  ],
+};
 const payloads = [
   "iVBORw0KGgoAAAANSUhEUgAAABAAAAAJCAYAAAA7KqwyAAAAFklEQVR42mO4/erff0oww6gBowYAMQBJjx0/o2g2tAAAAABJRU5ErkJggg==",
   "iVBORw0KGgoAAAANSUhEUgAAABAAAAAJCAYAAAA7KqwyAAAAFklEQVR42mO48+f5f0oww6gBowYAMQDDohr/igFCLQAAAABJRU5ErkJggg==",
@@ -36,6 +55,25 @@ afterEach(() => {
 });
 
 describe("prepareSiteMedia", () => {
+  it("resolves and exports a v2 bundle media source", async () => {
+    const releaseDirectory = outputRoot();
+    const publicDirectory = outputRoot();
+    const source = v2Manifest.items[0]!;
+    mkdirSync(join(releaseDirectory, "media"));
+    writeFileSync(join(releaseDirectory, source.path), payloads[0]!);
+    const immutableObjectLoader = vi.fn(async () => null);
+
+    const assets = await prepareSiteMedia(
+      { mediaManifest: v2Manifest },
+      { immutableObjectLoader, publicDirectory, releaseDirectory },
+    );
+
+    expect([...assets.keys()]).toEqual([source.id]);
+    expect(immutableObjectLoader).not.toHaveBeenCalled();
+    expect(readFileSync(join(publicDirectory, assets.get(source.id)!.fallback.relativePath)))
+      .toEqual(payloads[0]);
+  });
+
   it("resolves, verifies, transforms, exports, and indexes every v3 image", async () => {
     const objects = new Map(
       bundle.mediaManifest.items.map((item, index) => [item.path, payloads[index]!]),

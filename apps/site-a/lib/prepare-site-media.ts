@@ -1,4 +1,4 @@
-import type { LoadedReleaseBundleV3 } from "@content-foundry/content-contract";
+import type { LoadedSupportedReleaseBundle } from "@content-foundry/content-contract";
 import {
   createBundleMediaSourceReader,
   createImmutableObjectMediaSourceReader,
@@ -14,8 +14,10 @@ export interface PrepareSiteMediaOptions {
   readonly releaseDirectory: string;
 }
 
+type SiteMediaBundle = Pick<LoadedSupportedReleaseBundle, "mediaManifest">;
+
 export async function prepareSiteMedia(
-  bundle: LoadedReleaseBundleV3,
+  bundle: SiteMediaBundle,
   options: PrepareSiteMediaOptions,
 ): Promise<ReadonlyMap<string, ResponsiveImageAsset>> {
   const sources = await resolveImageManifest(bundle.mediaManifest, {

@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 
 import {
   ContractError,
-  type LoadedReleaseBundleV3,
+  type LoadedSupportedReleaseBundle,
 } from "@content-foundry/content-contract";
 import {
   createFilesystemImmutableObjectLoader,
@@ -23,6 +23,11 @@ export interface PrepareV3SiteBuildOptions extends SiteBuildArtifactPaths {
   readonly immutableObjectDirectory: string;
   readonly releaseDirectory: string;
 }
+
+type SiteBuildMediaBundle = Pick<
+  LoadedSupportedReleaseBundle,
+  "mediaManifest" | "release"
+>;
 
 function failure(message: string): ContractError {
   return new ContractError("BUILD_FAILED", message, [
@@ -66,7 +71,7 @@ function normalizeFailure(error: unknown): never {
 }
 
 export async function prepareV3SiteBuildArtifacts(
-  bundle: LoadedReleaseBundleV3,
+  bundle: SiteBuildMediaBundle,
   options: PrepareV3SiteBuildOptions,
 ): Promise<readonly ResponsiveImageAsset[]> {
   const buildDirectory = dirname(options.projectionPath);
