@@ -10,14 +10,17 @@ import { renderInformationPortalContent } from "./content.js";
 import { InformationPortalShell } from "./shell.js";
 import { renderInformationPortalState } from "./state.js";
 
-function renderContent(model: ThemePageViewModel): ReactNode {
+function renderContent(
+  model: ThemePageViewModel,
+  context: ThemeRenderContext,
+): ReactNode {
   switch (model.route.kind) {
     case "home":
     case "category":
     case "article":
     case "static-page":
     case "archive":
-      return renderInformationPortalContent(model.route);
+      return renderInformationPortalContent(model.route, context);
     case "search":
     case "not-found":
     case "retired":
@@ -39,7 +42,7 @@ function renderRoute(
       routeKind={model.route.kind}
       shell={model.shell}
     >
-      {renderContent(model)}
+      {renderContent(model, context)}
     </InformationPortalShell>
   );
 }

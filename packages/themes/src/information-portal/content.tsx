@@ -1,12 +1,17 @@
 import type { ReactNode } from "react";
 
 import type { ContentRouteViewModel } from "../content-route-view-model.js";
+import {
+  getThemeAdSlot,
+  type ThemeAdSlotContext,
+} from "../theme-ad-slot.js";
 import { ThemeArticleList } from "../theme-links.js";
 import { InformationPortalArticle } from "./article.js";
 import { PortalRouteIntro } from "./shell.js";
 
 export function renderInformationPortalContent(
   route: ContentRouteViewModel,
+  context: ThemeAdSlotContext = {},
 ): ReactNode {
   switch (route.kind) {
     case "home":
@@ -29,6 +34,7 @@ export function renderInformationPortalContent(
           <section aria-labelledby="ip-latest-heading" className="ip-list">
             <h2 id="ip-latest-heading">{route.articleSectionHeading}</h2>
             <ThemeArticleList articles={route.articles} headingLevel={3} />
+            {getThemeAdSlot(context, "home-feed")}
           </section>
         </div>
       );
@@ -49,7 +55,7 @@ export function renderInformationPortalContent(
         </div>
       );
     case "article":
-      return <InformationPortalArticle route={route} />;
+      return <InformationPortalArticle context={context} route={route} />;
     case "static-page":
       return <article className="ip-stack"><PortalRouteIntro route={route} /><div className="ip-panel ip-body">{route.body}</div></article>;
     case "archive":

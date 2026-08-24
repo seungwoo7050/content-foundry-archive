@@ -1,4 +1,8 @@
 import type { ArticleRouteViewModel } from "../content-route-view-model.js";
+import {
+  getThemeAdSlot,
+  type ThemeAdSlotContext,
+} from "../theme-ad-slot.js";
 import { ThemeArticleList } from "../theme-links.js";
 import { PortalRouteIntro } from "./shell.js";
 
@@ -43,8 +47,10 @@ function PortalEvidence({ route }: { readonly route: ArticleRouteViewModel }) {
 }
 
 export function InformationPortalArticle({
+  context = {},
   route,
 }: {
+  readonly context?: ThemeAdSlotContext;
   readonly route: ArticleRouteViewModel;
 }) {
   return (
@@ -54,6 +60,9 @@ export function InformationPortalArticle({
       <section aria-labelledby="ip-summary" className="ip-panel ip-summary">
         <h2 id="ip-summary">핵심 안내</h2><p>{route.description}</p>
       </section>
+      {route.advertisingEligible
+        ? getThemeAdSlot(context, "article-after-summary")
+        : null}
       {route.hero ? <div className="ip-panel ip-body">{route.hero}</div> : null}
       <div className="ip-article-layout">
         <div className="ip-article-main">
@@ -68,6 +77,9 @@ export function InformationPortalArticle({
               <ol>{route.toc.map((item) => <li data-level={item.level} key={item.id}><a href={`#${item.id}`}>{item.label}</a></li>)}</ol>
             </nav>
           ) : null}
+          {route.advertisingEligible
+            ? getThemeAdSlot(context, "desktop-sidebar")
+            : null}
         </aside>
       </div>
       {route.relatedSectionHeading && route.relatedArticles.length > 0 ? (
@@ -76,6 +88,9 @@ export function InformationPortalArticle({
           <ThemeArticleList articles={route.relatedArticles} headingLevel={3} />
         </section>
       ) : null}
+      {route.advertisingEligible
+        ? getThemeAdSlot(context, "article-end")
+        : null}
     </article>
   );
 }

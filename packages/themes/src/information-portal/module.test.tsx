@@ -83,4 +83,68 @@ describe("Information Portal route and skin matrix", () => {
       });
     }
   }
+
+  it("places only the four declared manual slots on eligible routes", () => {
+    const adSlots = {
+      "home-feed": <div data-slot="home-feed" />,
+      "article-after-summary": <div data-slot="article-after-summary" />,
+      "article-mid-1": <div data-slot="article-mid-1" />,
+      "article-end": <div data-slot="article-end" />,
+      "desktop-sidebar": <div data-slot="desktop-sidebar" />,
+    } as const;
+    const context = {
+      skinId: "calm-blue" as const,
+      colors: SKIN_TOKENS["calm-blue"],
+      adSlots,
+    };
+    const home = renderToStaticMarkup(
+      informationPortalTheme.renderRoute({ shell, route: routes[0]! }, context),
+    );
+    const article = renderToStaticMarkup(
+      informationPortalTheme.renderRoute({ shell, route: routes[2]! }, context),
+    );
+
+    expect(home.match(/data-slot=/g)).toHaveLength(1);
+    expect(home).toContain('data-slot="home-feed"');
+    expect(home.indexOf("생활 안내")).toBeLessThan(home.indexOf('data-slot="home-feed"'));
+    expect(article.match(/data-slot=/g)).toHaveLength(3);
+    expect(article.indexOf('id="ip-summary"')).toBeLessThan(
+      article.indexOf('data-slot="article-after-summary"'),
+    );
+    expect(article).toMatch(
+      /<aside aria-label="글 탐색과 안내 정보"[^>]*>[\s\S]*data-slot="desktop-sidebar"[\s\S]*<\/aside>/,
+    );
+    expect(article.indexOf("관련 안내")).toBeLessThan(
+      article.indexOf('data-slot="article-end"'),
+    );
+    expect(`${home}${article}`).not.toContain('data-slot="article-mid-1"');
+    for (const route of routes.filter(
+      ({ kind }) => kind !== "home" && kind !== "article",
+    )) {
+      expect(renderToStaticMarkup(
+        informationPortalTheme.renderRoute({ shell, route }, context),
+      )).not.toContain("data-slot=");
+    }
+  });
+
+  it("omits article slots when the article is not advertising eligible", () => {
+    const article = routes[2]!;
+    if (article.kind !== "article") throw new Error("Expected article fixture");
+    const html = renderToStaticMarkup(
+      informationPortalTheme.renderRoute(
+        { shell, route: { ...article, advertisingEligible: false } },
+        {
+          skinId: "calm-blue",
+          colors: SKIN_TOKENS["calm-blue"],
+          adSlots: {
+            "article-after-summary": <div data-slot="summary" />,
+            "article-end": <div data-slot="end" />,
+            "desktop-sidebar": <div data-slot="sidebar" />,
+          },
+        },
+      ),
+    );
+
+    expect(html).not.toContain("data-slot=");
+  });
 });
