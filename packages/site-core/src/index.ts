@@ -6,6 +6,12 @@ export {
   type BuildTargetOptions,
   type ReleaseMode,
 } from "./release-mode.js";
+export {
+  CONSENT_PROVIDERS,
+  resolveConsentBuildConfig,
+  type ConsentBuildConfig,
+  type ConsentProvider,
+} from "./consent-config.js";
 export { parseProductionOrigins } from "./production-origins.js";
 export {
   CONSENT_STATE_VERSION,
