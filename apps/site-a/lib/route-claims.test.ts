@@ -134,6 +134,38 @@ describe("generated route claims", () => {
   });
 
   it.each([
+    ["/archive/page/2", "archive-page", "generated archive page 2"],
+    [
+      "/category/daily-admin/page/2",
+      "category-page",
+      "/taxonomy/categories/0/slug page 2",
+    ],
+  ])("rejects a content-page collision at %s", (path, kind, source) => {
+    const paginatedBundle = withArticleCount(13);
+    const page = paginatedBundle.pages[0];
+    if (!page) throw new Error("Site A fixture page is missing");
+
+    expect(() => getRouteClaims({
+      ...paginatedBundle,
+      pages: [
+        ...paginatedBundle.pages,
+        {
+          ...page,
+          id: `collision-${kind}`,
+          path,
+          seo: { ...page.seo, canonicalPath: path },
+        },
+      ],
+    })).toThrowError(expect.objectContaining({
+      code: "REFERENCE_INVALID",
+      issues: [{
+        path: "/pages/1/path",
+        message: `route ${path} is already claimed by ${kind} at ${source}`,
+      }],
+    }));
+  });
+
+  it.each([
     ["/archive", "fixed-archive", "fixed archive route"],
     ["/search", "fixed-search", "fixed search route"],
     ["/404", "fixed-not-found", "fixed not-found route"],
