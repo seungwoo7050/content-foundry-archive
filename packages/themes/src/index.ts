@@ -29,3 +29,10 @@ export {
   type HomeRouteViewModel,
   type StaticPageRouteViewModel,
 } from "./content-route-view-model.js";
+export {
+  HTML_ROUTE_KINDS,
+  type HtmlRouteKind,
+  type HtmlRouteViewModel,
+  type ThemePageViewModel,
+  type ThemeRenderContext,
+} from "./html-route-view-model.js";
