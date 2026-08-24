@@ -1,6 +1,7 @@
 import type { ReleaseMode } from "@content-foundry/site-core";
 import type { LinkViewModel } from "@content-foundry/themes";
 
+import { hasMeaningfulPublicContent } from "./meaningful-public-content";
 import { SiteLaunchReadinessError } from "./site-launch-readiness-error";
 
 export const REQUIRED_SITE_A_PAGE_PATHS = Object.freeze([
@@ -35,7 +36,7 @@ export function validateSiteLaunchContent(
     if (!page) {
       issues.push(`${path} page is required`);
     } else {
-      if (page.content.length === 0) {
+      if (!hasMeaningfulPublicContent(page.content)) {
         issues.push(`${path} page content is empty`);
       }
       if (page.seo.index !== true || page.seo.follow !== true) {

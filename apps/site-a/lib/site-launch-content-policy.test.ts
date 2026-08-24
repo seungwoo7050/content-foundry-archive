@@ -13,7 +13,7 @@ import { SiteLaunchReadinessError } from "./site-launch-readiness-error";
 
 const createPage = (path: string) => ({
   path,
-  content: [{ type: "paragraph" }],
+  content: [{ type: "paragraph", markdown: `${path} 운영 안내` }],
   seo: { index: true, follow: true },
 });
 const completeSource = {
@@ -51,7 +51,14 @@ describe("Site A launch content policy", () => {
       pages: completeSource.pages.flatMap((page) => {
         if (page.path === "/contact") return [];
         if (page.path !== "/privacy") return [page];
-        return [{ ...page, content: [], seo: { index: false, follow: true } }];
+        return [{
+          ...page,
+          content: [
+            { type: "heading", id: "privacy", level: 2, text: "개인정보" },
+            { type: "paragraph", markdown: "   " },
+          ],
+          seo: { index: false, follow: true },
+        }];
       }),
     };
     const footer = completeFooter.filter(({ href }) => href !== "/privacy");
