@@ -20,7 +20,7 @@ export function ArticleReaderActions({
       {localBookmarksEnabled ? (
         <ArticleBookmark siteId={siteId} articleId={articleId} />
       ) : null}
-      <ArticleShareButton canonicalUrl={canonicalUrl} />
+      <ArticleShareButton articleId={articleId} canonicalUrl={canonicalUrl} />
       <ArticleFeedback />
     </section>
   );

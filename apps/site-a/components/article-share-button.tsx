@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { emitAnalyticsEvent } from "./analytics-event-dispatcher";
+
 export type ArticleShareResult =
   | "shared"
   | "copied"
@@ -50,6 +52,22 @@ export async function requestArticleShare(
   }
 }
 
+export async function requestArticleShareWithAnalytics(
+  target: ArticleShareTarget,
+  canonicalUrl: string,
+  articleId: string,
+  emit: typeof emitAnalyticsEvent = emitAnalyticsEvent,
+): Promise<ArticleShareResult> {
+  const result = await requestArticleShare(target, canonicalUrl);
+  const channel = result === "shared"
+    ? "native"
+    : result === "copied" ? "copy-link" : null;
+  if (channel !== null) {
+    emit({ eventName: "share_click", articleId, channel });
+  }
+  return result;
+}
+
 const RESULT_LABELS: Readonly<Record<ArticleShareResult, string>> = {
   shared: "공유했습니다.",
   copied: "글 주소를 복사했습니다.",
@@ -58,14 +76,20 @@ const RESULT_LABELS: Readonly<Record<ArticleShareResult, string>> = {
 };
 
 export function ArticleShareButton({
+  articleId,
   canonicalUrl,
 }: {
+  readonly articleId: string;
   readonly canonicalUrl: string;
 }) {
   const [result, setResult] = useState<ArticleShareResult | null>(null);
 
   async function handleShare() {
-    setResult(await requestArticleShare(navigator, canonicalUrl));
+    setResult(await requestArticleShareWithAnalytics(
+      navigator,
+      canonicalUrl,
+      articleId,
+    ));
   }
 
   return (

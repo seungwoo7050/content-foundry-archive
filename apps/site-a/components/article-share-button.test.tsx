@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   ArticleShareButton,
   requestArticleShare,
+  requestArticleShareWithAnalytics,
 } from "./article-share-button";
 
 describe("article share action", () => {
@@ -41,9 +42,36 @@ describe("article share action", () => {
     ).resolves.toBe("unavailable");
   });
 
+  it("records successful channels without recording cancelled attempts", async () => {
+    const emit = vi.fn().mockReturnValue(true);
+
+    await expect(requestArticleShareWithAnalytics(
+      { share: vi.fn().mockResolvedValue(undefined) },
+      "https://guides.example.kr/article/one",
+      "ART-000123",
+      emit,
+    )).resolves.toBe("shared");
+    expect(emit).toHaveBeenCalledWith({
+      eventName: "share_click",
+      articleId: "ART-000123",
+      channel: "native",
+    });
+
+    await expect(requestArticleShareWithAnalytics(
+      {},
+      "https://guides.example.kr/article/one",
+      "ART-000123",
+      emit,
+    )).resolves.toBe("unavailable");
+    expect(emit).toHaveBeenCalledTimes(1);
+  });
+
   it("renders one labeled button and a polite result region", () => {
     const markup = renderToStaticMarkup(
-      <ArticleShareButton canonicalUrl="https://guides.example.kr/article/one" />,
+      <ArticleShareButton
+        articleId="ART-000123"
+        canonicalUrl="https://guides.example.kr/article/one"
+      />,
     );
 
     expect(markup).toContain('<button type="button">공유</button>');

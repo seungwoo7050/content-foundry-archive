@@ -42,7 +42,10 @@ describe("ArticleReaderActions", () => {
       props: { siteId: "site-a", articleId: "ART-000123" },
     });
     expect(share).toMatchObject({
-      props: { canonicalUrl: "https://guides.example.kr/article/one" },
+      props: {
+        articleId: "ART-000123",
+        canonicalUrl: "https://guides.example.kr/article/one",
+      },
     });
   });
 
