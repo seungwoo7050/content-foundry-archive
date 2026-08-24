@@ -33,6 +33,7 @@ export {
 } from "./theme-registry.js";
 export {
   ThemeArticleList,
+  ThemeArticleTopics,
   ThemeBreadcrumbs,
   ThemeFooterNavigation,
   ThemeNavigation,

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   ThemeArticleList,
+  ThemeArticleTopics,
   ThemeBreadcrumbs,
   ThemeFooterNavigation,
   ThemeHomeAboutTeaser,
@@ -11,6 +12,20 @@ import {
 } from "./theme-links.js";
 
 describe("shared theme link primitives", () => {
+  it("renders article topics as ordered facts without inventing tag routes", () => {
+    expect(renderToStaticMarkup(<ThemeArticleTopics />)).toBe("");
+    expect(renderToStaticMarkup(<ThemeArticleTopics topics={[]} />)).toBe("");
+    expect(renderToStaticMarkup(
+      <ThemeArticleTopics topics={["정부24", "주민등록"]} />,
+    )).toBe(
+      '<ul aria-label="관련 주제" class="theme-article-topics">'
+      + "<li>정부24</li><li>주민등록</li></ul>",
+    );
+    expect(renderToStaticMarkup(
+      <ThemeArticleTopics topics={["정부24"]} />,
+    )).not.toContain("<a");
+  });
+
   it("renders accessible footer navigation only when links exist", () => {
     expect(renderToStaticMarkup(<ThemeFooterNavigation items={[]} />)).toBe("");
     expect(renderToStaticMarkup(<ThemeFooterNavigation items={[

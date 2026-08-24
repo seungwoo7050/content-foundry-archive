@@ -85,6 +85,20 @@ export function ThemeHomeAboutTeaser({
   ) : null;
 }
 
+export function ThemeArticleTopics({
+  topics,
+}: {
+  readonly topics?: readonly string[] | undefined;
+}) {
+  return topics && topics.length > 0 ? (
+    <ul aria-label="관련 주제" className="theme-article-topics">
+      {topics.map((topic, index) => (
+        <li key={`${topic}:${index}`}>{topic}</li>
+      ))}
+    </ul>
+  ) : null;
+}
+
 export function ThemeBreadcrumbs({
   items,
   currentPath,
