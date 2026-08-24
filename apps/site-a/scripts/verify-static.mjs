@@ -110,6 +110,45 @@ function assertSafeHtml(label, html) {
   assertSafeScripts(label, html);
 }
 
+function assertMinimalThemeRoute(label, html, routeKind) {
+  assert.match(
+    html,
+    /data-theme="minimal-knowledge-base"/,
+    `${label} does not use the configured theme`,
+  );
+  assert.match(
+    html,
+    /data-skin="calm-blue"/,
+    `${label} does not use the configured skin`,
+  );
+  assert.match(
+    html,
+    new RegExp(`data-route="${escapePattern(routeKind)}"`),
+    `${label} does not expose its route kind`,
+  );
+  assert.equal(
+    [...html.matchAll(/<main(?:\s|>)/g)].length,
+    1,
+    `${label} must contain exactly one main landmark`,
+  );
+  assert.match(html, /<main id="main-content">/);
+  assert.match(
+    html,
+    /<a\b(?=[^>]*\bhref="#main-content")[^>]*>본문으로 바로가기<\/a>/,
+  );
+  assert.match(html, /<nav aria-label="생활메모">/);
+  assert.match(
+    html,
+    /<footer\b[^>]*><small>© 2026 생활메모 · 운영: 생활메모<\/small><\/footer>/,
+  );
+  const renderedMarkup = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
+  assert.doesNotMatch(
+    renderedMarkup,
+    /\b(?:ART|MED)-\d{6}\b/,
+    `${label} exposes a raw content record ID in rendered markup`,
+  );
+}
+
 function listSourceFiles(root) {
   return readdirSync(root).flatMap((entry) => {
     const path = join(root, entry);
@@ -139,6 +178,17 @@ const rss = readArtifact("rss.xml");
 const searchIndex = JSON.parse(readArtifact("search-index.json"));
 const sitemap = readArtifact("sitemap.xml");
 const identity = JSON.parse(readArtifact("_release.json"));
+for (const [label, html, routeKind] of [
+  ["home", home, "home"],
+  ["article", article, "article"],
+  ["static page", staticPage, "static-page"],
+  ["category", category, "category"],
+  ["archive", archive, "archive"],
+  ["search", search, "search"],
+  ["404", notFound, "not-found"],
+]) {
+  assertMinimalThemeRoute(label, html, routeKind);
+}
 const expectedIdentities = {
   "2.0.0": {
     releaseId: "REL-2026-000042",
@@ -222,8 +272,7 @@ assert.deepEqual(sitemapEntries, [
   { url: "https://example.com/about" },
 ]);
 
-assert.match(home, /<h1 id="home-title">생활메모<\/h1>/);
-assert.match(home, /<p>운영: 생활메모<\/p>/);
+assert.match(home, /<h1>생활메모<\/h1>/);
 const homeStructuredData = readJsonLdScripts("home", home);
 assert.deepEqual(homeStructuredData, [
   {
@@ -237,11 +286,10 @@ assert.deepEqual(homeStructuredData, [
   },
 ]);
 assert.ok(!Object.hasOwn(homeStructuredData[0], "potentialAction"));
-assert.match(home, /<h2 id="home-search">필요한 안내 찾기<\/h2>/);
-assert.match(home, /href="\/search">사이트 검색<\/a>/);
+assert.match(home, /<h2><a href="\/search">사이트 검색<\/a><\/h2>/);
 assert.match(
   home,
-  /<nav aria-label="주요 메뉴"><ul><li><a href="\/">홈<\/a><\/li><li><a href="\/category\/daily-admin">생활·행정<\/a><\/li><\/ul><\/nav>/,
+  /<nav aria-label="생활메모"><ul><li><a href="\/">홈<\/a><\/li><li><a href="\/category\/daily-admin">생활·행정<\/a><\/li><\/ul><\/nav>/,
 );
 assert.match(article, /<h1>정부24 주민등록등본 발급 방법<\/h1>/);
 assert.match(
@@ -300,7 +348,7 @@ for (const [label, html] of [
     `${label} includes home-only WebSite structured data`,
   );
 }
-assert.match(article, /<h2 id="article-trust-title">이 안내의 정보<\/h2>/);
+assert.match(article, /<h2[^>]*>이 안내의 정보<\/h2>/);
 assert.match(article, /<dt>작성<\/dt><dd>생활메모<\/dd>/);
 assert.match(article, /<dt>운영<\/dt><dd>생활메모<\/dd>/);
 assert.match(
@@ -325,7 +373,7 @@ assert.match(
   category,
   /<h1>생활·행정<\/h1><p>생활과 행정 절차 안내<\/p>/,
 );
-assert.match(category, /<h2 id="category-recent">최근 안내<\/h2>/);
+assert.match(category, /<h2>최근 안내<\/h2>/);
 const expectedCategoryDate =
   identity.contractVersion === "3.0.0"
     ? ["2026-08-24T02:30:00Z", "2026년 8월 24일"]
@@ -341,14 +389,16 @@ assert.match(
   new RegExp(`href="/article/${articleSlug}">정부24 주민등록등본 발급 방법`),
 );
 assert.match(category, /정부24에서 주민등록등본을 발급하는 기본 절차를 정리합니다\./);
-assert.match(category, /<h2 id="category-topics">관련 주제<\/h2>/);
+assert.match(category, /<h2>관련 주제<\/h2>/);
 assert.match(category, /<li>정부24<\/li>/);
 assert.match(archive, /<h1>전체 글<\/h1>/);
 assert.match(archive, /게시일 최신순으로 모았습니다\./);
 assert.match(archive, /href="\/category\/daily-admin">생활·행정<\/a>/);
 assert.match(
   archive,
-  /<time dateTime="2026-08-20T01:00:00Z">2026년 8월 20일<\/time>/,
+  new RegExp(
+    `<time dateTime="${expectedCategoryDate[0]}">${expectedCategoryDate[1]}<\\/time>`,
+  ),
 );
 assert.match(
   archive,
@@ -363,6 +413,7 @@ assert.match(
   /생활메모는 실생활 정보를 정리하는 1인 운영 블로그입니다\./,
 );
 assert.match(notFound, /페이지를 찾을 수 없습니다/);
+assert.match(notFound, /<p>404<\/p>/);
 assert.match(notFound, /href="\/">생활메모 홈으로 돌아가기<\/a>/);
 assert.match(search, /<h1>검색<\/h1>/);
 assert.match(search, /<label for="site-search-query">찾고 싶은 안내<\/label>/);
