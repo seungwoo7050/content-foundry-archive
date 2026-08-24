@@ -17,13 +17,17 @@ export const SITE_A_PRIMARY_NAVIGATION_PATHS = Object.freeze([
   "/about",
 ] as const);
 
-interface LaunchCategory {
+interface LaunchCategoryIdentity {
   readonly id: string;
   readonly slug: string;
   readonly label: string;
 }
 
-interface NavigationRecord extends Omit<LaunchCategory, "slug"> {
+interface LaunchCategory extends LaunchCategoryIdentity {
+  readonly description: string;
+}
+
+interface NavigationRecord extends Pick<LaunchCategoryIdentity, "id" | "label"> {
   readonly path: string;
   readonly children: readonly NavigationRecord[];
 }
@@ -47,7 +51,7 @@ function categoryNavigation(items: readonly NavigationRecord[]): NavigationRecor
 }
 
 function matchesLaunchCategories(
-  actual: readonly LaunchCategory[],
+  actual: readonly LaunchCategoryIdentity[],
 ): boolean {
   return actual.length === SITE_A_LAUNCH_CATEGORIES.length
     && actual.every((category, index) => {
@@ -67,6 +71,11 @@ export function validateSiteLaunchDiscovery(
   const issues: string[] = [];
   if (!matchesLaunchCategories(source.taxonomy.categories)) {
     issues.push("production taxonomy must match the five Site A launch categories in charter order");
+  }
+  for (const category of source.taxonomy.categories) {
+    if (category.description.trim().length === 0) {
+      issues.push(`category ${category.id} requires a non-empty description`);
+    }
   }
   if (!source.site.search.enabled) {
     issues.push("production static search must be enabled");

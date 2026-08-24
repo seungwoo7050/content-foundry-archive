@@ -8,7 +8,12 @@ import {
 
 const completeSource = {
   site: { search: { enabled: true } },
-  taxonomy: { categories: SITE_A_LAUNCH_CATEGORIES },
+  taxonomy: {
+    categories: SITE_A_LAUNCH_CATEGORIES.map((category) => ({
+      ...category,
+      description: `${category.label} 실용 안내`,
+    })),
+  },
   navigation: {
     items: SITE_A_PRIMARY_NAVIGATION_PATHS.map((path, index) => {
       const category = SITE_A_LAUNCH_CATEGORIES[index - 1];
@@ -79,6 +84,19 @@ describe("Site A launch discovery policy", () => {
         "production primary navigation must expose home, five categories, search, and about in charter order",
         "production navigation must identify the five Site A categories once in charter order",
       ]),
+    }));
+  });
+
+  it("rejects a launch category without a public description", () => {
+    const categories = completeSource.taxonomy.categories.map((category, index) => (
+      index === 0 ? { ...category, description: "   " } : category
+    ));
+
+    expect(() => validateSiteLaunchDiscovery("production", {
+      ...completeSource,
+      taxonomy: { categories },
+    })).toThrow(expect.objectContaining({
+      issues: ["category daily-admin requires a non-empty description"],
     }));
   });
 });
