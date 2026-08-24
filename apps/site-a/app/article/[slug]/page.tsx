@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { ArticleBreadcrumbs } from "../../../components/article-breadcrumbs";
-import { ArticleEvidence } from "../../../components/article-evidence";
-import { ArticleTrustSummary } from "../../../components/article-trust-summary";
-import { RetiredRoute } from "../../../components/retired-route";
+import { ImageBlock } from "../../../components/image-block";
 import { StructuredData } from "../../../components/structured-data";
 import { VersionedContentBlocks } from "../../../components/versioned-content-blocks";
 import { createArticleMetadata } from "../../../lib/article-metadata";
+import { createArticleThemeViewModel } from "../../../lib/article-theme-view-model";
 import {
   findArticleBySlug,
   getArticlePageStaticParams,
@@ -16,10 +14,11 @@ import { createArticleBreadcrumbs } from "../../../lib/article-breadcrumbs";
 import { createArticleStructuredData } from "../../../lib/article-structured-data";
 import { createBreadcrumbStructuredData } from "../../../lib/breadcrumb-structured-data";
 import { findGoneRoute } from "../../../lib/gone-route";
-import { createArticleTrustViewModel } from "../../../lib/article-trust-view-model";
 import type { VersionedSiteReleaseContext } from "../../../lib/load-site-release";
 import { createRetiredRouteMetadata } from "../../../lib/retired-route-metadata";
 import { getVersionedSiteReleaseContext } from "../../../lib/site-release";
+import { createRetiredThemeViewModel } from "../../../lib/status-theme-view-model";
+import { renderThemePage } from "../../../lib/theme-page";
 
 export const dynamicParams = false;
 
@@ -48,12 +47,18 @@ export async function generateMetadata({
   return createArticleMetadata(context, article);
 }
 
-function renderArticleContent(context: VersionedSiteReleaseContext, slug: string) {
+function createArticleSlots(context: VersionedSiteReleaseContext, slug: string) {
   if (context.contractVersion === "3.0.0") {
     const article = findArticleBySlug(context.bundle, slug);
     if (!article) notFound();
-    return (
-      <VersionedContentBlocks
+    return {
+      hero: article.heroMediaId === null ? null : (
+        <ImageBlock
+          assets={context.mediaAssets}
+          block={{ type: "image", mediaId: article.heroMediaId }}
+        />
+      ),
+      body: <VersionedContentBlocks
         blocks={article.content}
         context={{
           mediaAssets: context.mediaAssets,
@@ -61,13 +66,21 @@ function renderArticleContent(context: VersionedSiteReleaseContext, slug: string
           siteId: context.bundle.release.siteId,
         }}
         contractVersion="3.0.0"
-      />
-    );
+      />,
+    };
   }
 
   const article = findArticleBySlug(context.bundle, slug);
   if (!article) notFound();
-  return <VersionedContentBlocks blocks={article.content} contractVersion="2.0.0" />;
+  return {
+    hero: null,
+    body: (
+      <VersionedContentBlocks
+        blocks={article.content}
+        contractVersion="2.0.0"
+      />
+    ),
+  };
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
@@ -79,11 +92,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   if (!article) {
     const retiredRoute = findGoneRoute(bundle, `/article/${slug}`);
     if (retiredRoute) {
-      return (
-        <RetiredRoute
-          path={retiredRoute.path}
-          replacementPath={retiredRoute.replacementPath}
-        />
+      return renderThemePage(
+        bundle,
+        createRetiredThemeViewModel(bundle, retiredRoute),
       );
     }
     notFound();
@@ -95,10 +106,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   if (!category) notFound();
 
   const breadcrumbs = createArticleBreadcrumbs(bundle.site, category, article);
-  const trust = createArticleTrustViewModel(bundle, article);
+  const route = createArticleThemeViewModel(
+    context,
+    article,
+    category,
+    createArticleSlots(context, slug),
+  );
 
   return (
-    <article className="article-page">
+    <>
       <StructuredData
         value={createArticleStructuredData(
           { canonicalOrigin: context.canonicalOrigin, site: bundle.site },
@@ -111,26 +127,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           breadcrumbs,
         )}
       />
-      <ArticleBreadcrumbs items={breadcrumbs} />
-      <header className="article-header">
-        <p>{category.label}</p>
-        <h1>{article.title}</h1>
-        <p>{article.summary}</p>
-      </header>
-      <ArticleTrustSummary
-        authorLabel={trust.authorLabel}
-        operatorLabel={trust.operatorLabel}
-        published={trust.published}
-        updated={trust.updated}
-        aboutPath={trust.aboutPath}
-        contactPath={trust.contactPath}
-      />
-      <div className="article-content">{renderArticleContent(context, slug)}</div>
-      <ArticleEvidence
-        sources={trust.sources}
-        updateTriggers={trust.updateTriggers}
-        faq={trust.faq}
-      />
-    </article>
+      {renderThemePage(bundle, route)}
+    </>
   );
 }
