@@ -530,6 +530,10 @@ assert.deepEqual(categoryArtifacts, [`${categorySlug}.html`]);
 assert.ok(!existsSync(join(outRoot, "category", "missing-category.html")));
 
 assert.match(home, /property="og:image" content="https:\/\/example\.com\/og\.png"/);
+assert.match(
+  home,
+  /property="og:image:alt" content="생활메모 — 실생활에 도움이 되는 정보를 정리하는 1인 운영 블로그"/,
+);
 assert.doesNotMatch(article, /(?:og:image|twitter:image|og\.png)/);
 assert.doesNotMatch(staticPage, /(?:og:image|twitter:image|og\.png)/);
 assert.doesNotMatch(category, /(?:og:image|twitter:image|og\.png)/);

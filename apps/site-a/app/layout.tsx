@@ -24,6 +24,7 @@ export function generateMetadata(): Metadata {
   const launch = resolveSiteLaunchConfig(context, process.env);
   const buildConfigChecksum = createBuildConfigChecksum({ config, launch });
   const socialImage = new URL("/og.png", canonicalOrigin).href;
+  const socialImageAlt = `${bundle.site.name} — ${bundle.site.description}`;
 
   return {
     metadataBase: new URL(canonicalOrigin),
@@ -48,7 +49,7 @@ export function generateMetadata(): Metadata {
           url: socialImage,
           width: 1729,
           height: 910,
-          alt: "생활메모 — 실생활 정보를 차분하게 정리합니다",
+          alt: socialImageAlt,
         },
       ],
     },
