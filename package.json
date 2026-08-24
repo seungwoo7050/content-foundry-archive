@@ -12,6 +12,7 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "quality:browser": "playwright test",
+    "quality:lighthouse": "pnpm build && lhci autorun --config=lighthouserc.cjs",
     "verify:static": "turbo run verify:static",
     "validate:release": "pnpm --filter @content-foundry/content-contract build && pnpm --filter @content-foundry/content-contract validate:release"
   },
