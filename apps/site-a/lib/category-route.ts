@@ -1,10 +1,26 @@
 import {
   ContractError,
   type ContractIssue,
-  type LoadedReleaseBundle,
 } from "@content-foundry/content-contract";
 
-function validateCategoryRouteReadiness(bundle: LoadedReleaseBundle) {
+export interface CategoryRouteRecord {
+  readonly id: string;
+  readonly slug: string;
+}
+
+export interface CategorizedArticleRouteRecord {
+  readonly categoryId: string;
+}
+
+export interface CategoryRouteSource<
+  TCategory extends CategoryRouteRecord = CategoryRouteRecord,
+  TArticle extends CategorizedArticleRouteRecord = CategorizedArticleRouteRecord,
+> {
+  readonly articles: readonly TArticle[];
+  readonly taxonomy: { readonly categories: readonly TCategory[] };
+}
+
+function validateCategoryRouteReadiness(bundle: CategoryRouteSource) {
   const articleCategoryIds = new Set(
     bundle.articles.map((article) => article.categoryId),
   );
@@ -27,16 +43,16 @@ function validateCategoryRouteReadiness(bundle: LoadedReleaseBundle) {
   }
 }
 
-export function getCategoryStaticParams(bundle: LoadedReleaseBundle) {
+export function getCategoryStaticParams(bundle: CategoryRouteSource) {
   validateCategoryRouteReadiness(bundle);
   return bundle.taxonomy.categories.map((category) => ({
     category: category.slug,
   }));
 }
 
-export function findCategoryBySlug(
-  bundle: LoadedReleaseBundle,
+export function findCategoryBySlug<TCategory extends CategoryRouteRecord>(
+  bundle: CategoryRouteSource<TCategory>,
   category: string,
-) {
+): TCategory | undefined {
   return bundle.taxonomy.categories.find((entry) => entry.slug === category);
 }

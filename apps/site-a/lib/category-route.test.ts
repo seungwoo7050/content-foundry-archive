@@ -1,11 +1,15 @@
 import { resolve } from "node:path";
 
-import { loadReleaseBundle } from "@content-foundry/content-contract";
-import { describe, expect, it } from "vitest";
+import {
+  loadReleaseBundle,
+  type LoadedReleaseBundleV3,
+} from "@content-foundry/content-contract";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
   findCategoryBySlug,
   getCategoryStaticParams,
+  type CategoryRouteSource,
 } from "./category-route";
 
 const fixture = resolve(
@@ -15,6 +19,20 @@ const fixture = resolve(
 const bundle = loadReleaseBundle(fixture);
 
 describe("category route selection", () => {
+  it("accepts and preserves v3 category route records", () => {
+    expectTypeOf<LoadedReleaseBundleV3>().toExtend<CategoryRouteSource>();
+    const category = findCategoryBySlug(
+      {
+        articles: [] as LoadedReleaseBundleV3["articles"],
+        taxonomy: { categories: [] as LoadedReleaseBundleV3["taxonomy"]["categories"] },
+      },
+      "missing",
+    );
+    expectTypeOf(category).toEqualTypeOf<
+      LoadedReleaseBundleV3["taxonomy"]["categories"][number] | undefined
+    >();
+  });
+
   it("enumerates taxonomy slugs in release order", () => {
     const orderedBundle = structuredClone(bundle);
     const firstCategory = orderedBundle.taxonomy.categories[0];
