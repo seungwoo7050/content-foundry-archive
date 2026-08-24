@@ -23,7 +23,7 @@ const completeSource = {
   articles: SITE_A_LAUNCH_CATEGORIES.map(({ id }, index) => ({
     id: `ART-LAUNCH-${index}`,
     categoryId: id,
-    content: [{ type: "paragraph" }],
+    content: [{ type: "paragraph", markdown: `${id} 실용 안내` }],
   })),
 };
 
@@ -48,7 +48,11 @@ describe("Site A launch discovery policy", () => {
       site: { search: { enabled: false } },
       taxonomy: { categories: [] },
       navigation: { items: [] },
-      articles: [{ id: "ART-EMPTY", categoryId: "daily-admin", content: [] }],
+      articles: [{
+        id: "ART-EMPTY",
+        categoryId: "daily-admin",
+        content: [{ type: "paragraph", markdown: "  " }],
+      }],
     })).toThrow(expect.objectContaining({
       issues: [
         "production taxonomy must match the five Site A launch categories in charter order",

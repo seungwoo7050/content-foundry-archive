@@ -1,5 +1,6 @@
 import type { ReleaseMode } from "@content-foundry/site-core";
 
+import { hasMeaningfulPublicContent } from "./meaningful-public-content";
 import { SiteLaunchReadinessError } from "./site-launch-readiness-error";
 
 export const SITE_A_LAUNCH_CATEGORIES = Object.freeze([
@@ -89,13 +90,14 @@ export function validateSiteLaunchDiscovery(
     );
   }
   for (const article of source.articles) {
-    if (article.content.length === 0) {
+    if (!hasMeaningfulPublicContent(article.content)) {
       issues.push(`published article ${article.id} content is empty`);
     }
   }
   for (const category of SITE_A_LAUNCH_CATEGORIES) {
     if (!source.articles.some((article) => (
-      article.categoryId === category.id && article.content.length > 0
+      article.categoryId === category.id
+      && hasMeaningfulPublicContent(article.content)
     ))) {
       issues.push(`${category.id} category requires a non-empty published article`);
     }
