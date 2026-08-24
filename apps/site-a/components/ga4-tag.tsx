@@ -17,6 +17,7 @@ interface Ga4Window {
 }
 
 const GA4_SCRIPT_SELECTOR = 'script[data-content-foundry-provider="ga4"]';
+export const GA4_PROVIDER_READY_EVENT = "content-foundry:ga4-provider-ready";
 
 export function loadGa4(
   documentTarget: Document,
@@ -40,6 +41,7 @@ export function loadGa4(
   script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
   script.setAttribute("data-content-foundry-provider", "ga4");
   documentTarget.head.append(script);
+  documentTarget.dispatchEvent(new Event(GA4_PROVIDER_READY_EVENT));
   return true;
 }
 

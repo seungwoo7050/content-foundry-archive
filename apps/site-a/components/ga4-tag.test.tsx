@@ -3,7 +3,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
-import { Ga4Tag, loadGa4 } from "./ga4-tag";
+import { GA4_PROVIDER_READY_EVENT, Ga4Tag, loadGa4 } from "./ga4-tag";
 
 describe("GA4 Basic consent-mode tag", () => {
   it("renders no provider markup before the CMP callback", () => {
@@ -17,6 +17,8 @@ describe("GA4 Basic consent-mode tag", () => {
 
   it("loads and configures one validated GA4 script", () => {
     const appended: Array<Record<string, unknown>> = [];
+    const dispatched: Event[] = [];
+    const dataLayer: unknown[] = [];
     const script = {
       async: false,
       src: "",
@@ -26,8 +28,13 @@ describe("GA4 Basic consent-mode tag", () => {
       querySelector: vi.fn(() => null),
       createElement: vi.fn(() => script),
       head: { append: (value: Record<string, unknown>) => appended.push(value) },
+      dispatchEvent: (event: Event) => {
+        expect(appended).toEqual([script]);
+        expect(dataLayer[1]).toEqual(["config", "G-ABC123"]);
+        dispatched.push(event);
+        return true;
+      },
     } as unknown as Document;
-    const dataLayer: unknown[] = [];
 
     expect(loadGa4(documentTarget, { dataLayer }, "G-ABC123")).toBe(true);
     expect(script).toMatchObject({
@@ -41,13 +48,17 @@ describe("GA4 Basic consent-mode tag", () => {
     expect(appended).toEqual([script]);
     expect(dataLayer[0]).toEqual(["js", expect.any(Date)]);
     expect(dataLayer[1]).toEqual(["config", "G-ABC123"]);
+    expect(dispatched.map(({ type }) => type)).toEqual([GA4_PROVIDER_READY_EVENT]);
   });
 
   it("deduplicates the loader and rejects forged identifiers", () => {
+    const dispatchEvent = vi.fn();
     const existingDocument = {
       querySelector: () => ({}),
+      dispatchEvent,
     } as unknown as Document;
     expect(loadGa4(existingDocument, {}, "G-ABC123")).toBe(false);
+    expect(dispatchEvent).not.toHaveBeenCalled();
     expect(() => loadGa4(existingDocument, {}, "G-forged")).toThrow(
       "valid measurement ID",
     );
