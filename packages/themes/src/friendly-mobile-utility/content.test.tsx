@@ -6,7 +6,7 @@ import type {
   CategoryRouteViewModel,
   HomeRouteViewModel,
 } from "../content-route-view-model.js";
-import type { PaginationViewModel } from "../presentation-view-model.js";
+import type { ArticleListItemViewModel, PaginationViewModel } from "../presentation-view-model.js";
 import { renderFriendlyContentRoute } from "./content.js";
 
 const base = {
@@ -15,6 +15,15 @@ const base = {
   description: "필요한 안내를 정리합니다.",
   breadcrumbs: [{ href: "/", label: "생활메모" }],
 } as const;
+
+function article(href: string, label: string): ArticleListItemViewModel {
+  return {
+    link: { href, label }, summary: `${label} 요약`,
+    date: { kind: "published", dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
+    estimatedReadingTime: { minutes: 2, label: "예상 읽기 시간 약 2분" },
+    category: null, topics: [],
+  };
+}
 
 function renderListRoute(kind: "archive" | "category", pagination: PaginationViewModel) {
   const basePath = kind === "archive" ? "/archive" : "/category/life";
@@ -47,12 +56,7 @@ describe("Friendly Mobile Utility content routes", () => {
       ...base,
       kind: "home",
       articleSectionHeading: "최근 안내",
-      articles: [{
-        link: { href: "/article/start", label: "신청 안내" }, summary: "신청 절차",
-        date: { kind: "published", dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
-        estimatedReadingTime: { minutes: 2, label: "예상 읽기 시간 약 2분" },
-        category: null, topics: [],
-      }],
+      articles: [article("/article/start", "신청 안내")],
       categories: [{ href: "/category/life", label: "생활", description: "생활 절차를 확인합니다." }],
       searchLink: { href: "/search", label: "사이트 검색" },
       aboutTeaser: {
@@ -72,6 +76,33 @@ describe("Friendly Mobile Utility content routes", () => {
     expect(html).toContain("한 명의 운영자가 정보를 확인하고 정리합니다.");
     expect(html).toContain('<a href="/about">소개</a>');
     expect(html).not.toMatch(/popular|trending|ranking|인기|순위/i);
+  });
+
+  it("renders explicit editorial groups without falling back to the latest list", () => {
+    const route: HomeRouteViewModel = {
+      ...base, kind: "home", articleSectionHeading: "새로 올라온 안내",
+      articles: [article("/article/fallback", "기존 최신")], categories: [], searchLink: null,
+      featuredArticles: [article("/article/featured", "선정 글")],
+      currentArticles: [article("/article/current", "현재 글")],
+      evergreenArticles: [article("/article/basic", "기본 글")], latestArticles: [article("/article/latest", "새 글")],
+      categoryHighlights: [{
+        category: { href: "/category/life", label: "생활", description: "생활 절차 안내" },
+        articles: [article("/article/category", "생활 글")], }],
+    };
+    const html = renderToStaticMarkup(renderFriendlyContentRoute(route));
+
+    expect(["선정 안내", "지금 확인할 안내", "기본 안내", "새로 올라온 안내", "생활 절차 안내"]
+      .every((fact) => html.includes(fact))).toBe(true);
+    expect(["선정 글", "현재 글", "기본 글", "새 글", "생활 글"].every((label) => html.includes(label))).toBe(true);
+    expect(html).toContain('<h2><a href="/category/life">생활</a></h2>');
+    expect(html).not.toContain("기존 최신");
+    expect(html).not.toMatch(/popular|trending|ranking|인기|순위/i);
+
+    const empty = renderToStaticMarkup(renderFriendlyContentRoute({
+      ...route, featuredArticles: [], currentArticles: [],
+      evergreenArticles: [], latestArticles: [], categoryHighlights: [],
+    }));
+    expect(empty).not.toContain("기존 최신");
   });
 
   it.each([undefined, null])("omits a %s about teaser", (aboutTeaser) => {

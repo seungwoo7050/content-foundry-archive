@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import type { ContentRouteViewModel } from "../content-route-view-model.js";
+import type { ContentRouteViewModel, HomeRouteViewModel } from "../content-route-view-model.js";
 import {
   getThemeAdSlot,
   type ThemeAdSlotContext,
@@ -13,12 +13,30 @@ import {
 import { FriendlyArticle } from "./article.js";
 import { FriendlyRouteIntro } from "./shell.js";
 
+function renderFriendlyHomeArticleGroup(
+  articles: HomeRouteViewModel["articles"] | undefined,
+  heading: string,
+  id: string,
+) {
+  return articles?.length ? (
+    <section aria-labelledby={id} className="fmu-list">
+      <h2 id={id}>{heading}</h2>
+      <ThemeArticleList articles={articles} headingLevel={3} />
+    </section>
+  ) : null;
+}
+
 export function renderFriendlyContentRoute(
   route: ContentRouteViewModel,
   context: ThemeAdSlotContext = {},
 ): ReactNode {
   switch (route.kind) {
-    case "home":
+    case "home": {
+      const hasEditorialGroups = route.featuredArticles !== undefined
+        || route.currentArticles !== undefined
+        || route.evergreenArticles !== undefined
+        || route.latestArticles !== undefined
+        || route.categoryHighlights !== undefined;
       return (
         <div className="fmu-stack">
           <section className="fmu-panel fmu-summary">
@@ -38,14 +56,30 @@ export function renderFriendlyContentRoute(
               </div>
             </section>
           ) : null}
-          <section aria-labelledby="fmu-home-latest" className="fmu-list">
-            <h2 id="fmu-home-latest">{route.articleSectionHeading}</h2>
-            <ThemeArticleList articles={route.articles} headingLevel={3} />
+          {hasEditorialGroups ? <>
+            {renderFriendlyHomeArticleGroup(route.featuredArticles, "선정 안내", "fmu-home-featured")}
+            {renderFriendlyHomeArticleGroup(route.currentArticles, "지금 확인할 안내", "fmu-home-current")}
+            {renderFriendlyHomeArticleGroup(route.evergreenArticles, "기본 안내", "fmu-home-evergreen")}
+            {renderFriendlyHomeArticleGroup(route.latestArticles, route.articleSectionHeading, "fmu-home-latest")}
+            {route.categoryHighlights?.map(({ category, articles }) => (
+              <section className="fmu-list" key={category.href}>
+                <h2><a href={category.href}>{category.label}</a></h2>
+                <p>{category.description}</p>
+                {articles.length > 0 ? <ThemeArticleList articles={articles} headingLevel={3} /> : null}
+              </section>
+            ))}
             {getThemeAdSlot(context, "home-feed")}
-          </section>
+          </> : (
+            <section aria-labelledby="fmu-home-latest" className="fmu-list">
+              <h2 id="fmu-home-latest">{route.articleSectionHeading}</h2>
+              <ThemeArticleList articles={route.articles} headingLevel={3} />
+              {getThemeAdSlot(context, "home-feed")}
+            </section>
+          )}
           <ThemeHomeAboutTeaser teaser={route.aboutTeaser} />
         </div>
       );
+    }
     case "category":
       return (
         <div className="fmu-stack">
