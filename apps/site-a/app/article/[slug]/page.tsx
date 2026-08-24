@@ -16,6 +16,7 @@ import { createBreadcrumbStructuredData } from "../../../lib/breadcrumb-structur
 import { findGoneRoute } from "../../../lib/gone-route";
 import type { VersionedSiteReleaseContext } from "../../../lib/load-site-release";
 import { createRetiredRouteMetadata } from "../../../lib/retired-route-metadata";
+import { resolveSiteAdSlots } from "../../../lib/resolve-site-ad-slots";
 import { getVersionedSiteReleaseContext } from "../../../lib/site-release";
 import { createRetiredThemeViewModel } from "../../../lib/status-theme-view-model";
 import { renderThemePage } from "../../../lib/theme-page";
@@ -127,7 +128,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           breadcrumbs,
         )}
       />
-      {renderThemePage(bundle, route)}
+      {renderThemePage(
+        bundle,
+        route,
+        resolveSiteAdSlots(context, process.env),
+      )}
     </>
   );
 }
