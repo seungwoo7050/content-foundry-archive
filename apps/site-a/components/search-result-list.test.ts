@@ -1,8 +1,8 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { SearchResultList } from "./search-result-list";
+import { reportSearchResultClick, SearchResultList } from "./search-result-list";
 
 const categories = [
   { id: "daily-admin", href: "/category/daily-admin", label: "생활·행정" },
@@ -56,5 +56,17 @@ describe("SearchResultList", () => {
     expect(html).toContain("0개의 안내를 찾았습니다.");
     expect(html).toContain('<a href="/category/daily-admin">생활·행정</a>');
     expect(html).toContain('<a href="/archive">전체 글 보기</a>');
+  });
+
+  it("reports only the article ID and one-based result position", () => {
+    const emit = vi.fn(() => true);
+
+    expect(reportSearchResultClick("ART-1", 2, emit)).toBe(true);
+    expect(emit).toHaveBeenCalledOnce();
+    expect(emit).toHaveBeenCalledWith({
+      eventName: "search_result_click",
+      articleId: "ART-1",
+      resultPosition: 2,
+    });
   });
 });

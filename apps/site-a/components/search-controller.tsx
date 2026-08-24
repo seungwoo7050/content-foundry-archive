@@ -6,6 +6,7 @@ import {
   SearchFallbackLinks,
   SearchResultList,
 } from "./search-result-list";
+import { emitAnalyticsEvent } from "./analytics-event-dispatcher";
 import type { SearchIndexEntry } from "../lib/search-index-entry";
 import { loadSearchIndex } from "../lib/load-search-index";
 import { searchIndexEntries, type SearchResult } from "../lib/search-results";
@@ -24,6 +25,16 @@ type SearchState =
   | { readonly kind: "loading" }
   | { readonly kind: "error" }
   | { readonly kind: "ready"; readonly results: readonly SearchResult[] };
+
+export function reportSearchSubmit(
+  resultCount: number,
+  emit: typeof emitAnalyticsEvent = emitAnalyticsEvent,
+): boolean {
+  return emit({
+    eventName: "search_submit",
+    queryCategory: resultCount > 0 ? "results-found" : "no-results",
+  });
+}
 
 export function SearchController({ viewModel }: SearchControllerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -52,9 +63,11 @@ export function SearchController({ viewModel }: SearchControllerProps) {
       );
       const entries = await indexPromiseRef.current;
       if (requestId !== requestIdRef.current) return;
+      const results = searchIndexEntries(entries, rawQuery, viewModel.locale);
+      reportSearchSubmit(results.length);
       setState({
         kind: "ready",
-        results: searchIndexEntries(entries, rawQuery, viewModel.locale),
+        results,
       });
     } catch {
       indexPromiseRef.current = null;

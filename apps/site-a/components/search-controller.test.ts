@@ -1,8 +1,8 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { SearchController } from "./search-controller";
+import { reportSearchSubmit, SearchController } from "./search-controller";
 import type { SearchRouteViewModel } from "../lib/search-route-view-model";
 
 const viewModel: SearchRouteViewModel = {
@@ -33,4 +33,18 @@ describe("SearchController", () => {
     expect(html).toContain('<a href="/category/daily-admin">생활·행정</a>');
     expect(html).toContain('<a href="/archive">전체 글 보기</a>');
   });
+
+  it.each([[2, "results-found"], [0, "no-results"]] as const)(
+    "reports a safe result category for %i results",
+    (resultCount, queryCategory) => {
+      const emit = vi.fn(() => true);
+
+      expect(reportSearchSubmit(resultCount, emit)).toBe(true);
+      expect(emit).toHaveBeenCalledOnce();
+      expect(emit).toHaveBeenCalledWith({
+        eventName: "search_submit",
+        queryCategory,
+      });
+    },
+  );
 });

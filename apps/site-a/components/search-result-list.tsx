@@ -1,4 +1,5 @@
 import type { SearchResult } from "../lib/search-results";
+import { emitAnalyticsEvent } from "./analytics-event-dispatcher";
 
 export interface SearchFallbackCategory {
   readonly id: string;
@@ -11,6 +12,14 @@ interface SearchResultListProps {
   readonly categories: readonly SearchFallbackCategory[];
   readonly locale: string;
   readonly timeZone: string;
+}
+
+export function reportSearchResultClick(
+  articleId: string,
+  resultPosition: number,
+  emit: typeof emitAnalyticsEvent = emitAnalyticsEvent,
+): boolean {
+  return emit({ eventName: "search_result_click", articleId, resultPosition });
 }
 
 export function SearchFallbackLinks({
@@ -56,11 +65,16 @@ export function SearchResultList({
       </p>
       {results.length > 0 ? (
         <ol className="search-results">
-          {results.map(({ entry }) => (
+          {results.map(({ entry }, index) => (
             <li key={entry.id}>
               <article>
                 <h3>
-                  <a href={entry.path}>{entry.title}</a>
+                  <a
+                    href={entry.path}
+                    onClick={() => reportSearchResultClick(entry.id, index + 1)}
+                  >
+                    {entry.title}
+                  </a>
                 </h3>
                 <p>{entry.summary}</p>
                 <p>
