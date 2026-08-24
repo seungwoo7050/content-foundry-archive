@@ -11,7 +11,7 @@ import canonicalize from "canonicalize";
 import { resolveSupportedContractVersion } from "./contract-version.js";
 import { ContractError } from "./errors.js";
 import type { PublicSiteReleaseManifest } from "./generated/release.js";
-import { validateContractDocument } from "./validate-document.js";
+import { validateContractDocumentForVersion } from "./validate-document.js";
 
 const ZERO_CHECKSUM = `sha256:${"0".repeat(64)}`;
 const MANIFEST_LINE = /^([0-9a-f]{64})  ([^\\]+)$/;
@@ -107,7 +107,7 @@ export function verifyReleaseIntegrity(
     ]);
   }
 
-  resolveSupportedContractVersion(release.contractVersion);
+  const version = resolveSupportedContractVersion(release.contractVersion);
 
   const checksums = readIntegrityFile(root, "checksums.txt");
   const entries = parseChecksums(checksums);
@@ -149,5 +149,5 @@ export function verifyReleaseIntegrity(
   if (actualBundleChecksum !== expected) fail("Bundle checksum mismatch");
 
   release.bundleChecksum = expected;
-  return validateContractDocument("release", release);
+  return validateContractDocumentForVersion(version, "release", release);
 }

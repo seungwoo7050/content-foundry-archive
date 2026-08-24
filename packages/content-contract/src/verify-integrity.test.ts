@@ -16,11 +16,15 @@ const fixture = new URL(
   "../vendor/2.0.0/fixtures/bundles/valid/site-a-minimal/",
   import.meta.url,
 );
+const v3Fixture = new URL(
+  "../vendor/3.0.0/fixtures/bundles/valid/site-a-minimal/",
+  import.meta.url,
+);
 const temporaryRoots: string[] = [];
 
-const copyFixture = () => {
+const copyFixture = (source = fixture) => {
   const root = mkdtempSync(join(tmpdir(), "content-foundry-bundle-"));
-  cpSync(fixture, root, { recursive: true });
+  cpSync(source, root, { recursive: true });
   temporaryRoots.push(root);
   return root;
 };
@@ -69,6 +73,12 @@ describe("verifyReleaseIntegrity", () => {
     release.contractVersion = "3.0.0";
     writeFileSync(manifest, `${JSON.stringify(release, null, 2)}\n`);
     expect(() => verifyReleaseIntegrity(root)).toThrowError(
+      expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }),
+    );
+  });
+
+  it("keeps the canonical v3 bundle unsupported before activation", () => {
+    expect(() => verifyReleaseIntegrity(copyFixture(v3Fixture))).toThrowError(
       expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }),
     );
   });

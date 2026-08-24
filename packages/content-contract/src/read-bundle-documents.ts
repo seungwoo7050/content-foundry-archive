@@ -12,9 +12,11 @@ import type { PublicSiteConfiguration } from "./generated/site.js";
 import type { PublicSiteTaxonomy } from "./generated/taxonomy.js";
 import {
   type ContractDocumentKind,
-  validateContractDocument,
+  validateContractDocumentForVersion,
 } from "./validate-document.js";
 import { verifyReleaseIntegrity } from "./verify-integrity.js";
+
+type ReleaseContractVersion = PublicSiteReleaseManifest["contractVersion"];
 
 export interface ReleaseBundleDocuments {
   readonly release: PublicSiteReleaseManifest;
@@ -38,14 +40,20 @@ function readJson(root: string, path: string): unknown {
 }
 
 function readDocument<K extends ContractDocumentKind>(
+  version: ReleaseContractVersion,
   root: string,
   path: string,
   kind: K,
 ) {
-  return validateContractDocument(kind, readJson(root, path));
+  return validateContractDocumentForVersion(
+    version,
+    kind,
+    readJson(root, path),
+  );
 }
 
 function readRecords<K extends "article" | "page">(
+  version: ReleaseContractVersion,
   root: string,
   directory: string,
   kind: K,
@@ -59,24 +67,26 @@ function readRecords<K extends "article" | "page">(
           `Unexpected ${directory} entry: ${name}`,
         );
       }
-      return readDocument(root, `${directory}/${name}`, kind);
+      return readDocument(version, root, `${directory}/${name}`, kind);
     });
 }
 
 export function readReleaseBundleDocuments(root: string): ReleaseBundleDocuments {
   const release = verifyReleaseIntegrity(root);
+  const version = release.contractVersion;
   return {
     release,
-    site: readDocument(root, "site.json", "site"),
-    navigation: readDocument(root, "navigation.json", "navigation"),
-    taxonomy: readDocument(root, "taxonomy.json", "taxonomy"),
+    site: readDocument(version, root, "site.json", "site"),
+    navigation: readDocument(version, root, "navigation.json", "navigation"),
+    taxonomy: readDocument(version, root, "taxonomy.json", "taxonomy"),
     mediaManifest: readDocument(
+      version,
       root,
       "media/media-manifest.json",
       "media-manifest",
     ),
-    redirects: readDocument(root, "redirects.json", "redirects"),
-    articles: readRecords(root, "articles", "article"),
-    pages: readRecords(root, "pages", "page"),
+    redirects: readDocument(version, root, "redirects.json", "redirects"),
+    articles: readRecords(version, root, "articles", "article"),
+    pages: readRecords(version, root, "pages", "page"),
   };
 }

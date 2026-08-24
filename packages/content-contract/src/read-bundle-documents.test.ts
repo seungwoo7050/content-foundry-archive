@@ -15,6 +15,7 @@ describe("readReleaseBundleDocuments", () => {
   it("validates and reads every canonical record group", () => {
     const bundle = readReleaseBundleDocuments(fixture);
 
+    expect(bundle.release.contractVersion).toBe("2.0.0");
     expect(bundle.release.releaseId).toBe("REL-2026-000042");
     expect(bundle.site.id).toBe("site-a");
     expect(bundle.navigation.items).toHaveLength(2);
