@@ -556,9 +556,20 @@ assert.deepEqual(dispositions, {
 });
 
 if (identity.contractVersion === "2.0.0") {
-  assert.ok(!existsSync(projectionPath), "v2 retained a media projection");
-  assert.ok(!existsSync(publicMediaRoot), "v2 retained public media");
-  assert.ok(!existsSync(exportedMediaRoot), "v2 exported media");
+  assert.deepEqual(JSON.parse(readFileSync(projectionPath, "utf8")), {
+    projectionVersion: 1,
+    contractVersion: "2.0.0",
+    siteId: identity.siteId,
+    releaseId: identity.releaseId,
+    bundleChecksum: identity.bundleChecksum,
+    assets: [],
+  });
+  if (existsSync(publicMediaRoot)) {
+    assert.deepEqual(listFiles(publicMediaRoot), [], "v2 fixture retained public media files");
+  }
+  if (existsSync(exportedMediaRoot)) {
+    assert.deepEqual(listFiles(exportedMediaRoot), [], "v2 fixture exported media files");
+  }
   assert.doesNotMatch(article, /content-gallery|data-action-kind|\/_media\//);
   assert.doesNotMatch(staticPage, /data-action-kind|\/_media\//);
 } else {
