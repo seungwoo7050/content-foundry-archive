@@ -6,6 +6,7 @@ import {
   ThemeBreadcrumbs,
   ThemeFooterNavigation,
   ThemeNavigation,
+  ThemeRecoveryLinks,
 } from "./theme-links.js";
 
 describe("shared theme link primitives", () => {
@@ -29,6 +30,20 @@ describe("shared theme link primitives", () => {
       ] },
     ]} />);
     expect(html).toBe('<nav aria-label="주요 메뉴"><ul><li><a href="/guide">안내</a><ul><li><a href="/guide/start">시작</a></li></ul></li></ul></nav>');
+  });
+
+  it("renders recovery links in order without exposing kind as content", () => {
+    expect(renderToStaticMarkup(<ThemeRecoveryLinks />)).toBe("");
+    expect(renderToStaticMarkup(<ThemeRecoveryLinks items={[]} />)).toBe("");
+    expect(renderToStaticMarkup(<ThemeRecoveryLinks items={[
+      { kind: "search", href: "/search", label: "검색" },
+      { kind: "replacement", href: "/article/current", label: "최신 안내" },
+    ]} />)).toBe(
+      '<nav aria-label="페이지 복구 경로"><ul>'
+      + '<li data-recovery-kind="search"><a href="/search">검색</a></li>'
+      + '<li data-recovery-kind="replacement"><a href="/article/current">최신 안내</a></li>'
+      + "</ul></nav>",
+    );
   });
 
   it("links ancestors and marks the matching final breadcrumb as current", () => {

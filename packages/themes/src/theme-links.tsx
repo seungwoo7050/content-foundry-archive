@@ -3,6 +3,7 @@ import type {
   LinkViewModel,
   NavigationItemViewModel,
 } from "./presentation-view-model.js";
+import type { StateRecoveryLinkViewModel } from "./state-route-view-model.js";
 
 function NavigationItems({
   items,
@@ -45,6 +46,24 @@ export function ThemeFooterNavigation({
       <ul>
         {items.map((item) => (
           <li key={item.href}><a href={item.href}>{item.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+  ) : null;
+}
+
+export function ThemeRecoveryLinks({
+  items,
+}: {
+  readonly items?: readonly StateRecoveryLinkViewModel[];
+}) {
+  return items && items.length > 0 ? (
+    <nav aria-label="페이지 복구 경로">
+      <ul>
+        {items.map(({ href, label, kind }) => (
+          <li key={`${kind}:${href}`} data-recovery-kind={kind}>
+            <a href={href}>{label}</a>
+          </li>
         ))}
       </ul>
     </nav>
