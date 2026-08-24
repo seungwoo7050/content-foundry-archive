@@ -22,4 +22,24 @@ describe("release build metadata", () => {
       routeCount: 6,
     });
   });
+
+  it("counts gone HTML without counting redirect actions", () => {
+    const bundle = loadReleaseBundle(fixture);
+    bundle.redirects.items.push(
+      {
+        type: "gone",
+        path: "/retired-guide",
+        status: 410,
+        replacementPath: null,
+      },
+      {
+        type: "redirect",
+        fromPath: "/old-guide",
+        toPath: "/about",
+        status: 308,
+      },
+    );
+
+    expect(createReleaseBuildMetadata(bundle).routeCount).toBe(7);
+  });
 });

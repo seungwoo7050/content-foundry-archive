@@ -8,6 +8,7 @@ import {
   type ReleaseIdentity,
   type ReleaseIdentitySource,
 } from "./release-identity";
+import { getGoneRoutes, type GoneRouteSource } from "./gone-route";
 import { getRouteClaims, type GeneratedRouteSource } from "./route-claims";
 
 export interface ReleaseBuildMetadata extends ReleaseIdentity {
@@ -16,15 +17,15 @@ export interface ReleaseBuildMetadata extends ReleaseIdentity {
 }
 
 export function createReleaseBuildMetadata(
-  bundle: ReleaseIdentitySource & GeneratedRouteSource,
+  bundle: ReleaseIdentitySource & GeneratedRouteSource & GoneRouteSource,
 ): ReleaseBuildMetadata {
-  const routeCount = [...getRouteClaims(bundle).values()].filter(
+  const generatedHtmlCount = [...getRouteClaims(bundle).values()].filter(
     ({ outputKind }) => outputKind === "html",
   ).length;
 
   return {
     ...createReleaseIdentity(bundle),
     supportedContractVersions: [...SUPPORTED_CONTRACT_VERSIONS],
-    routeCount,
+    routeCount: generatedHtmlCount + getGoneRoutes(bundle).length,
   };
 }
