@@ -2,11 +2,15 @@ import { resolve } from "node:path";
 
 import {
   loadReleaseBundle,
+  type LoadedReleaseBundleV3,
   type PublicRouteDispositions,
 } from "@content-foundry/content-contract";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { validateSiteRouteGraph } from "./validate-site-route-graph";
+import {
+  type SiteRouteGraphSource,
+  validateSiteRouteGraph,
+} from "./validate-site-route-graph";
 
 const fixture = resolve(
   process.cwd(),
@@ -21,6 +25,10 @@ function withDisposition(
 }
 
 describe("Site A route graph", () => {
+  it("accepts the v3 release route graph structure", () => {
+    expectTypeOf<LoadedReleaseBundleV3>().toExtend<SiteRouteGraphSource>();
+  });
+
   it("returns the valid release unchanged", () => {
     expect(validateSiteRouteGraph(bundle)).toBe(bundle);
   });

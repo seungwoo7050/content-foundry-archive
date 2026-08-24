@@ -1,12 +1,16 @@
-import type { LoadedReleaseBundle } from "@content-foundry/content-contract";
-
-import { validateDispositionSourceClaims } from "./validate-disposition-source-claims";
+import {
+  type DispositionRouteSource,
+  validateDispositionSourceClaims,
+} from "./validate-disposition-source-claims";
 import { validateDispositionTargets } from "./validate-disposition-targets";
-import { validateNavigationDestinations } from "./validate-navigation-destinations";
+import {
+  type NavigationRouteSource,
+  validateNavigationDestinations,
+} from "./validate-navigation-destinations";
 
-export function validateSiteRouteGraph(
-  bundle: LoadedReleaseBundle,
-): LoadedReleaseBundle {
+export type SiteRouteGraphSource = DispositionRouteSource & NavigationRouteSource;
+
+export function validateSiteRouteGraph<T extends SiteRouteGraphSource>(bundle: T): T {
   validateDispositionSourceClaims(bundle);
   validateDispositionTargets(bundle);
   validateNavigationDestinations(bundle);
