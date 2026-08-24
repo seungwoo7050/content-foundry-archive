@@ -71,7 +71,7 @@ describe("Clean Personal Blog", () => {
     expect(html).toContain(`data-skin="${skinId}"`);
     expect(html).toContain(`data-route="${route.kind}"`);
     expect(html).toContain(markers[route.kind]);
-    expect(html).toContain('id="main-content"');
+    expect(html).toContain('id="main-content" tabindex="-1"');
     for (const color of Object.values(SKIN_TOKENS[skinId])) expect(html).toContain(color);
     expect(html).not.toMatch(/author bio|email|social|reading.?time|popular|newsletter|save|data-ad|ad-slot/i);
   });

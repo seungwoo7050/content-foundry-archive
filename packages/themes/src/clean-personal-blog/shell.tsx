@@ -42,7 +42,7 @@ export function CleanPersonalBlogShell({
           </div>
         </div>
       </header>
-      <main className="personal-main" data-route={route.kind} id="main-content">
+      <main className="personal-main" data-route={route.kind} id="main-content" tabIndex={-1}>
         <div className="personal-reading-column">
           {route.breadcrumbs.length > 0 ? (
             <div className="personal-breadcrumbs">
