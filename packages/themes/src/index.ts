@@ -22,6 +22,12 @@ export {
 } from "./state-route-view-model.js";
 export { THEME_IDS, type ThemeId } from "./theme-id.js";
 export {
+  AD_SLOT_IDS,
+  type AdSlotId,
+  type ThemeModule,
+  type ThemeQualityProfile,
+} from "./theme-module.js";
+export {
   type ArchiveRouteViewModel,
   type ArticleRouteViewModel,
   type CategoryRouteViewModel,
