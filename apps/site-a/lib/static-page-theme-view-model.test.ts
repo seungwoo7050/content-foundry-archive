@@ -14,9 +14,11 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 import { VersionedContentBlocks } from "../components/versioned-content-blocks";
 import { getGeneratedRoutes } from "./generated-routes";
 import type {
+  PreparedSiteReleaseContextV2,
   SiteReleaseContext,
   SiteReleaseContextV3,
 } from "./load-site-release";
+import { renderStaticPageContent } from "./static-page-content";
 import {
   createStaticPageThemeViewModel,
   type StaticPageThemeContext,
@@ -39,6 +41,26 @@ const v3Bundle = loadV3ReleaseBundle(
     }),
   },
 );
+const mediaAssets = new Map([
+  [
+    "MED-000045",
+    {
+      fallback: {
+        mediaId: "MED-000045",
+        relativePath: "_media/MED-000045/source.png",
+        publicPath: "/_media/MED-000045/source.png",
+        sha256: "verified",
+        mimeType: "image/png",
+        width: 16,
+        height: 9,
+        alt: "v2 소개 화면",
+        credit: null,
+        license: null,
+      },
+      derivatives: [],
+    },
+  ],
+]);
 
 function firstPage<T extends LoadedReleaseBundle | LoadedReleaseBundleV3>(
   release: T,
@@ -86,6 +108,42 @@ describe("static-page theme view model", () => {
     expect(model).not.toHaveProperty("bundle");
     expect(model).not.toHaveProperty("contractVersion");
     expect(model).not.toHaveProperty("id");
+  });
+
+  it("passes prepared v2 media to the production static-page renderer", () => {
+    const page = firstPage(bundle);
+    const context: PreparedSiteReleaseContextV2 = {
+      contractVersion: "2.0.0",
+      config: {
+        siteId: "site-a",
+        mode: "template",
+        releaseDirectory: fixtureRoot,
+        origin: null,
+        noindex: true,
+        analyticsEnabled: false,
+        adsEnabled: false,
+      },
+      bundle: {
+        ...bundle,
+        pages: [{
+          ...page,
+          content: [
+            ...page.content,
+            { type: "image", mediaId: "MED-000045" },
+          ],
+        }],
+      },
+      canonicalOrigin: bundle.site.origin,
+      mediaAssets,
+    };
+
+    const html = renderToStaticMarkup(
+      renderStaticPageContent(context, ["about"]),
+    );
+
+    expect(html).toContain("1인 운영 블로그입니다.");
+    expect(html).toContain('src="/_media/MED-000045/source.png"');
+    expect(html).toContain('alt="v2 소개 화면"');
   });
 
   it("preserves the v3 VersionedContentBlocks slot without exposing records", () => {
