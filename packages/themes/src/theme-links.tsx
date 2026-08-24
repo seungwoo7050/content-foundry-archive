@@ -9,15 +9,24 @@ import type { StateRecoveryLinkViewModel } from "./state-route-view-model.js";
 
 function NavigationItems({
   items,
+  currentPath,
 }: {
   readonly items: readonly NavigationItemViewModel[];
+  readonly currentPath?: string | undefined;
 }) {
   return (
     <ul>
       {items.map(({ link, children }) => (
         <li key={link.href}>
-          <a href={link.href}>{link.label}</a>
-          {children.length > 0 ? <NavigationItems items={children} /> : null}
+          <a
+            aria-current={link.href === currentPath ? "page" : undefined}
+            href={link.href}
+          >
+            {link.label}
+          </a>
+          {children.length > 0 ? (
+            <NavigationItems currentPath={currentPath} items={children} />
+          ) : null}
         </li>
       ))}
     </ul>
@@ -27,13 +36,15 @@ function NavigationItems({
 export function ThemeNavigation({
   items,
   ariaLabel,
+  currentPath,
 }: {
   readonly items: readonly NavigationItemViewModel[];
   readonly ariaLabel: string;
+  readonly currentPath?: string | undefined;
 }) {
   return items.length > 0 ? (
     <nav aria-label={ariaLabel}>
-      <NavigationItems items={items} />
+      <NavigationItems currentPath={currentPath} items={items} />
     </nav>
   ) : null;
 }

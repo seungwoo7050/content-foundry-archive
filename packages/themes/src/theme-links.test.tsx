@@ -41,12 +41,12 @@ describe("shared theme link primitives", () => {
   });
 
   it("renders recursive navigation with its caller-provided label", () => {
-    const html = renderToStaticMarkup(<ThemeNavigation ariaLabel="주요 메뉴" items={[
+    const html = renderToStaticMarkup(<ThemeNavigation ariaLabel="주요 메뉴" currentPath="/guide/start" items={[
       { link: { href: "/guide", label: "안내" }, children: [
         { link: { href: "/guide/start", label: "시작" }, children: [] },
       ] },
     ]} />);
-    expect(html).toBe('<nav aria-label="주요 메뉴"><ul><li><a href="/guide">안내</a><ul><li><a href="/guide/start">시작</a></li></ul></li></ul></nav>');
+    expect(html).toBe('<nav aria-label="주요 메뉴"><ul><li><a href="/guide">안내</a><ul><li><a aria-current="page" href="/guide/start">시작</a></li></ul></li></ul></nav>');
   });
 
   it("renders recovery links in order without exposing kind as content", () => {
