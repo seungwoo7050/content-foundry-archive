@@ -1,5 +1,6 @@
 export { exportImageSources } from "./export-image-sources.js";
 export { exportResponsiveImageAsset } from "./export-responsive-image-asset.js";
+export { exportResponsiveImageSources } from "./export-responsive-image-sources.js";
 export { exportStaticImageSource } from "./export-static-image-source.js";
 export {
   generateResponsiveImageAsset,
