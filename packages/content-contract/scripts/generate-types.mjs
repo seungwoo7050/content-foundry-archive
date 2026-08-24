@@ -5,44 +5,74 @@ import { fileURLToPath } from "node:url";
 import { compileFromFile } from "json-schema-to-typescript";
 
 const packageRoot = dirname(dirname(fileURLToPath(import.meta.url)));
-const schemaRoot = join(packageRoot, "vendor", "2.0.0", "schemas");
-const outputRoot = join(packageRoot, "src", "generated");
+const generatedRoot = join(packageRoot, "src", "generated");
 const checkOnly = process.argv.includes("--check");
 
-const schemas = [
-  "article",
-  "content-block",
-  "content",
-  "media-manifest",
-  "navigation",
-  "page",
-  "redirects",
-  "release",
-  "site",
-  "taxonomy",
+const contracts = [
+  {
+    version: "2.0.0",
+    outputRoot: generatedRoot,
+    schemas: [
+      "article",
+      "content-block",
+      "content",
+      "media-manifest",
+      "navigation",
+      "page",
+      "redirects",
+      "release",
+      "site",
+      "taxonomy",
+    ],
+  },
+  {
+    version: "3.0.0",
+    outputRoot: join(generatedRoot, "3.0.0"),
+    schemas: [
+      "action-link-block",
+      "article",
+      "code-command-block",
+      "content-block",
+      "content",
+      "gallery-block",
+      "media-manifest",
+      "navigation",
+      "niche-component-block",
+      "page",
+      "redirects",
+      "release",
+      "site",
+      "taxonomy",
+    ],
+  },
 ];
 
-const options = {
-  bannerComment: "/* Generated from contract 2.0.0. Do not edit. */",
-  cwd: schemaRoot,
-  style: { singleQuote: false },
-  unreachableDefinitions: true,
-};
+for (const contract of contracts) {
+  const schemaRoot = join(packageRoot, "vendor", contract.version, "schemas");
+  const options = {
+    bannerComment: `/* Generated from contract ${contract.version}. Do not edit. */`,
+    cwd: schemaRoot,
+    style: { singleQuote: false },
+    unreachableDefinitions: true,
+  };
 
-await mkdir(outputRoot, { recursive: true });
+  await mkdir(contract.outputRoot, { recursive: true });
 
-for (const name of schemas) {
-  const source = join(schemaRoot, `${name}.schema.json`);
-  const target = join(outputRoot, `${name}.ts`);
-  const generated = await compileFromFile(source, options);
+  for (const name of contract.schemas) {
+    const source = join(schemaRoot, `${name}.schema.json`);
+    const target = join(contract.outputRoot, `${name}.ts`);
+    const generated = await compileFromFile(source, options);
 
-  if (checkOnly) {
-    const current = await readFile(target, "utf8").catch(() => "");
-    if (current !== generated) {
-      throw new Error(`Generated contract type is stale: ${name}.ts`);
+    if (checkOnly) {
+      const current = await readFile(target, "utf8").catch(() => "");
+      if (current !== generated) {
+        throw new Error(
+          `Generated contract type is stale: ${contract.version}/${name}.ts`,
+        );
+      }
+      continue;
     }
-    continue;
-  }
 
-  await writeFile(target, generated);
+    await writeFile(target, generated);
+  }
 }
