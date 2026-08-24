@@ -1,3 +1,6 @@
+import { resolve } from "node:path";
+
+import { loadReleaseBundle } from "@content-foundry/content-contract";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -5,11 +8,18 @@ import {
   createRetiredThemeViewModel,
 } from "./status-theme-view-model";
 
-const bundle = { site: { name: "생활메모" } };
+const fixture = resolve(
+  process.cwd(),
+  "../../packages/content-contract/vendor/2.0.0/fixtures/bundles/valid/site-a-minimal",
+);
+const bundle = loadReleaseBundle(fixture);
+const article = bundle.articles[0]!;
 
 describe("status theme view models", () => {
-  it("projects the static missing-page facts and home recovery", () => {
-    expect(createNotFoundThemeViewModel(bundle)).toEqual({
+  it("projects missing-page facts and only actual release recovery paths", () => {
+    const model = createNotFoundThemeViewModel(bundle);
+
+    expect(model).toEqual({
       kind: "not-found",
       path: "/404",
       heading: "페이지를 찾을 수 없습니다",
@@ -21,25 +31,73 @@ describe("status theme view models", () => {
       ],
       statusCode: 404,
       action: { href: "/", label: "생활메모 홈으로 돌아가기" },
+      recoveryLinks: [
+        { kind: "search", href: "/search", label: "사이트 검색" },
+        {
+          kind: "category",
+          href: "/category/daily-admin",
+          label: "생활·행정",
+        },
+        {
+          kind: "replacement",
+          href: "/article/government24-resident-registration-guide",
+          label: "최근 안내: 정부24 주민등록등본 발급 방법",
+        },
+      ],
     });
+    expect(model.recoveryLinks?.map(({ href }) => href)).not.toContain("/category");
   });
 
-  it("uses an explicit retired replacement when one exists", () => {
+  it("uses an explicit retired replacement once and adds other recovery", () => {
     expect(createRetiredThemeViewModel(bundle, {
       type: "gone",
       path: "/old-guide",
       status: 410,
-      replacementPath: "/article/current-guide",
+      replacementPath: article.seo.canonicalPath,
     })).toMatchObject({
       kind: "retired",
       path: "/old-guide",
       description: "/old-guide 주소의 콘텐츠는 더 이상 제공하지 않습니다.",
       statusCode: 410,
       action: {
-        href: "/article/current-guide",
+        href: "/article/government24-resident-registration-guide",
         label: "대신 볼 수 있는 안내로 이동",
       },
+      recoveryLinks: [
+        { kind: "search", href: "/search", label: "사이트 검색" },
+        {
+          kind: "category",
+          href: "/category/daily-admin",
+          label: "생활·행정",
+        },
+      ],
     });
+  });
+
+  it("selects at most one recent article by update and stable id", () => {
+    const model = createNotFoundThemeViewModel({
+      ...bundle,
+      site: { ...bundle.site, search: { enabled: false } },
+      taxonomy: { ...bundle.taxonomy, categories: [] },
+      articles: [
+        {
+          ...article,
+          id: "ART-B",
+          updatedAt: "2026-08-25T00:00:00Z",
+          seo: { ...article.seo, canonicalPath: "/article/b" },
+        },
+        {
+          ...article,
+          id: "ART-A",
+          updatedAt: "2026-08-25T00:00:00Z",
+          seo: { ...article.seo, canonicalPath: "/article/a" },
+        },
+      ],
+    });
+
+    expect(model.recoveryLinks).toEqual([
+      { kind: "replacement", href: "/article/a", label: `최근 안내: ${article.title}` },
+    ]);
   });
 
   it("falls back to the archive without inventing a replacement", () => {
@@ -56,5 +114,10 @@ describe("status theme view models", () => {
       label: "더 이상 제공하지 않는 페이지입니다",
     });
     expect(model).not.toHaveProperty("replacementPath");
+    expect(model.recoveryLinks?.map(({ href }) => href)).toEqual([
+      "/search",
+      "/category/daily-admin",
+      "/article/government24-resident-registration-guide",
+    ]);
   });
 });
