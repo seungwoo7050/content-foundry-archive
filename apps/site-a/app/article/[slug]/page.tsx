@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { ArticleBreadcrumbs } from "../../../components/article-breadcrumbs";
 import { ArticleEvidence } from "../../../components/article-evidence";
 import { ArticleTrustSummary } from "../../../components/article-trust-summary";
 import { RetiredRoute } from "../../../components/retired-route";
@@ -11,7 +12,9 @@ import {
   findArticleBySlug,
   getArticlePageStaticParams,
 } from "../../../lib/article-route";
+import { createArticleBreadcrumbs } from "../../../lib/article-breadcrumbs";
 import { createArticleStructuredData } from "../../../lib/article-structured-data";
+import { createBreadcrumbStructuredData } from "../../../lib/breadcrumb-structured-data";
 import { findGoneRoute } from "../../../lib/gone-route";
 import { createArticleTrustViewModel } from "../../../lib/article-trust-view-model";
 import type { VersionedSiteReleaseContext } from "../../../lib/load-site-release";
@@ -89,6 +92,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const category = bundle.taxonomy.categories.find(
     ({ id }) => id === article.categoryId,
   );
+  if (!category) notFound();
+
+  const breadcrumbs = createArticleBreadcrumbs(bundle.site, category, article);
   const trust = createArticleTrustViewModel(bundle, article);
 
   return (
@@ -99,8 +105,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           article,
         )}
       />
+      <StructuredData
+        value={createBreadcrumbStructuredData(
+          context.canonicalOrigin,
+          breadcrumbs,
+        )}
+      />
+      <ArticleBreadcrumbs items={breadcrumbs} />
       <header className="article-header">
-        {category ? <p>{category.label}</p> : null}
+        <p>{category.label}</p>
         <h1>{article.title}</h1>
         <p>{article.summary}</p>
       </header>
