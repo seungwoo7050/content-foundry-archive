@@ -14,6 +14,15 @@ describe("content route view models", () => {
     expectTypeOf<StaticPageRouteViewModel["body"]>().toEqualTypeOf<ReactNode>();
   });
 
+  it("keeps release-backed article navigation and ad eligibility explicit", () => {
+    expectTypeOf<ArticleRouteViewModel["toc"]>().toEqualTypeOf<
+      readonly { readonly id: string; readonly label: string; readonly level: number }[]
+    >();
+    expectTypeOf<
+      ArticleRouteViewModel["advertisingEligible"]
+    >().toEqualTypeOf<boolean>();
+  });
+
   it("discriminates the five public content routes", () => {
     expectTypeOf<ContentRouteViewModel["kind"]>().toEqualTypeOf<
       "home" | "category" | "article" | "static-page" | "archive"
