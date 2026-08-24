@@ -3,6 +3,7 @@ import type { CSSProperties, ReactNode } from "react";
 import type { SiteShellViewModel } from "../presentation-view-model.js";
 import type { ThemeRenderContext } from "../html-route-view-model.js";
 import { ThemeNavigation } from "../theme-links.js";
+import { MINIMAL_KNOWLEDGE_BASE_STYLES } from "./styles.js";
 
 function semanticColorProperties(
   colors: ThemeRenderContext["colors"],
@@ -40,6 +41,7 @@ export function MinimalKnowledgeBaseShell({
       lang={shell.locale}
       style={semanticColorProperties(context.colors)}
     >
+      <style>{MINIMAL_KNOWLEDGE_BASE_STYLES}</style>
       <a className="kb-skip-link" href={shell.skipLink.href}>
         {shell.skipLink.label}
       </a>
