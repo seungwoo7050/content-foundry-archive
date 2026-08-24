@@ -7,6 +7,8 @@ import {
 } from "./read-bundle-documents.js";
 import { validateContentReferences } from "./validate-content-references.js";
 import { validateContentSemantics } from "./validate-content-semantics.js";
+import { validateExternalActionUrls } from "./validate-external-action-urls.js";
+import { validateGalleryAltText } from "./validate-gallery-alt-text.js";
 import { validatePublicKeys } from "./validate-public-keys.js";
 import { validateReleaseIdentity } from "./validate-release-identity.js";
 import { validateRouteDispositions } from "./validate-route-dispositions.js";
@@ -53,6 +55,16 @@ function validateLoadedReleaseBundle<T extends VersionedReleaseBundle>(
   return bundle;
 }
 
+export function validateV3ReleaseBundle(
+  bundle: ReleaseBundleDocumentsByVersion["3.0.0"],
+  options: LoadReleaseBundleOptions = {},
+): ReleaseBundleDocumentsByVersion["3.0.0"] {
+  const validated = validateLoadedReleaseBundle(bundle, options);
+  validateGalleryAltText(validated);
+  validateExternalActionUrls(validated);
+  return validated;
+}
+
 export function loadReleaseBundleForVersion(
   version: "2.0.0",
   root: string,
@@ -75,7 +87,7 @@ export function loadReleaseBundleForVersion(
     );
   }
   if (version === "3.0.0") {
-    return validateLoadedReleaseBundle(
+    return validateV3ReleaseBundle(
       readReleaseBundleDocumentsForVersion("3.0.0", root),
       options,
     );

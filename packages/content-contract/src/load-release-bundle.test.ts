@@ -5,6 +5,7 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 import {
   loadReleaseBundle,
   loadReleaseBundleForVersion,
+  validateV3ReleaseBundle,
 } from "./load-release-bundle.js";
 import type { ReleaseBundleDocumentsByVersion } from "./read-bundle-documents.js";
 
@@ -57,6 +58,35 @@ describe("loadReleaseBundle", () => {
       expect.objectContaining({
         code: "REFERENCE_INVALID",
         issues: [expect.objectContaining({ path: "/release/siteId" })],
+      }),
+    );
+  });
+
+  it("composes gallery alt validation into the v3 loader", () => {
+    const bundle = loadReleaseBundleForVersion("3.0.0", fixtureV3);
+    bundle.mediaManifest.items[0]!.alt = "   ";
+
+    expect(() => validateV3ReleaseBundle(bundle)).toThrowError(
+      expect.objectContaining({
+        code: "CONTRACT_INVALID",
+        issues: [expect.objectContaining({ path: "/media/items/0/alt" })],
+      }),
+    );
+  });
+
+  it("composes external action validation into the v3 loader", () => {
+    const bundle = loadReleaseBundleForVersion("3.0.0", fixtureV3);
+    bundle.articles[0]!.content[3] = {
+      type: "action-link",
+      kind: "official",
+      label: "소개 읽기",
+      url: "https://example.com/about",
+    };
+
+    expect(() => validateV3ReleaseBundle(bundle)).toThrowError(
+      expect.objectContaining({
+        code: "CONTRACT_INVALID",
+        issues: [expect.objectContaining({ path: "/articles/0/content/3/url" })],
       }),
     );
   });
