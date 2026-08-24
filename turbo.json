@@ -12,6 +12,18 @@
       ],
       "outputs": ["dist/**", ".next/**", "out/**"]
     },
+    "@content-foundry/site-a#build": {
+      "dependsOn": ["^build"],
+      "env": [
+        "RELEASE_MODE",
+        "CONTENT_RELEASE_DIR",
+        "IMMUTABLE_MEDIA_DIR",
+        "SITE_ORIGIN",
+        "ENABLE_ANALYTICS",
+        "ENABLE_ADS"
+      ],
+      "outputs": [".next/**", "out/**", ".site-build/**", "public/_media/**"]
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },
