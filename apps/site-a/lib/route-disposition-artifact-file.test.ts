@@ -4,6 +4,8 @@ import {
   readFileSync,
   readdirSync,
   rmSync,
+  symlinkSync,
+  writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -56,5 +58,20 @@ describe("route disposition artifact persistence", () => {
       code: "BUILD_FAILED",
     });
     expect(readdirSync(dirname(path))).toEqual(["route-dispositions.json"]);
+  });
+
+  it("rejects a linked build directory before writing externally", async () => {
+    const path = artifactPath();
+    const outside = join(dirname(dirname(path)), "outside-build");
+    mkdirSync(outside);
+    const external = join(outside, "keep.txt");
+    writeFileSync(external, "external");
+    symlinkSync(outside, dirname(path), "dir");
+
+    await expect(writeRouteDispositionArtifact(path, bundle)).rejects.toMatchObject({
+      code: "BUILD_FAILED",
+    });
+    expect(readFileSync(external, "utf8")).toBe("external");
+    expect(readdirSync(outside)).toEqual(["keep.txt"]);
   });
 });

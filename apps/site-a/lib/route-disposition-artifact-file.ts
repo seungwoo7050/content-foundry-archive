@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, rename, rm, writeFile } from "node:fs/promises";
+import { lstat, mkdir, rename, rm, writeFile } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 
 import { ContractError } from "@content-foundry/content-contract";
@@ -27,6 +27,7 @@ export async function writeRouteDispositionArtifact(
   const temporary = join(directory, `.${basename(path)}.${randomUUID()}.tmp`);
   try {
     await mkdir(directory, { recursive: true });
+    if (!(await lstat(directory)).isDirectory()) fail();
     await writeFile(temporary, source, { encoding: "utf8", flag: "wx" });
     await rename(temporary, path);
   } catch {
