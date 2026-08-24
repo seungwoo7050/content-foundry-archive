@@ -175,6 +175,7 @@ const article = readArtifact(articleRelativePath);
 const staticPage = readArtifact(staticPageRelativePath);
 const category = readArtifact(categoryRelativePath);
 const archive = readArtifact("archive.html");
+const adsTxt = readArtifact("ads.txt");
 const notFound = readArtifact("404.html");
 const search = readArtifact("search.html");
 const robots = readArtifact("robots.txt");
@@ -214,6 +215,7 @@ const expectedIdentities = {
   },
 };
 assert.deepEqual(identity, expectedIdentities[identity.contractVersion]);
+assert.equal(adsTxt, "");
 assert.equal(robots, "User-Agent: *\nDisallow: /\n\n");
 
 const sitemapEntries = [...sitemap.matchAll(

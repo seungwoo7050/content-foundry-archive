@@ -17,6 +17,7 @@ export type RouteClaimKind =
   | "fixed-home"
   | "fixed-archive"
   | "fixed-not-found"
+  | "fixed-ads-txt"
   | "fixed-release-identity"
   | "fixed-robots"
   | "fixed-rss"
@@ -76,6 +77,13 @@ export function getRouteClaims(
       navigable: false,
       outputKind: "machine",
       source: "fixed release-identity route",
+    },
+    {
+      path: "/ads.txt",
+      kind: "fixed-ads-txt",
+      navigable: false,
+      outputKind: "machine",
+      source: "fixed ads.txt route",
     },
     {
       path: "/sitemap.xml",

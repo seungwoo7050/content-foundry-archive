@@ -51,6 +51,12 @@ describe("generated route claims", () => {
         outputKind: "machine",
         source: "fixed release-identity route",
       },
+      "/ads.txt": {
+        kind: "fixed-ads-txt",
+        navigable: false,
+        outputKind: "machine",
+        source: "fixed ads.txt route",
+      },
       "/sitemap.xml": {
         kind: "fixed-sitemap",
         navigable: false,
@@ -100,6 +106,7 @@ describe("generated route claims", () => {
     ["/archive", "fixed-archive", "fixed archive route"],
     ["/search", "fixed-search", "fixed search route"],
     ["/404", "fixed-not-found", "fixed not-found route"],
+    ["/ads.txt", "fixed-ads-txt", "fixed ads.txt route"],
     ["/sitemap.xml", "fixed-sitemap", "fixed sitemap route"],
     ["/robots.txt", "fixed-robots", "fixed robots route"],
     ["/rss.xml", "fixed-rss", "fixed RSS route"],
