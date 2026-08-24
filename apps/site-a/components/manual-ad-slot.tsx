@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import {
   AdvertisingConfigError,
@@ -13,6 +13,7 @@ import {
 } from "@content-foundry/advertising";
 import { canLoadGoogleAdvertising } from "@content-foundry/site-core";
 
+import { emitAnalyticsEvent } from "./analytics-event-dispatcher";
 import { useGoogleCmpConsent } from "../lib/use-google-cmp-consent";
 
 interface AdSenseWindow {
@@ -33,6 +34,26 @@ export function activateManualAdUnit(target: AdSenseWindow): void {
   target.adsbygoogle.push({});
 }
 
+export interface ManualAdViewabilityState {
+  readonly advertisingAllowed: boolean;
+  readonly visible: boolean;
+  readonly reported: boolean;
+}
+
+export function updateManualAdViewability(
+  slotId: AdSlotId,
+  current: ManualAdViewabilityState,
+  change: Partial<Pick<ManualAdViewabilityState, "advertisingAllowed" | "visible">>,
+  emit: typeof emitAnalyticsEvent = emitAnalyticsEvent,
+): ManualAdViewabilityState {
+  const next = { ...current, ...change };
+  if (!next.reported && next.advertisingAllowed && next.visible) {
+    emit({ eventName: "ad_slot_viewability", slotId });
+    return { ...next, reported: true };
+  }
+  return next;
+}
+
 function EnabledManualAdSlot({
   publicClientId,
   slotId,
@@ -43,18 +64,45 @@ function EnabledManualAdSlot({
   readonly unitId: AdSenseUnitId;
 }) {
   const activated = useRef(false);
+  const placement = useRef<HTMLElement>(null);
+  const viewability = useRef<ManualAdViewabilityState>({
+    advertisingAllowed: false,
+    visible: false,
+    reported: false,
+  });
   const handleConsent = useCallback((values: unknown) => {
-    if (!activated.current && canLoadGoogleAdvertising(values)) {
+    const advertisingAllowed = canLoadGoogleAdvertising(values);
+    viewability.current = updateManualAdViewability(
+      slotId,
+      viewability.current,
+      { advertisingAllowed },
+    );
+    if (!activated.current && advertisingAllowed) {
       activated.current = true;
       activateManualAdUnit(window as unknown as AdSenseWindow);
     }
-  }, []);
+  }, [slotId]);
   useGoogleCmpConsent(handleConsent);
+
+  useEffect(() => {
+    const target = placement.current;
+    if (target === null || typeof IntersectionObserver !== "function") return;
+    const observer = new IntersectionObserver(([entry]) => {
+      viewability.current = updateManualAdViewability(
+        slotId,
+        viewability.current,
+        { visible: Boolean(entry?.isIntersecting && entry.intersectionRatio >= 0.5) },
+      );
+    }, { threshold: [0.5] });
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [slotId]);
 
   return (
     <aside
       aria-label="광고"
       data-ad-placement={slotId}
+      ref={placement}
       style={{ minHeight: SLOT_MIN_HEIGHT[slotId] }}
     >
       <small aria-hidden="true">광고</small>

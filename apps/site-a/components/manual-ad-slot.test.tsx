@@ -4,9 +4,13 @@ import {
 } from "@content-foundry/advertising";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { ManualAdSlot, activateManualAdUnit } from "./manual-ad-slot";
+import {
+  ManualAdSlot,
+  activateManualAdUnit,
+  updateManualAdViewability,
+} from "./manual-ad-slot";
 
 const enabled = resolveAdvertisingProviderConfig(true, {
   provider: "adsense",
@@ -50,6 +54,42 @@ describe("manual AdSense slot", () => {
     const target = { adsbygoogle: [] as unknown[] };
     activateManualAdUnit(target);
     expect(target.adsbygoogle).toEqual([{}]);
+  });
+
+  it("reports viewability once after both ad consent and half visibility", () => {
+    const emit = vi.fn(() => true);
+    const initial = {
+      advertisingAllowed: false,
+      visible: false,
+      reported: false,
+    };
+    const visible = updateManualAdViewability(
+      "article-end",
+      initial,
+      { visible: true },
+      emit,
+    );
+    expect(emit).not.toHaveBeenCalled();
+
+    const reported = updateManualAdViewability(
+      "article-end",
+      visible,
+      { advertisingAllowed: true },
+      emit,
+    );
+    expect(emit).toHaveBeenCalledWith({
+      eventName: "ad_slot_viewability",
+      slotId: "article-end",
+    });
+    expect(reported.reported).toBe(true);
+
+    updateManualAdViewability(
+      "article-end",
+      reported,
+      { visible: false },
+      emit,
+    );
+    expect(emit).toHaveBeenCalledTimes(1);
   });
 
   it("rejects forged client and unit identifiers", () => {
