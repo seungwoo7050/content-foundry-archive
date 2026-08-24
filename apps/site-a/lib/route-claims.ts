@@ -18,6 +18,7 @@ export type RouteClaimKind =
   | "fixed-archive"
   | "fixed-not-found"
   | "fixed-release-identity"
+  | "fixed-robots"
   | "fixed-sitemap"
   | "article"
   | "category"
@@ -72,6 +73,13 @@ export function getRouteClaims(
       navigable: false,
       outputKind: "machine",
       source: "fixed sitemap route",
+    },
+    {
+      path: "/robots.txt",
+      kind: "fixed-robots",
+      navigable: false,
+      outputKind: "machine",
+      source: "fixed robots route",
     },
     ...bundle.articles.map((article, index) => ({
       path: article.seo.canonicalPath,

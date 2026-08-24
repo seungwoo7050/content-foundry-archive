@@ -51,6 +51,12 @@ describe("generated route claims", () => {
         outputKind: "machine",
         source: "fixed sitemap route",
       },
+      "/robots.txt": {
+        kind: "fixed-robots",
+        navigable: false,
+        outputKind: "machine",
+        source: "fixed robots route",
+      },
       "/article/government24-resident-registration-guide": {
         kind: "article",
         navigable: true,
@@ -76,6 +82,7 @@ describe("generated route claims", () => {
     ["/archive", "fixed-archive", "fixed archive route"],
     ["/404", "fixed-not-found", "fixed not-found route"],
     ["/sitemap.xml", "fixed-sitemap", "fixed sitemap route"],
+    ["/robots.txt", "fixed-robots", "fixed robots route"],
     [
       "/article/government24-resident-registration-guide",
       "article",
