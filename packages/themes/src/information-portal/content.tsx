@@ -18,7 +18,15 @@ export function renderInformationPortalContent(
   context: ThemeAdSlotContext = {},
 ): ReactNode {
   switch (route.kind) {
-    case "home":
+    case "home": {
+      const homeGroups = [
+        [route.featuredArticles, "ip-home-featured", "ip-featured-heading", "주요 안내"],
+        [route.currentArticles, "ip-home-current", "ip-current-heading", "지금 확인할 안내"],
+        [route.evergreenArticles, "ip-home-reference", "ip-reference-heading", "기본 안내"],
+        [route.latestArticles, "ip-home-latest", "ip-group-latest-heading", route.articleSectionHeading],
+      ] as const;
+      const hasPresentation = homeGroups.some(([articles]) => articles !== undefined)
+        || route.categoryHighlights !== undefined;
       return (
         <div className="ip-stack">
           <PortalRouteIntro route={route} />
@@ -35,14 +43,34 @@ export function renderInformationPortalContent(
               ))}</div>
             </section>
           ) : null}
-          <section aria-labelledby="ip-latest-heading" className="ip-list">
-            <h2 id="ip-latest-heading">{route.articleSectionHeading}</h2>
-            <ThemeArticleList articles={route.articles} headingLevel={3} />
+          {hasPresentation ? <>
+            {homeGroups.map(([articles, className, headingId, heading]) => (
+              articles && articles.length > 0 ? (
+                <section aria-labelledby={headingId} className={`${className} ip-list`} key={className}>
+                  <h2 id={headingId}>{heading}</h2>
+                  <ThemeArticleList articles={articles} headingLevel={3} />
+                </section>
+              ) : null
+            ))}
+            {route.categoryHighlights?.map(({ category, articles }, index) => (
+              <section aria-labelledby={`ip-highlight-${index}`} className="ip-home-category-highlight ip-panel ip-list" key={category.href}>
+                <h2 id={`ip-highlight-${index}`}><a href={category.href}>{category.label}</a></h2>
+                <p>{category.description}</p>
+                {articles.length > 0 ? <ThemeArticleList articles={articles} headingLevel={3} /> : null}
+              </section>
+            ))}
             {getThemeAdSlot(context, "home-feed")}
-          </section>
+          </> : (
+            <section aria-labelledby="ip-latest-heading" className="ip-list">
+              <h2 id="ip-latest-heading">{route.articleSectionHeading}</h2>
+              <ThemeArticleList articles={route.articles} headingLevel={3} />
+              {getThemeAdSlot(context, "home-feed")}
+            </section>
+          )}
           <ThemeHomeAboutTeaser teaser={route.aboutTeaser} />
         </div>
       );
+    }
     case "category":
       return (
         <div className="ip-stack">

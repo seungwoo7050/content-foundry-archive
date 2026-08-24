@@ -6,7 +6,10 @@ import type {
   CategoryRouteViewModel,
   HomeRouteViewModel,
 } from "../content-route-view-model.js";
-import type { PaginationViewModel } from "../presentation-view-model.js";
+import type {
+  ArticleListItemViewModel,
+  PaginationViewModel,
+} from "../presentation-view-model.js";
 import { renderInformationPortalContent } from "./content.js";
 
 const base = {
@@ -15,6 +18,15 @@ const base = {
   description: "필요한 안내를 모았습니다.",
   breadcrumbs: [{ href: "/", label: "생활메모" }],
 } as const;
+
+const article: ArticleListItemViewModel = {
+  link: { href: "/article/start", label: "신청 안내" },
+  summary: "신청 절차",
+  date: { kind: "published", dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
+  estimatedReadingTime: { minutes: 2, label: "예상 읽기 시간 약 2분" },
+  category: null,
+  topics: [],
+};
 
 function renderListRoute(kind: "archive" | "category", pagination: PaginationViewModel) {
   const basePath = kind === "archive" ? "/archive" : "/category/life";
@@ -47,12 +59,7 @@ describe("Information Portal discovery routes", () => {
       ...base,
       kind: "home",
       articleSectionHeading: "최근 안내",
-      articles: [{
-        link: { href: "/article/start", label: "신청 안내" }, summary: "신청 절차",
-        date: { kind: "published", dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
-        estimatedReadingTime: { minutes: 2, label: "예상 읽기 시간 약 2분" },
-        category: null, topics: [],
-      }],
+      articles: [article],
       categories: [{ href: "/category/life", label: "생활", description: "생활 절차를 확인합니다." }],
       searchLink: { href: "/search", label: "사이트 검색" },
       aboutTeaser: {
@@ -68,9 +75,34 @@ describe("Information Portal discovery routes", () => {
     expect(html).toContain('class="ip-search-action" href="/search"');
     expect(html).toContain("생활 절차를 확인합니다.");
     expect(html).toContain('href="/article/start">신청 안내</a>');
+    expect(html).toContain('<h2 id="ip-latest-heading">최근 안내</h2>');
     expect(html.match(/id="home-about-teaser-heading"/g)).toHaveLength(1);
     expect(html).toContain("한 명의 운영자가 정보를 확인하고 정리합니다.");
     expect(html).toContain('<a href="/about">소개</a>');
+    expect(html).not.toMatch(/ranking|trending|popular|count|순위|인기/i);
+  });
+
+  it("renders release-provided portal groups as distinct discovery sections", () => {
+    const route: HomeRouteViewModel = {
+      ...base, kind: "home", articleSectionHeading: "최근 안내", articles: [article],
+      featuredArticles: [article], currentArticles: [article],
+      evergreenArticles: [article], latestArticles: [article],
+      categoryHighlights: [{
+        category: { href: "/category/life", label: "생활", description: "생활 절차 안내" },
+        articles: [article],
+      }],
+      categories: [], searchLink: null,
+    };
+
+    const html = renderToStaticMarkup(renderInformationPortalContent(route));
+    const headings = ["주요 안내", "지금 확인할 안내", "기본 안내", "최근 안내"];
+    const positions = headings.map((heading) => html.indexOf(`>${heading}</h2>`));
+    expect(positions.every((position) => position >= 0)).toBe(true);
+    expect(positions).toEqual([...positions].sort((left, right) => left - right));
+    expect(html).toContain(
+      '<h2 id="ip-highlight-0"><a href="/category/life">생활</a></h2><p>생활 절차 안내</p>',
+    );
+    expect(html.match(/href="\/article\/start"/g)).toHaveLength(5);
     expect(html).not.toMatch(/ranking|trending|popular|count|순위|인기/i);
   });
 
