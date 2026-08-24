@@ -70,4 +70,26 @@ describe("public build configuration projection", () => {
       /private\/release|ownedGa4MeasurementId|ownedAdSenseClientId/,
     );
   });
+
+  it("nulls production-only facts when effective providers are disabled", () => {
+    const disabled = createBuildConfigProjection({
+      config: { ...config, mode: "template", origin: null },
+      launch: {
+        ...launch,
+        consent: { provider: "disabled", configRevision: null },
+        analytics: { provider: "disabled", publicMeasurementId: null },
+        advertising: {
+          provider: "disabled", enabled: false, publicClientId: null, manualUnits: {},
+        },
+        cmp: { provider: "disabled", publicClientId: null },
+        adsTxtRecord: null,
+      },
+    });
+
+    expect(disabled.productionOrigin).toBeNull();
+    expect(disabled.advertising.manualUnits).toEqual([]);
+    expect(disabled.googleCmpReady).toBeNull();
+    expect(disabled.adsenseAutoAdsEnabled).toBeNull();
+    expect(disabled.adsenseSiteReady).toBeNull();
+  });
 });
