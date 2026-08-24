@@ -22,3 +22,4 @@ export {
   canLoadAdvertising,
   type AdvertisingConsentState,
 } from "./advertising-consent.js";
+export { createAdsTxtRecord } from "./ads-txt.js";
