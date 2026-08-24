@@ -12,11 +12,17 @@ import type { PublicSiteConfiguration } from "./generated/site.js";
 import type { PublicSiteTaxonomy } from "./generated/taxonomy.js";
 import {
   type ContractDocumentKind,
+  type RegisteredContractSchemaVersion,
   validateContractDocumentForVersion,
 } from "./validate-document.js";
-import { verifyReleaseIntegrity } from "./verify-integrity.js";
+import {
+  verifyReleaseIntegrity,
+  verifyReleaseIntegrityForVersion,
+} from "./verify-integrity.js";
 
-type ReleaseContractVersion = PublicSiteReleaseManifest["contractVersion"];
+type ContractDocumentV3<K extends ContractDocumentKind> = ReturnType<
+  typeof validateContractDocumentForVersion<"3.0.0", K>
+>;
 
 export interface ReleaseBundleDocuments {
   readonly release: PublicSiteReleaseManifest;
@@ -29,6 +35,22 @@ export interface ReleaseBundleDocuments {
   readonly pages: readonly PublishedStaticPageProjection[];
 }
 
+export interface ReleaseBundleDocumentsV3 {
+  readonly release: ContractDocumentV3<"release">;
+  readonly site: ContractDocumentV3<"site">;
+  readonly navigation: ContractDocumentV3<"navigation">;
+  readonly taxonomy: ContractDocumentV3<"taxonomy">;
+  readonly mediaManifest: ContractDocumentV3<"media-manifest">;
+  readonly redirects: ContractDocumentV3<"redirects">;
+  readonly articles: readonly ContractDocumentV3<"article">[];
+  readonly pages: readonly ContractDocumentV3<"page">[];
+}
+
+export interface ReleaseBundleDocumentsByVersion {
+  "2.0.0": ReleaseBundleDocuments;
+  "3.0.0": ReleaseBundleDocumentsV3;
+}
+
 function readJson(root: string, path: string): unknown {
   try {
     return JSON.parse(readFileSync(join(root, path), "utf8")) as unknown;
@@ -39,24 +61,26 @@ function readJson(root: string, path: string): unknown {
   }
 }
 
-function readDocument<K extends ContractDocumentKind>(
-  version: ReleaseContractVersion,
+function readDocumentV2<K extends ContractDocumentKind>(
   root: string,
   path: string,
   kind: K,
 ) {
-  return validateContractDocumentForVersion(
-    version,
-    kind,
-    readJson(root, path),
-  );
+  return validateContractDocumentForVersion("2.0.0", kind, readJson(root, path));
 }
 
-function readRecords<K extends "article" | "page">(
-  version: ReleaseContractVersion,
+function readDocumentV3<K extends ContractDocumentKind>(
+  root: string,
+  path: string,
+  kind: K,
+) {
+  return validateContractDocumentForVersion("3.0.0", kind, readJson(root, path));
+}
+
+function readRecords<T>(
   root: string,
   directory: string,
-  kind: K,
+  readRecord: (path: string) => T,
 ) {
   return readdirSync(join(root, directory))
     .sort((left, right) => Buffer.compare(Buffer.from(left), Buffer.from(right)))
@@ -67,26 +91,87 @@ function readRecords<K extends "article" | "page">(
           `Unexpected ${directory} entry: ${name}`,
         );
       }
-      return readDocument(version, root, `${directory}/${name}`, kind);
+      return readRecord(`${directory}/${name}`);
     });
 }
 
-export function readReleaseBundleDocuments(root: string): ReleaseBundleDocuments {
-  const release = verifyReleaseIntegrity(root);
-  const version = release.contractVersion;
+function assembleReleaseBundleDocumentsV2(
+  root: string,
+  release: PublicSiteReleaseManifest,
+): ReleaseBundleDocuments {
   return {
     release,
-    site: readDocument(version, root, "site.json", "site"),
-    navigation: readDocument(version, root, "navigation.json", "navigation"),
-    taxonomy: readDocument(version, root, "taxonomy.json", "taxonomy"),
-    mediaManifest: readDocument(
-      version,
+    site: readDocumentV2(root, "site.json", "site"),
+    navigation: readDocumentV2(root, "navigation.json", "navigation"),
+    taxonomy: readDocumentV2(root, "taxonomy.json", "taxonomy"),
+    mediaManifest: readDocumentV2(
       root,
       "media/media-manifest.json",
       "media-manifest",
     ),
-    redirects: readDocument(version, root, "redirects.json", "redirects"),
-    articles: readRecords(version, root, "articles", "article"),
-    pages: readRecords(version, root, "pages", "page"),
+    redirects: readDocumentV2(root, "redirects.json", "redirects"),
+    articles: readRecords(root, "articles", (path) =>
+      readDocumentV2(root, path, "article"),
+    ),
+    pages: readRecords(root, "pages", (path) =>
+      readDocumentV2(root, path, "page"),
+    ),
   };
+}
+
+function assembleReleaseBundleDocumentsV3(
+  root: string,
+  release: ContractDocumentV3<"release">,
+): ReleaseBundleDocumentsV3 {
+  return {
+    release,
+    site: readDocumentV3(root, "site.json", "site"),
+    navigation: readDocumentV3(root, "navigation.json", "navigation"),
+    taxonomy: readDocumentV3(root, "taxonomy.json", "taxonomy"),
+    mediaManifest: readDocumentV3(
+      root,
+      "media/media-manifest.json",
+      "media-manifest",
+    ),
+    redirects: readDocumentV3(root, "redirects.json", "redirects"),
+    articles: readRecords(root, "articles", (path) =>
+      readDocumentV3(root, path, "article"),
+    ),
+    pages: readRecords(root, "pages", (path) =>
+      readDocumentV3(root, path, "page"),
+    ),
+  };
+}
+
+export function readReleaseBundleDocumentsForVersion(
+  version: "2.0.0",
+  root: string,
+): ReleaseBundleDocumentsByVersion["2.0.0"];
+export function readReleaseBundleDocumentsForVersion(
+  version: "3.0.0",
+  root: string,
+): ReleaseBundleDocumentsByVersion["3.0.0"];
+export function readReleaseBundleDocumentsForVersion(
+  version: RegisteredContractSchemaVersion,
+  root: string,
+): ReleaseBundleDocuments | ReleaseBundleDocumentsV3 {
+  if (version === "2.0.0") {
+    return assembleReleaseBundleDocumentsV2(
+      root,
+      verifyReleaseIntegrityForVersion("2.0.0", root),
+    );
+  }
+  if (version === "3.0.0") {
+    return assembleReleaseBundleDocumentsV3(
+      root,
+      verifyReleaseIntegrityForVersion("3.0.0", root),
+    );
+  }
+
+  const unhandledVersion: never = version;
+  throw new Error(`Unhandled registered contract version: ${unhandledVersion}`);
+}
+
+export function readReleaseBundleDocuments(root: string): ReleaseBundleDocuments {
+  return assembleReleaseBundleDocumentsV2(root, verifyReleaseIntegrity(root));
 }
