@@ -6,6 +6,8 @@ import {
   type LoadedReleaseBundleV3,
 } from "@content-foundry/content-contract";
 import type { ArticleListItemViewModel } from "@content-foundry/themes";
+import type { ResponsiveImageAsset } from "@content-foundry/media";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
@@ -20,6 +22,28 @@ const fixture = resolve(
 );
 const bundle = loadReleaseBundle(fixture);
 const article = bundle.articles[0]!;
+
+const artworkAsset: ResponsiveImageAsset = {
+  fallback: {
+    mediaId: "MED-CARD",
+    relativePath: "_media/card/source.webp",
+    publicPath: "/_media/card/source.webp",
+    sha256: "card-sha",
+    mimeType: "image/webp",
+    width: 1536,
+    height: 1024,
+    alt: "중립 추상 이미지",
+    credit: null,
+    license: "QA only",
+  },
+  derivatives: [{
+    relativePath: "_media/card/480w.webp",
+    publicPath: "/_media/card/480w.webp",
+    mimeType: "image/webp",
+    width: 480,
+    height: 320,
+  }],
+};
 
 describe("theme article list item", () => {
   it("accepts both supported release structures", () => {
@@ -62,6 +86,22 @@ describe("theme article list item", () => {
       dateTime: "2026-08-23T15:30:00Z",
       label: "2026년 8월 24일",
     });
+  });
+
+  it("projects an intrinsic lazy responsive hero without forcing a crop", () => {
+    const model = createThemeArticleListItem(
+      { ...bundle, mediaAssets: new Map([["MED-CARD", artworkAsset]]) },
+      { ...article, heroMediaId: "MED-CARD" },
+    );
+    const html = renderToStaticMarkup(model.artwork);
+
+    expect(html).toContain('loading="lazy"');
+    expect(html).toContain('width="1536"');
+    expect(html).toContain('height="1024"');
+    expect(html).toContain(
+      'sizes="(min-width: 64rem) 24rem, (min-width: 48rem) 44vw, 100vw"',
+    );
+    expect(html).not.toMatch(/object-fit|object-position/);
   });
 
   it("can project the publication date for chronological lists", () => {

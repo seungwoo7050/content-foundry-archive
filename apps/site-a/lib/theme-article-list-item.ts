@@ -2,10 +2,12 @@ import { ContractError, type ContractIssue } from "@content-foundry/content-cont
 import type { ArticleListItemViewModel } from "@content-foundry/themes";
 
 import { getArticleCardDate } from "./article-card-date";
+import { renderArticleCardArtwork } from "./article-card-artwork";
 import {
   getEstimatedReadingTimeMinutes,
   type ArticleReadingTimeSource,
 } from "./article-reading-time";
+import type { ResponsiveImageAssetRegistry } from "./responsive-image-asset-registry";
 
 interface ThemeArticleTaxonRecord {
   readonly id: string;
@@ -15,6 +17,7 @@ interface ThemeArticleTaxonRecord {
 
 export interface ThemeArticleListSource {
   readonly site: { readonly locale: string; readonly timeZone: string };
+  readonly mediaAssets?: ResponsiveImageAssetRegistry;
   readonly taxonomy: {
     readonly categories: readonly ThemeArticleTaxonRecord[];
     readonly tags: readonly ThemeArticleTaxonRecord[];
@@ -22,6 +25,7 @@ export interface ThemeArticleListSource {
 }
 
 export interface ThemeArticleListRecord extends ArticleReadingTimeSource {
+  readonly heroMediaId: string | null;
   readonly title: string;
   readonly summary: string;
   readonly publishedAt: string;
@@ -72,8 +76,13 @@ export function createThemeArticleListItem(
     article,
     bundle.site.locale,
   );
+  const artwork = renderArticleCardArtwork(
+    article.heroMediaId,
+    bundle.mediaAssets,
+  );
 
   return {
+    ...(artwork === null ? {} : { artwork }),
     link: { href: article.seo.canonicalPath, label: article.title },
     summary: article.summary,
     date: {
