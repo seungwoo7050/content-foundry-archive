@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 
 import type { SiteShellViewModel } from "../presentation-view-model.js";
 import type { ThemeRenderContext } from "../html-route-view-model.js";
-import { ThemeNavigation } from "../theme-links.js";
+import { ThemeFooterNavigation, ThemeNavigation } from "../theme-links.js";
 import { MINIMAL_KNOWLEDGE_BASE_STYLES } from "./styles.js";
 
 function semanticColorProperties(
@@ -58,6 +58,7 @@ export function MinimalKnowledgeBaseShell({
       <main id="main-content">{children}</main>
       <footer className="kb-footer">
         <small>{shell.footerText}</small>
+        <ThemeFooterNavigation items={shell.footerNavigation ?? []} />
       </footer>
     </div>
   );

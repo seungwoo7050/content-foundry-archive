@@ -143,8 +143,9 @@ function assertMinimalThemeRoute(label, html, routeKind) {
   assert.match(html, /<nav aria-label="생활메모">/);
   assert.match(
     html,
-    /<footer\b[^>]*><small>© 2026 생활메모 · 운영: 생활메모<\/small><\/footer>/,
+    /<footer\b[^>]*><small>© 2026 생활메모 · 운영: 생활메모<\/small><nav aria-label="운영 및 정책">/,
   );
+  assert.match(html, /<a href="\/about">소개<\/a>/);
   const renderedMarkup = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
   assert.doesNotMatch(
     renderedMarkup,

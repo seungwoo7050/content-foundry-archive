@@ -54,7 +54,7 @@ describe("renderThemePage", () => {
     expect(html).toContain(`data-theme="${themeId}"`);
   });
 
-  it.each(THEME_IDS.filter((themeId) => themeId !== "minimal-knowledge-base"))(
+  it.each(THEME_IDS)(
     "renders projected footer trust links in %s",
     (themeId) => {
       const html = renderToStaticMarkup(
