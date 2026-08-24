@@ -15,6 +15,7 @@ export interface ThemeShellSource {
     readonly locale: string;
     readonly name: string;
     readonly description: string;
+    readonly author: { readonly displayName: string };
   };
   readonly navigation: {
     readonly items: readonly ThemeShellNavigationRecord[];
@@ -41,6 +42,6 @@ export function createThemeShellViewModel(
     brand: { href: "/", label: bundle.site.name },
     description: bundle.site.description,
     primaryNavigation: bundle.navigation.items.map(createNavigationItem),
-    footerText: `© ${releaseYear} ${bundle.site.name}`,
+    footerText: `© ${releaseYear} ${bundle.site.name} · 운영: ${bundle.site.author.displayName}`,
   };
 }

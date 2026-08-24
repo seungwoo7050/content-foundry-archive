@@ -43,7 +43,7 @@ describe("theme shell view model", () => {
           children: [],
         },
       ],
-      footerText: "© 2026 생활메모",
+      footerText: "© 2026 생활메모 · 운영: 생활메모",
     });
     expect(shell).not.toHaveProperty("bundle");
     expect(shell).not.toHaveProperty("contractVersion");
@@ -85,6 +85,6 @@ describe("theme shell view model", () => {
         ],
       },
     ]);
-    expect(shell.footerText).toBe("© 2031 생활메모");
+    expect(shell.footerText).toBe("© 2031 생활메모 · 운영: 생활메모");
   });
 });
