@@ -31,13 +31,16 @@ export interface SiteReleaseContext {
   readonly canonicalOrigin: string;
 }
 
-export interface SiteReleaseContextV3 {
+export interface ValidatedSiteReleaseV3 {
   readonly contractVersion: "3.0.0";
   readonly config: BuildTargetConfig;
   readonly bundle: LoadedReleaseBundleV3;
   readonly canonicalOrigin: string;
-  readonly mediaAssets: ResponsiveImageAssetRegistry;
   readonly nicheComponents: NicheComponentRegistry;
+}
+
+export interface SiteReleaseContextV3 extends ValidatedSiteReleaseV3 {
+  readonly mediaAssets: ResponsiveImageAssetRegistry;
 }
 
 export interface LoadSiteReleaseV3Options {
@@ -75,10 +78,9 @@ export function loadSiteRelease(
   };
 }
 
-export function loadSiteReleaseV3(
+export function loadValidatedSiteReleaseV3(
   config: BuildTargetConfig,
-  options: LoadSiteReleaseV3Options,
-): SiteReleaseContextV3 {
+): ValidatedSiteReleaseV3 {
   const nicheComponents = createSiteNicheComponentRegistry();
   const bundle = loadV3ReleaseBundle(config.releaseDirectory, {
     expectedSiteId: config.siteId,
@@ -96,10 +98,20 @@ export function loadSiteReleaseV3(
     config,
     bundle,
     canonicalOrigin: validateCanonicalOrigin(config, bundle.site.origin),
+    nicheComponents,
+  };
+}
+
+export function loadSiteReleaseV3(
+  config: BuildTargetConfig,
+  options: LoadSiteReleaseV3Options,
+): SiteReleaseContextV3 {
+  const validated = loadValidatedSiteReleaseV3(config);
+  return {
+    ...validated,
     mediaAssets: createResponsiveImageAssetRegistry(
-      bundle.mediaManifest,
+      validated.bundle.mediaManifest,
       options.mediaAssets,
     ),
-    nicheComponents,
   };
 }

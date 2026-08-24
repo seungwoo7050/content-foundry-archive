@@ -16,7 +16,11 @@ import {
 import { resolveBuildTargetConfig } from "@content-foundry/site-core";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { loadSiteRelease, loadSiteReleaseV3 } from "./load-site-release";
+import {
+  loadSiteRelease,
+  loadSiteReleaseV3,
+  loadValidatedSiteReleaseV3,
+} from "./load-site-release";
 
 const fixture = resolve(
   process.cwd(),
@@ -68,10 +72,14 @@ describe("loadSiteRelease", () => {
   });
 
   it("assembles a fully validated synchronous v3 release context", () => {
-    const context = loadSiteReleaseV3(templateConfig(v3Fixture), {
+    const config = templateConfig(v3Fixture);
+    const validated = loadValidatedSiteReleaseV3(config);
+    const context = loadSiteReleaseV3(config, {
       mediaAssets: mediaAssets(),
     });
 
+    expect(validated.bundle).toEqual(context.bundle);
+    expect(validated.nicheComponents).toEqual(context.nicheComponents);
     expect(context.contractVersion).toBe("3.0.0");
     expect(context.bundle.release.releaseId).toBe("REL-2026-000043");
     expect([...context.mediaAssets.keys()]).toEqual(["MED-000045", "MED-000046"]);
