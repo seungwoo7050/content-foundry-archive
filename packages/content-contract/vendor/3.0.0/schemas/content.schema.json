@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://content-foundry.example/contracts/3.0.0/content.schema.json",
+  "title": "Published Structured Content",
+  "type": "array",
+  "items": {
+    "$ref": "content-block.schema.json"
+  }
+}

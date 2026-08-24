@@ -1,0 +1,9 @@
+{
+  "overlayPaths": [
+    "articles/ART-000123.json",
+    "redirects.json"
+  ],
+  "operation": "point-internal-action-at-gone-route",
+  "integrityMode": "recompute",
+  "expectedError": "REFERENCE_INVALID"
+}

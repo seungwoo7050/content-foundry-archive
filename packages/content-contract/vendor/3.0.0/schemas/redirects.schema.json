@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://content-foundry.example/contracts/3.0.0/redirects.schema.json",
+  "title": "Public Route Dispositions",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["items"],
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {"$ref": "#/$defs/redirect"},
+          {"$ref": "#/$defs/gone"}
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "path": {
+      "type": "string",
+      "pattern": "^/[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*$"
+    },
+    "redirect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "fromPath", "toPath", "status"],
+      "properties": {
+        "type": {"const": "redirect"},
+        "fromPath": {"$ref": "#/$defs/path"},
+        "toPath": {"$ref": "#/$defs/path"},
+        "status": {"enum": [301, 308]}
+      }
+    },
+    "gone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "path", "status", "replacementPath"],
+      "properties": {
+        "type": {"const": "gone"},
+        "path": {"$ref": "#/$defs/path"},
+        "status": {"const": 410},
+        "replacementPath": {
+          "oneOf": [
+            {"$ref": "#/$defs/path"},
+            {"type": "null"}
+          ]
+        }
+      }
+    }
+  }
+}

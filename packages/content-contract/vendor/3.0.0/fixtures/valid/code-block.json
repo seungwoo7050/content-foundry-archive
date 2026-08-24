@@ -1,0 +1,6 @@
+{
+  "type": "code",
+  "language": "html",
+  "code": "<button type=\"button\">\n  저장\n</button>",
+  "caption": "문자열로 표시되는 마크업 예시"
+}

@@ -1,0 +1,13 @@
+{
+  "contractVersion": "3.0.0",
+  "releaseId": "REL-2026-000043",
+  "siteId": "site-a",
+  "createdAt": "2026-08-24T03:00:00Z",
+  "contentRevision": 43,
+  "siteConfigRevision": 7,
+  "articleCount": 1,
+  "pageCount": 1,
+  "defaultTheme": "minimal-knowledge-base",
+  "defaultSkin": "calm-blue",
+  "bundleChecksum": "sha256:45a1c3f057fb59b3a7fd28e5e87a8c41eb299d0446c71949e5d4e32d2a92d745"
+}

@@ -1,0 +1,18 @@
+{
+  "items": [
+    {"id": "home", "label": "홈", "path": "/", "children": []},
+    {
+      "id": "categories",
+      "label": "카테고리",
+      "path": "/category",
+      "children": [
+        {
+          "id": "daily-admin",
+          "label": "생활·행정",
+          "path": "/category/daily-admin",
+          "children": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "items": [
+    {"type": "redirect", "fromPath": "/old-guide", "toPath": "/new-guide", "status": 302}
+  ]
+}

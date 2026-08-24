@@ -1,0 +1,16 @@
+{
+  "id": "about",
+  "path": "/about",
+  "title": "소개",
+  "summary": "생활메모 소개",
+  "content": [
+    {"type": "paragraph", "markdown": "생활메모 소개입니다."}
+  ],
+  "seo": {
+    "title": "생활메모 소개",
+    "description": "생활메모 운영 목적",
+    "canonicalPath": "/contact",
+    "index": true,
+    "follow": true
+  }
+}

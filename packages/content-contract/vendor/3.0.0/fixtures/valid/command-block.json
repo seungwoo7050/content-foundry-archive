@@ -1,0 +1,6 @@
+{
+  "type": "command",
+  "shell": "posix-sh",
+  "command": "git status --short\ngit diff --check",
+  "caption": "작업 트리 상태와 whitespace 확인"
+}

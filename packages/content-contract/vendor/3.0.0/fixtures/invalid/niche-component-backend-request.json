@@ -1,0 +1,7 @@
+{
+  "type": "niche-component",
+  "componentId": "date-gap-calculator",
+  "label": "두 날짜 사이 일수 계산기",
+  "fallbackText": "시작일과 종료일을 달력에 표시하고, 본문이 정한 포함 기준에 따라 날짜 수를 세세요.",
+  "endpoint": "https://api.example.invalid/calculate"
+}

@@ -1,0 +1,6 @@
+{
+  "type": "action-link",
+  "kind": "official",
+  "label": "Official Example에서 신청하기",
+  "url": "https://official.example/application"
+}

@@ -1,0 +1,6 @@
+{
+  "type": "action-link",
+  "kind": "official",
+  "label": "안전하지 않은 링크",
+  "url": "javascript:alert(1)"
+}

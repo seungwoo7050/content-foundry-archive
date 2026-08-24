@@ -1,0 +1,6 @@
+{
+  "overlayPath": "media/media-manifest.json",
+  "operation": "replace-first-gallery-media-alt-with-whitespace",
+  "integrityMode": "recompute",
+  "expectedError": "CONTRACT_INVALID"
+}

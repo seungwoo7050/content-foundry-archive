@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://content-foundry.example/contracts/3.0.0/code-command-block.schema.json",
+  "title": "Published Code or Command Block",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "language", "code"],
+      "properties": {
+        "type": {"const": "code"},
+        "language": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "code": {"type": "string", "minLength": 1, "pattern": "\\S"},
+        "caption": {"type": ["string", "null"], "minLength": 1}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "shell", "command"],
+      "properties": {
+        "type": {"const": "command"},
+        "shell": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "command": {"type": "string", "minLength": 1, "pattern": "\\S"},
+        "caption": {"type": ["string", "null"], "minLength": 1}
+      }
+    }
+  ]
+}

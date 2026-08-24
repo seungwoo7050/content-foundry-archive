@@ -1,0 +1,6 @@
+{
+  "items": [
+    {"type": "redirect", "fromPath": "/first", "toPath": "/second", "status": 308},
+    {"type": "redirect", "fromPath": "/second", "toPath": "/first", "status": 308}
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "categories": [
+    {
+      "id": "daily-admin",
+      "slug": "daily-admin",
+      "label": "생활·행정",
+      "description": "생활과 행정 절차 안내"
+    }
+  ],
+  "tags": [
+    {
+      "id": "government24",
+      "slug": "government24",
+      "label": "정부24",
+      "description": "정부24 서비스"
+    }
+  ]
+}

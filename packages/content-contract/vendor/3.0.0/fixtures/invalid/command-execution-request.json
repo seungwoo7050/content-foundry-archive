@@ -1,0 +1,7 @@
+{
+  "type": "command",
+  "shell": "posix-sh",
+  "command": "git status --short",
+  "caption": null,
+  "execute": true
+}
