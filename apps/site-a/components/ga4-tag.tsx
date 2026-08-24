@@ -23,11 +23,7 @@ export function Ga4Tag({
         async
         src={`https://www.googletagmanager.com/gtag/js?id=${config.publicMeasurementId}`}
       />
-      <script
-        dangerouslySetInnerHTML={{
-          __html: createGa4Source(config.publicMeasurementId),
-        }}
-      />
+      <script>{createGa4Source(config.publicMeasurementId)}</script>
     </>
   );
 }

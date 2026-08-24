@@ -9,9 +9,5 @@ gtag('consent', 'default', {
 });`;
 
 export function GoogleConsentDefaults() {
-  return (
-    <script
-      dangerouslySetInnerHTML={{ __html: GOOGLE_CONSENT_DEFAULTS_SOURCE }}
-    />
-  );
+  return <script>{GOOGLE_CONSENT_DEFAULTS_SOURCE}</script>;
 }
