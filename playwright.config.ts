@@ -48,7 +48,7 @@ export default defineConfig({
   ],
   webServer: {
     command:
-      "pnpm build && pnpm exec serve apps/site-a/out --listen tcp://127.0.0.1:4173 --no-clipboard",
+      "pnpm build && pnpm exec serve apps/site-a/out --config ../../../serve.json --listen tcp://127.0.0.1:4173 --no-clipboard",
     url: baseURL,
     reuseExistingServer: !ci,
     timeout: 120_000,
