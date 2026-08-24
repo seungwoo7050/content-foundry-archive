@@ -1,10 +1,12 @@
 import { resolve } from "node:path";
 
+import type { LoadedReleaseBundleV3 } from "@content-foundry/content-contract";
 import { resolveBuildTargetConfig } from "@content-foundry/site-core";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { loadSiteRelease } from "./load-site-release";
-import { createPageMetadata } from "./page-metadata";
+import { loadSiteRelease, type SiteReleaseContextV3 } from "./load-site-release";
+import type { MetadataContext } from "./metadata-context";
+import { createPageMetadata, type PageMetadataSource } from "./page-metadata";
 
 const fixture = resolve(
   process.cwd(),
@@ -19,6 +21,13 @@ const context = loadSiteRelease(
 );
 
 describe("createPageMetadata", () => {
+  it("accepts v3 page and release context metadata structures", () => {
+    expectTypeOf<SiteReleaseContextV3>().toExtend<MetadataContext>();
+    expectTypeOf<
+      LoadedReleaseBundleV3["pages"][number]
+    >().toExtend<PageMetadataSource>();
+  });
+
   it("projects static-page SEO while preserving template noindex", () => {
     const page = context.bundle.pages[0];
     if (!page) {

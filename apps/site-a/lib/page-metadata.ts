@@ -1,11 +1,20 @@
-import type { PublishedStaticPageProjection } from "@content-foundry/content-contract";
 import type { Metadata } from "next";
 
-import type { SiteReleaseContext } from "./load-site-release";
+import type { MetadataContext } from "./metadata-context";
+
+export interface PageMetadataSource {
+  readonly seo: {
+    readonly canonicalPath: string;
+    readonly title: string;
+    readonly description: string;
+    readonly index: boolean;
+    readonly follow: boolean;
+  };
+}
 
 export function createPageMetadata(
-  context: SiteReleaseContext,
-  page: PublishedStaticPageProjection,
+  context: MetadataContext,
+  page: PageMetadataSource,
 ): Metadata {
   const canonical = new URL(page.seo.canonicalPath, context.canonicalOrigin).href;
   const index = !context.config.noindex && page.seo.index;
