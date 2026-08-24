@@ -19,6 +19,7 @@ describe("Minimal Knowledge Base styles", () => {
     const html = renderToStaticMarkup(
       <MinimalKnowledgeBaseShell
         context={{ skinId, colors: SKIN_TOKENS[skinId] }}
+        routePath="/"
         shell={shell}
       >
         <p>본문</p>

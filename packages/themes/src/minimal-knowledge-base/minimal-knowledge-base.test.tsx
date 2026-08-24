@@ -116,6 +116,23 @@ describe("Minimal Knowledge Base", () => {
     expect(html).toContain("--focus-ring:#174AAD");
   });
 
+  it("marks only the exact current knowledge rail navigation link", () => {
+    const staticPage = routeAt(3);
+    if (staticPage.kind !== "static-page") throw new Error("Expected static-page fixture");
+    const html = render({
+      ...staticPage,
+      ...base("/guide/start", "시작"),
+    });
+
+    expect(html).toContain(
+      '<a aria-current="page" href="/guide/start">시작</a>',
+    );
+    expect(html).toContain('<a href="/guide">안내</a>');
+    expect(html).not.toContain(
+      '<a aria-current="page" href="/guide">안내</a>',
+    );
+  });
+
   it("keeps home and category knowledge sections in their intended order", () => {
     const home = render(routeAt(0));
     expect(home.indexOf("kb-home-search")).toBeLessThan(home.indexOf("kb-category-grid"));

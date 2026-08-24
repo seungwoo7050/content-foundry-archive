@@ -26,10 +26,12 @@ function semanticColorProperties(
 
 export function MinimalKnowledgeBaseShell({
   shell,
+  routePath,
   context,
   children,
 }: {
   readonly shell: SiteShellViewModel;
+  readonly routePath: string;
   readonly context: ThemeRenderContext;
   readonly children: ReactNode;
 }) {
@@ -52,6 +54,7 @@ export function MinimalKnowledgeBaseShell({
         </header>
         <ThemeNavigation
           ariaLabel={shell.brand.label}
+          currentPath={routePath}
           items={shell.primaryNavigation}
         />
       </aside>

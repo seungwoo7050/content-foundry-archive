@@ -42,7 +42,11 @@ export const minimalKnowledgeBaseTheme = Object.freeze({
   }),
   renderRoute(model, context) {
     return (
-      <MinimalKnowledgeBaseShell context={context} shell={model.shell}>
+      <MinimalKnowledgeBaseShell
+        context={context}
+        routePath={model.route.path}
+        shell={model.shell}
+      >
         <RouteContent context={context} route={model.route} />
       </MinimalKnowledgeBaseShell>
     );
