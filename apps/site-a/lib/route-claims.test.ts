@@ -33,6 +33,12 @@ describe("generated route claims", () => {
         outputKind: "html",
         source: "fixed archive route",
       },
+      "/search": {
+        kind: "fixed-search",
+        navigable: true,
+        outputKind: "html",
+        source: "fixed search route",
+      },
       "/404": {
         kind: "fixed-not-found",
         navigable: false,
@@ -92,6 +98,7 @@ describe("generated route claims", () => {
 
   it.each([
     ["/archive", "fixed-archive", "fixed archive route"],
+    ["/search", "fixed-search", "fixed search route"],
     ["/404", "fixed-not-found", "fixed not-found route"],
     ["/sitemap.xml", "fixed-sitemap", "fixed sitemap route"],
     ["/robots.txt", "fixed-robots", "fixed robots route"],

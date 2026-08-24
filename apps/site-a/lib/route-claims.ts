@@ -20,6 +20,7 @@ export type RouteClaimKind =
   | "fixed-release-identity"
   | "fixed-robots"
   | "fixed-rss"
+  | "fixed-search"
   | "fixed-search-index"
   | "fixed-sitemap"
   | "article"
@@ -54,6 +55,13 @@ export function getRouteClaims(
       navigable: true,
       outputKind: "html",
       source: "fixed archive route",
+    },
+    {
+      path: "/search",
+      kind: "fixed-search",
+      navigable: true,
+      outputKind: "html",
+      source: "fixed search route",
     },
     {
       path: "/404",
