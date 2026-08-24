@@ -9,7 +9,6 @@ import { TextDecoder } from "node:util";
 
 import canonicalize from "canonicalize";
 
-import { resolveSupportedContractVersion } from "./contract-version.js";
 import { ContractError } from "./errors.js";
 import type { PublicSiteReleaseManifest as PublicSiteReleaseManifestV3 } from "./generated/3.0.0/release.js";
 import type { PublicSiteReleaseManifest } from "./generated/release.js";
@@ -265,7 +264,13 @@ export function verifyReleaseIntegrity(
   root: string,
 ): PublicSiteReleaseManifest {
   const { release, source } = readReleaseManifest(root);
-  const version = resolveSupportedContractVersion(release.contractVersion);
+  if (release.contractVersion !== "2.0.0") {
+    throw new ContractError(
+      "CONTRACT_UNSUPPORTED",
+      `Legacy release verifier supports only contract 2.0.0: ${String(release.contractVersion)}`,
+      [{ path: "/contractVersion", message: "expected 2.0.0" }],
+    );
+  }
   verifyReleaseIntegrityWithManifest(root, release, source);
-  return validateContractDocumentForVersion(version, "release", release);
+  return validateContractDocumentForVersion("2.0.0", "release", release);
 }

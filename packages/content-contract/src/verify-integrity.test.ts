@@ -305,7 +305,7 @@ describe("verifyReleaseIntegrity", () => {
     );
   });
 
-  it("keeps the canonical v3 bundle unsupported before activation", () => {
+  it("keeps the canonical v3 bundle outside the legacy verifier", () => {
     expect(() => verifyReleaseIntegrity(copyFixture(v3Fixture))).toThrowError(
       expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }),
     );
