@@ -1,14 +1,22 @@
 import {
   ContractError,
   type ContractIssue,
-  type LoadedReleaseBundle,
-  type NavigationItem,
 } from "@content-foundry/content-contract";
 
 import { getGeneratedRoutes } from "./generated-routes";
+import { type GeneratedRouteSource } from "./route-claims";
+
+interface RouteNavigationItem {
+  readonly path: string;
+  readonly children: readonly RouteNavigationItem[];
+}
+
+export interface NavigationRouteSource extends GeneratedRouteSource {
+  readonly navigation: { readonly items: readonly RouteNavigationItem[] };
+}
 
 function validateItems(
-  items: readonly NavigationItem[],
+  items: readonly RouteNavigationItem[],
   base: string,
   generatedRoutes: ReadonlySet<string>,
   issues: ContractIssue[],
@@ -25,9 +33,9 @@ function validateItems(
   });
 }
 
-export function validateNavigationDestinations(
-  bundle: LoadedReleaseBundle,
-): LoadedReleaseBundle {
+export function validateNavigationDestinations<T extends NavigationRouteSource>(
+  bundle: T,
+): T {
   const issues: ContractIssue[] = [];
   validateItems(
     bundle.navigation.items,

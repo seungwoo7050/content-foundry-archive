@@ -2,11 +2,15 @@ import { resolve } from "node:path";
 
 import {
   loadReleaseBundle,
+  type LoadedReleaseBundleV3,
   type NavigationItem,
 } from "@content-foundry/content-contract";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { validateNavigationDestinations } from "./validate-navigation-destinations";
+import {
+  type NavigationRouteSource,
+  validateNavigationDestinations,
+} from "./validate-navigation-destinations";
 
 const fixture = resolve(
   process.cwd(),
@@ -19,6 +23,10 @@ function withNavigation(items: NavigationItem[]) {
 }
 
 describe("navigation destinations", () => {
+  it("accepts the v3 release navigation structure", () => {
+    expectTypeOf<LoadedReleaseBundleV3>().toExtend<NavigationRouteSource>();
+  });
+
   it("accepts nested direct generated routes", () => {
     const release = withNavigation([
       {
