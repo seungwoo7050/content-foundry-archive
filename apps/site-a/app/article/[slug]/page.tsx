@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { ContentBlocks } from "../../../components/content-blocks";
+import { VersionedContentBlocks } from "../../../components/versioned-content-blocks";
 import { createArticleMetadata } from "../../../lib/article-metadata";
 import {
   findArticleBySlug,
   getArticleStaticParams,
 } from "../../../lib/article-route";
-import { getSiteReleaseContext } from "../../../lib/site-release";
+import type { VersionedSiteReleaseContext } from "../../../lib/load-site-release";
+import { getVersionedSiteReleaseContext } from "../../../lib/site-release";
 
 export const dynamicParams = false;
 
@@ -16,14 +17,14 @@ interface ArticlePageProps {
 }
 
 export function generateStaticParams() {
-  return getArticleStaticParams(getSiteReleaseContext().bundle);
+  return getArticleStaticParams(getVersionedSiteReleaseContext().bundle);
 }
 
 export async function generateMetadata({
   params,
 }: ArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const context = getSiteReleaseContext();
+  const context = getVersionedSiteReleaseContext();
   const article = findArticleBySlug(context.bundle, slug);
 
   if (!article) {
@@ -33,9 +34,32 @@ export async function generateMetadata({
   return createArticleMetadata(context, article);
 }
 
+function renderArticleContent(context: VersionedSiteReleaseContext, slug: string) {
+  if (context.contractVersion === "3.0.0") {
+    const article = findArticleBySlug(context.bundle, slug);
+    if (!article) notFound();
+    return (
+      <VersionedContentBlocks
+        blocks={article.content}
+        context={{
+          mediaAssets: context.mediaAssets,
+          nicheComponents: context.nicheComponents,
+          siteId: context.bundle.release.siteId,
+        }}
+        contractVersion="3.0.0"
+      />
+    );
+  }
+
+  const article = findArticleBySlug(context.bundle, slug);
+  if (!article) notFound();
+  return <VersionedContentBlocks blocks={article.content} contractVersion="2.0.0" />;
+}
+
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params;
-  const { bundle } = getSiteReleaseContext();
+  const context = getVersionedSiteReleaseContext();
+  const { bundle } = context;
   const article = findArticleBySlug(bundle, slug);
 
   if (!article) {
@@ -79,9 +103,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </div>
         </dl>
       </header>
-      <div className="article-content">
-        <ContentBlocks blocks={article.content} />
-      </div>
+      <div className="article-content">{renderArticleContent(context, slug)}</div>
     </article>
   );
 }
