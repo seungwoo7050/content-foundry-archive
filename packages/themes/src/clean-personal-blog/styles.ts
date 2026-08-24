@@ -10,9 +10,11 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
 .personal-masthead__inner { padding-block: 2rem 1.25rem; }
 .personal-title { color: var(--personal-text) !important; font-family: ui-serif, Georgia, serif; font-size: clamp(1.8rem, 6vw, 2.7rem); font-weight: 700; text-decoration: none; }
 .personal-tagline { margin: .2rem 0 1rem; color: var(--personal-text-muted); }
+.personal-nav { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem 1rem; }
 .personal-nav ul { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin: 0; padding: 0; list-style: none; }
 .personal-nav ul ul { margin-left: .6rem; }
 .personal-nav a { color: var(--personal-text); font-size: .92rem; }
+.personal-nav .personal-masthead-search { display: inline-flex; min-height: 44px; align-items: center; padding: .35rem .7rem; background: var(--personal-surface-muted); border: 1px solid var(--personal-border); border-radius: .35rem; font-weight: 700; text-decoration: none; }
 .personal-main { padding-block: 2rem 5rem; }
 .personal-breadcrumbs ol { display: flex; flex-wrap: wrap; gap: .35rem; margin: 0 0 2rem; padding: 0; color: var(--personal-text-muted); font-size: .82rem; list-style: none; }
 .personal-breadcrumbs li:not(:last-child)::after { content: "·"; margin-left: .35rem; }

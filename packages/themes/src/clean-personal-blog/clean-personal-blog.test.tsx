@@ -98,6 +98,33 @@ describe("Clean Personal Blog", () => {
     );
   });
 
+  it("renders only a release-provided masthead search entry", () => {
+    const renderShell = (shellModel: SiteShellViewModel) =>
+      renderToStaticMarkup(
+        cleanPersonalBlogTheme.renderRoute(
+          { shell: shellModel, route: routes[3]! },
+          { skinId: "warm-neutral", colors: SKIN_TOKENS["warm-neutral"] },
+        ),
+      );
+    const masthead = (html: string) => html.match(
+      /<header class="personal-masthead">[\s\S]*?<\/header>/,
+    )?.[0];
+    const withSearch = masthead(renderShell({
+      ...shell,
+      searchLink: { href: "/search", label: "사이트 검색" },
+    }));
+
+    expect(withSearch).toContain(
+      '<a class="personal-masthead-search" href="/search">사이트 검색</a>',
+    );
+    expect(masthead(renderShell(shell))).not.toContain(
+      "personal-masthead-search",
+    );
+    expect(masthead(renderShell({ ...shell, searchLink: null }))).not.toContain(
+      "personal-masthead-search",
+    );
+  });
+
   it("renders a supplied about teaser once and omits absent data", () => {
     const home = routes[0]!;
     if (home.kind !== "home") throw new Error("home fixture is missing");

@@ -10,6 +10,9 @@ describe("Clean Personal Blog output styles", () => {
     expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(
       ".personal-article-reading-time { display: inline-block;",
     );
+    expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(
+      ".personal-nav .personal-masthead-search { display: inline-flex; min-height: 44px;",
+    );
     expect(CLEAN_PERSONAL_BLOG_STYLES).toContain('.personal-body a[href^="http"]::after');
     expect(CLEAN_PERSONAL_BLOG_STYLES).not.toMatch(/data-ad-|adsbygoogle/i);
   });

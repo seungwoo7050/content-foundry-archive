@@ -43,6 +43,14 @@ export function CleanPersonalBlogShell({
               currentPath={route.path}
               items={shell.primaryNavigation}
             />
+            {shell.searchLink ? (
+              <a
+                className="personal-masthead-search"
+                href={shell.searchLink.href}
+              >
+                {shell.searchLink.label}
+              </a>
+            ) : null}
           </div>
         </div>
       </header>
