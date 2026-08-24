@@ -1,7 +1,11 @@
 import type { ReactNode } from "react";
 
 import type { ThemePageViewModel, ThemeRenderContext } from "../html-route-view-model.js";
-import { ThemeBreadcrumbs, ThemeNavigation } from "../theme-links.js";
+import {
+  ThemeBreadcrumbs,
+  ThemeFooterNavigation,
+  ThemeNavigation,
+} from "../theme-links.js";
 import { createPersonalColorStyle } from "./colors.js";
 import { CLEAN_PERSONAL_BLOG_STYLES } from "./styles.js";
 
@@ -53,7 +57,10 @@ export function CleanPersonalBlogShell({
         </div>
       </main>
       <footer className="personal-footer">
-        <div className="personal-footer__inner">{shell.footerText}</div>
+        <div className="personal-footer__inner">
+          {shell.footerText}
+          <ThemeFooterNavigation items={shell.footerNavigation ?? []} />
+        </div>
       </footer>
     </div>
   );

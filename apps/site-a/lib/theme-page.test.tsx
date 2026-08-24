@@ -54,6 +54,18 @@ describe("renderThemePage", () => {
     expect(html).toContain(`data-theme="${themeId}"`);
   });
 
+  it.each(THEME_IDS.filter((themeId) => themeId !== "minimal-knowledge-base"))(
+    "renders projected footer trust links in %s",
+    (themeId) => {
+      const html = renderToStaticMarkup(
+        renderThemePage(withDefaults(themeId), route),
+      );
+
+      expect(html).toContain('<nav aria-label="운영 및 정책">');
+      expect(html).toContain('<a href="/about">소개</a>');
+    },
+  );
+
   it.each(SKIN_IDS)("binds the %s semantic token context", (skinId) => {
     const html = renderToStaticMarkup(
       renderThemePage(withDefaults("minimal-knowledge-base", skinId), route),

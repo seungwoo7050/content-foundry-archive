@@ -3,7 +3,11 @@ import type { ReactNode } from "react";
 import type { HtmlRouteKind, ThemeRenderContext } from "../html-route-view-model.js";
 import type { SiteShellViewModel } from "../presentation-view-model.js";
 import type { RouteBaseViewModel } from "../route-base-view-model.js";
-import { ThemeBreadcrumbs, ThemeNavigation } from "../theme-links.js";
+import {
+  ThemeBreadcrumbs,
+  ThemeFooterNavigation,
+  ThemeNavigation,
+} from "../theme-links.js";
 import {
   createPortalColorStyle,
   INFORMATION_PORTAL_STYLES,
@@ -67,7 +71,10 @@ export function InformationPortalShell({
         {children}
       </main>
       <footer className="ip-footer">
-        <div className="ip-footer-inner"><p>{shell.footerText}</p></div>
+        <div className="ip-footer-inner">
+          <p>{shell.footerText}</p>
+          <ThemeFooterNavigation items={shell.footerNavigation ?? []} />
+        </div>
       </footer>
     </div>
   );

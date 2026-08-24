@@ -5,7 +5,11 @@ import type {
   SiteShellViewModel,
 } from "../presentation-view-model.js";
 import type { SemanticColorTokens, SkinId } from "../skin.js";
-import { ThemeBreadcrumbs, ThemeNavigation } from "../theme-links.js";
+import {
+  ThemeBreadcrumbs,
+  ThemeFooterNavigation,
+  ThemeNavigation,
+} from "../theme-links.js";
 import { EDITORIAL_UTILITY_STYLES } from "./styles.js";
 
 type EditorialVariables = CSSProperties & Record<`--editorial-${string}`, string>;
@@ -83,7 +87,10 @@ export function EditorialShell({
         {children}
       </main>
       <footer className="editorial-footer">
-        <div className="editorial-footer__inner">{shell.footerText}</div>
+        <div className="editorial-footer__inner">
+          {shell.footerText}
+          <ThemeFooterNavigation items={shell.footerNavigation ?? []} />
+        </div>
       </footer>
     </div>
   );

@@ -3,7 +3,11 @@ import type { ReactNode } from "react";
 import type { HtmlRouteKind, ThemeRenderContext } from "../html-route-view-model.js";
 import type { SiteShellViewModel } from "../presentation-view-model.js";
 import type { RouteBaseViewModel } from "../route-base-view-model.js";
-import { ThemeBreadcrumbs, ThemeNavigation } from "../theme-links.js";
+import {
+  ThemeBreadcrumbs,
+  ThemeFooterNavigation,
+  ThemeNavigation,
+} from "../theme-links.js";
 import {
   createFriendlyColorStyle,
   FRIENDLY_MOBILE_STYLES,
@@ -76,6 +80,7 @@ export function FriendlyMobileShell({
       <footer className="fmu-footer">
         <div className="fmu-footer-inner">
           <p>{shell.footerText}</p>
+          <ThemeFooterNavigation items={shell.footerNavigation ?? []} />
         </div>
       </footer>
     </div>
