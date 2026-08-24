@@ -6,3 +6,4 @@ export {
   type BuildTargetOptions,
   type ReleaseMode,
 } from "./release-mode.js";
+export { parseProductionOrigins } from "./production-origins.js";
