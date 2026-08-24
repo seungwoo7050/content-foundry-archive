@@ -9,6 +9,10 @@ import { TextDecoder } from "node:util";
 
 import canonicalize from "canonicalize";
 
+import {
+  resolveSupportedContractVersion,
+  type SupportedContractVersion,
+} from "./contract-version.js";
 import { ContractError } from "./errors.js";
 import type { PublicSiteReleaseManifest as PublicSiteReleaseManifestV3 } from "./generated/3.0.0/release.js";
 import type { PublicSiteReleaseManifest } from "./generated/release.js";
@@ -34,6 +38,14 @@ interface ParsedReleaseManifest {
   readonly release: Record<string, unknown>;
   readonly source: string;
 }
+
+interface ReleaseManifestByVersion {
+  readonly "2.0.0": PublicSiteReleaseManifest;
+  readonly "3.0.0": PublicSiteReleaseManifestV3;
+}
+
+export type SupportedReleaseManifest =
+  ReleaseManifestByVersion[SupportedContractVersion];
 
 const fail = (message: string): never => {
   throw new ContractError("INTEGRITY_FAILED", message);
@@ -240,6 +252,15 @@ export function verifyReleaseIntegrityForVersion(
   root: string,
 ): PublicSiteReleaseManifest | PublicSiteReleaseManifestV3 {
   const { release, source } = readReleaseManifest(root);
+  return verifyReleaseIntegrityForParsedVersion(version, root, release, source);
+}
+
+function verifyReleaseIntegrityForParsedVersion(
+  version: RegisteredContractSchemaVersion,
+  root: string,
+  release: Record<string, unknown>,
+  source: string,
+): PublicSiteReleaseManifest | PublicSiteReleaseManifestV3 {
   if (release.contractVersion !== version) {
     throw new ContractError(
       "CONTRACT_INVALID",
@@ -258,6 +279,21 @@ export function verifyReleaseIntegrityForVersion(
 
   const unhandledVersion: never = version;
   throw new Error(`Unhandled registered contract version: ${unhandledVersion}`);
+}
+
+export function verifySupportedReleaseIntegrity(
+  root: string,
+): SupportedReleaseManifest {
+  const { release, source } = readReleaseManifest(root);
+  const version = resolveSupportedContractVersion(
+    release.contractVersion,
+  ) as RegisteredContractSchemaVersion;
+  return verifyReleaseIntegrityForParsedVersion(
+    version,
+    root,
+    release,
+    source,
+  ) as SupportedReleaseManifest;
 }
 
 export function verifyReleaseIntegrity(

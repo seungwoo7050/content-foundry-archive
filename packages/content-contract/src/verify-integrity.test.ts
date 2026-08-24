@@ -14,6 +14,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   verifyReleaseIntegrity,
   verifyReleaseIntegrityForVersion,
+  verifySupportedReleaseIntegrity,
 } from "./verify-integrity.js";
 
 const fixture = new URL(
@@ -98,6 +99,15 @@ describe("verifyReleaseIntegrity", () => {
     );
     expect(release.contractVersion).toBe("3.0.0");
     expect(release.releaseId).toBe("REL-2026-000043");
+  });
+
+  it("dispatches only currently supported release integrity", () => {
+    expect(
+      verifySupportedReleaseIntegrity(copyFixture()).contractVersion,
+    ).toBe("2.0.0");
+    expect(() =>
+      verifySupportedReleaseIntegrity(copyFixture(v3Fixture)),
+    ).toThrowError(expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }));
   });
 
   it("detects a modified v3 article through the internal version boundary", () => {
