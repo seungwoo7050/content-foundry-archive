@@ -88,6 +88,12 @@ export function InformationPortalArticle({
           <ThemeArticleList articles={route.relatedArticles} headingLevel={3} />
         </section>
       ) : null}
+      {route.readerActions !== null && route.readerActions !== undefined ? (
+        <section aria-labelledby="ip-reader-actions" className="ip-panel">
+          <h2 id="ip-reader-actions">독자 도구</h2>
+          {route.readerActions}
+        </section>
+      ) : null}
       {route.advertisingEligible
         ? getThemeAdSlot(context, "article-end")
         : null}
