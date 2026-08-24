@@ -198,6 +198,26 @@ assert.match(
   /<nav aria-label="주요 메뉴"><ul><li><a href="\/">홈<\/a><\/li><li><a href="\/category\/daily-admin">생활·행정<\/a><\/li><\/ul><\/nav>/,
 );
 assert.match(article, /<h1>정부24 주민등록등본 발급 방법<\/h1>/);
+assert.match(article, /<h2 id="article-trust-title">이 안내의 정보<\/h2>/);
+assert.match(article, /<dt>작성<\/dt><dd>생활메모<\/dd>/);
+assert.match(article, /<dt>운영<\/dt><dd>생활메모<\/dd>/);
+assert.match(
+  article,
+  /<dt>게시<\/dt><dd><time dateTime="2026-08-20T01:00:00Z">2026년 8월 20일<\/time>/,
+);
+if (identity.contractVersion === "3.0.0") {
+  assert.match(
+    article,
+    /<dt>수정<\/dt><dd><time dateTime="2026-08-24T02:30:00Z">2026년 8월 24일<\/time>/,
+  );
+} else {
+  assert.doesNotMatch(article, /<dt>수정<\/dt>/);
+}
+assert.match(article, /href="\/about">운영 방식 보기<\/a>/);
+assert.doesNotMatch(
+  article,
+  /(?:article-sources-title|article-update-triggers-title|article-faq-title)/,
+);
 assert.match(staticPage, /<h1>소개<\/h1>/);
 assert.match(
   category,

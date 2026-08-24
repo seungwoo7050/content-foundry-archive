@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { ArticleEvidence } from "../../../components/article-evidence";
+import { ArticleTrustSummary } from "../../../components/article-trust-summary";
 import { RetiredRoute } from "../../../components/retired-route";
 import { VersionedContentBlocks } from "../../../components/versioned-content-blocks";
 import { createArticleMetadata } from "../../../lib/article-metadata";
@@ -9,6 +11,7 @@ import {
   getArticlePageStaticParams,
 } from "../../../lib/article-route";
 import { findGoneRoute } from "../../../lib/gone-route";
+import { createArticleTrustViewModel } from "../../../lib/article-trust-view-model";
 import type { VersionedSiteReleaseContext } from "../../../lib/load-site-release";
 import { createRetiredRouteMetadata } from "../../../lib/retired-route-metadata";
 import { getVersionedSiteReleaseContext } from "../../../lib/site-release";
@@ -84,10 +87,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const category = bundle.taxonomy.categories.find(
     ({ id }) => id === article.categoryId,
   );
-  const dateFormatter = new Intl.DateTimeFormat(bundle.site.locale, {
-    dateStyle: "long",
-    timeZone: bundle.site.timeZone,
-  });
+  const trust = createArticleTrustViewModel(bundle, article);
 
   return (
     <article className="article-page">
@@ -95,30 +95,21 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         {category ? <p>{category.label}</p> : null}
         <h1>{article.title}</h1>
         <p>{article.summary}</p>
-        <dl className="article-meta">
-          <div>
-            <dt>작성</dt>
-            <dd>{article.author.displayName}</dd>
-          </div>
-          <div>
-            <dt>게시</dt>
-            <dd>
-              <time dateTime={article.publishedAt}>
-                {dateFormatter.format(new Date(article.publishedAt))}
-              </time>
-            </dd>
-          </div>
-          <div>
-            <dt>수정</dt>
-            <dd>
-              <time dateTime={article.updatedAt}>
-                {dateFormatter.format(new Date(article.updatedAt))}
-              </time>
-            </dd>
-          </div>
-        </dl>
       </header>
+      <ArticleTrustSummary
+        authorLabel={trust.authorLabel}
+        operatorLabel={trust.operatorLabel}
+        published={trust.published}
+        updated={trust.updated}
+        aboutPath={trust.aboutPath}
+        contactPath={trust.contactPath}
+      />
       <div className="article-content">{renderArticleContent(context, slug)}</div>
+      <ArticleEvidence
+        sources={trust.sources}
+        updateTriggers={trust.updateTriggers}
+        faq={trust.faq}
+      />
     </article>
   );
 }
