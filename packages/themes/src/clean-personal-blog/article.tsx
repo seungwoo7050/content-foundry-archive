@@ -3,7 +3,7 @@ import {
   getThemeAdSlot,
   type ThemeAdSlotContext,
 } from "../theme-ad-slot.js";
-import { ThemeArticleList } from "../theme-links.js";
+import { ThemeArticleList, ThemeArticleTopics } from "../theme-links.js";
 
 function ArticleTrust({ route }: { readonly route: ArticleRouteViewModel }) {
   return (
@@ -64,6 +64,7 @@ export function CleanPersonalArticle({
         {route.category ? <p className="personal-category"><a href={route.category.href}>{route.category.label}</a></p> : null}
         <h1>{route.heading}</h1>
         <p className="personal-article-summary">{route.description}</p>
+        <ThemeArticleTopics topics={route.topics} />
       </header>
       {route.advertisingEligible
         ? getThemeAdSlot(context, "article-after-summary")
