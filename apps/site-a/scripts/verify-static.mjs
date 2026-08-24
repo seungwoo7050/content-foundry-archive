@@ -145,7 +145,7 @@ function assertMinimalThemeRoute(label, html, routeKind) {
     1,
     `${label} must contain exactly one main landmark`,
   );
-  assert.match(html, /<main id="main-content">/);
+  assert.match(html, /<main id="main-content" tabindex="-1">/);
   assert.match(
     html,
     /<a\b(?=[^>]*\bhref="#main-content")[^>]*>본문으로 바로가기<\/a>/,
