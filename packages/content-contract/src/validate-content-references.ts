@@ -1,6 +1,10 @@
 import { ContractError, type ContractIssue } from "./errors.js";
-import type { PublishedContentBlock } from "./generated/content-block.js";
-import type { ReleaseBundleDocuments } from "./read-bundle-documents.js";
+import type { ReleaseBundleDocumentsByVersion } from "./read-bundle-documents.js";
+
+type ReferenceBundle =
+  ReleaseBundleDocumentsByVersion[keyof ReleaseBundleDocumentsByVersion];
+type ReferenceContentBlock =
+  ReferenceBundle["articles"][number]["content"][number];
 
 function addMissing(
   issues: ContractIssue[],
@@ -17,7 +21,7 @@ function addMissing(
 function validateMediaBlocks(
   issues: ContractIssue[],
   mediaIds: ReadonlySet<string>,
-  content: readonly PublishedContentBlock[],
+  content: readonly ReferenceContentBlock[],
   base: string,
 ) {
   content.forEach((block, index) => {
@@ -30,12 +34,21 @@ function validateMediaBlocks(
         "media ID",
       );
     }
+    if (block.type === "gallery") {
+      block.items.forEach((item, itemIndex) => {
+        addMissing(
+          issues,
+          mediaIds,
+          item.mediaId,
+          `${base}/${index}/items/${itemIndex}/mediaId`,
+          "media ID",
+        );
+      });
+    }
   });
 }
 
-export function validateContentReferences(
-  bundle: ReleaseBundleDocuments,
-): ReleaseBundleDocuments {
+export function validateContentReferences<T extends ReferenceBundle>(bundle: T): T {
   const issues: ContractIssue[] = [];
   const categoryIds = new Set(bundle.taxonomy.categories.map(({ id }) => id));
   const tagIds = new Set(bundle.taxonomy.tags.map(({ id }) => id));
