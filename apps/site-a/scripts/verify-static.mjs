@@ -403,6 +403,10 @@ if (identity.contractVersion === "3.0.0") {
   assert.doesNotMatch(article, /<dt>수정<\/dt>/);
 }
 assert.match(article, /href="\/about">운영 방식 보기<\/a>/);
+assert.match(article, /<button type="button">공유<\/button>/);
+assert.match(article, /<h2[^>]*>이 안내가 도움이 되었나요\?<\/h2>/);
+assert.match(article, /<button aria-pressed="false" type="button">도움됨<\/button>/);
+assert.doesNotMatch(article, /기사 저장 상태를 확인하고 있습니다/);
 assert.doesNotMatch(
   article,
   /(?:article-sources-title|article-update-triggers-title|article-faq-title)/,

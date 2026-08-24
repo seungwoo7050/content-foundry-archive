@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { ArticleReaderActions } from "../../../components/article-reader-actions";
 import { ImageBlock } from "../../../components/image-block";
 import { StructuredData } from "../../../components/structured-data";
 import { VersionedContentBlocks } from "../../../components/versioned-content-blocks";
@@ -27,8 +28,32 @@ interface ArticlePageProps {
   params: Promise<{ slug: string }>;
 }
 
+interface ReaderActionArticle {
+  readonly id: string;
+  readonly seo: { readonly canonicalPath: string };
+}
+
 export function generateStaticParams() {
   return getArticlePageStaticParams(getVersionedSiteReleaseContext().bundle);
+}
+
+function createReaderActions(
+  context: VersionedSiteReleaseContext,
+  article: ReaderActionArticle,
+) {
+  return (
+    <ArticleReaderActions
+      articleId={article.id}
+      canonicalUrl={new URL(
+        article.seo.canonicalPath,
+        context.canonicalOrigin,
+      ).href}
+      localBookmarksEnabled={
+        context.bundle.site.featureFlags.localBookmarks === true
+      }
+      siteId={context.bundle.release.siteId}
+    />
+  );
 }
 
 export async function generateMetadata({
@@ -53,6 +78,7 @@ function createArticleSlots(context: VersionedSiteReleaseContext, slug: string) 
     const article = findArticleBySlug(context.bundle, slug);
     if (!article) notFound();
     return {
+      readerActions: createReaderActions(context, article),
       hero: article.heroMediaId === null ? null : (
         <ImageBlock
           assets={context.mediaAssets}
@@ -74,6 +100,7 @@ function createArticleSlots(context: VersionedSiteReleaseContext, slug: string) 
   const article = findArticleBySlug(context.bundle, slug);
   if (!article) notFound();
   return {
+    readerActions: createReaderActions(context, article),
     hero: null,
     body: (
       <VersionedContentBlocks
