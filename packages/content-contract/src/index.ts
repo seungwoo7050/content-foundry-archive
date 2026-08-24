@@ -148,3 +148,12 @@ export {
   validateV4PresentationStructure,
 } from "./validate-v4-presentation-structure.js";
 export { validateV4PresentationReferences } from "./validate-v4-presentation-references.js";
+export {
+  type V4PresentationReadinessContext,
+  type V4PresentationReleaseMode,
+  validateV4PresentationReadiness,
+} from "./validate-v4-presentation-readiness.js";
+export {
+  type V4ReleaseConsumerContext,
+  validateV4ReleaseConsumerContext,
+} from "./validate-v4-release-consumer-context.js";
