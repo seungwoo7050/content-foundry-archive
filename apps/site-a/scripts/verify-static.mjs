@@ -98,6 +98,7 @@ const staticPage = readArtifact(staticPageRelativePath);
 const category = readArtifact(categoryRelativePath);
 const archive = readArtifact("archive.html");
 const notFound = readArtifact("404.html");
+const sitemap = readArtifact("sitemap.xml");
 const identity = JSON.parse(readArtifact("_release.json"));
 const expectedIdentities = {
   "2.0.0": {
@@ -120,6 +121,27 @@ const expectedIdentities = {
   },
 };
 assert.deepEqual(identity, expectedIdentities[identity.contractVersion]);
+
+const sitemapEntries = [...sitemap.matchAll(
+  /<url>\s*<loc>([^<]+)<\/loc>(?:\s*<lastmod>([^<]+)<\/lastmod>)?\s*<\/url>/g,
+)].map((match) => ({
+  url: match[1],
+  ...(match[2] ? { lastModified: match[2] } : {}),
+}));
+const expectedArticleLastModified =
+  identity.contractVersion === "3.0.0"
+    ? "2026-08-24T02:30:00Z"
+    : "2026-08-20T01:00:00Z";
+assert.deepEqual(sitemapEntries, [
+  { url: "https://example.com/" },
+  { url: "https://example.com/archive" },
+  {
+    url: `https://example.com/article/${articleSlug}`,
+    lastModified: expectedArticleLastModified,
+  },
+  { url: `https://example.com/category/${categorySlug}` },
+  { url: "https://example.com/about" },
+]);
 
 assert.match(home, /<h1 id="home-title">생활메모<\/h1>/);
 assert.match(
