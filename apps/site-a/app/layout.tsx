@@ -11,7 +11,9 @@ import {
   createReleaseIdentity,
   createReleaseIdentityMetadata,
 } from "../lib/release-identity";
+import { resolveBrandMediaAssets } from "../lib/brand-media-assets";
 import { createSiteAnalyticsRouteProjection } from "../lib/site-analytics-route-projection";
+import { createSiteBrandMetadata } from "../lib/site-brand-metadata";
 import { resolveSiteLaunchConfig } from "../lib/site-launch-config";
 import { getVersionedSiteReleaseContext } from "../lib/site-release";
 import "./globals.css";
@@ -23,8 +25,10 @@ export function generateMetadata(): Metadata {
   const identity = createReleaseIdentity(bundle);
   const launch = resolveSiteLaunchConfig(context, process.env);
   const buildConfigChecksum = createBuildConfigChecksum({ config, launch });
-  const socialImage = new URL("/og.png", canonicalOrigin).href;
-  const socialImageAlt = `${bundle.site.name} — ${bundle.site.description}`;
+  const brand = createSiteBrandMetadata(
+    canonicalOrigin,
+    resolveBrandMediaAssets(bundle, context.mediaAssets),
+  );
 
   return {
     metadataBase: new URL(canonicalOrigin),
@@ -34,6 +38,9 @@ export function generateMetadata(): Metadata {
     },
     description: bundle.site.description,
     alternates: { canonical: "/" },
+    ...(brand.favicon
+      ? { icons: { icon: [brand.favicon] } }
+      : {}),
     robots: {
       index: !noindex,
       follow: !noindex,
@@ -44,20 +51,13 @@ export function generateMetadata(): Metadata {
       description: bundle.site.description,
       url: canonicalOrigin,
       locale: bundle.site.locale.replace("-", "_"),
-      images: [
-        {
-          url: socialImage,
-          width: 1729,
-          height: 910,
-          alt: socialImageAlt,
-        },
-      ],
+      images: brand.socialImage ? [brand.socialImage] : [],
     },
     twitter: {
-      card: "summary_large_image",
+      card: brand.socialImage ? "summary_large_image" : "summary",
       title: bundle.site.name,
       description: bundle.site.description,
-      images: [socialImage],
+      images: brand.socialImage ? [brand.socialImage.url] : [],
     },
     other: {
       ...createReleaseIdentityMetadata(identity),
