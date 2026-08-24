@@ -1,9 +1,10 @@
 import { ContractError, type ContractIssue } from "./errors.js";
-import type { ReleaseBundleDocuments } from "./read-bundle-documents.js";
+import type { ReleaseBundleDocumentsByVersion } from "./read-bundle-documents.js";
 
-export function validateContentSemantics(
-  bundle: ReleaseBundleDocuments,
-): ReleaseBundleDocuments {
+type SemanticBundle =
+  ReleaseBundleDocumentsByVersion[keyof ReleaseBundleDocumentsByVersion];
+
+export function validateContentSemantics<T extends SemanticBundle>(bundle: T): T {
   const issues: ContractIssue[] = [];
 
   bundle.articles.forEach((article, articleIndex) => {
