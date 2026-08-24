@@ -43,6 +43,14 @@ export interface SiteReleaseContextV3 extends ValidatedSiteReleaseV3 {
   readonly mediaAssets: ResponsiveImageAssetRegistry;
 }
 
+export interface SiteReleaseContextByVersion {
+  readonly "2.0.0": SiteReleaseContext;
+  readonly "3.0.0": SiteReleaseContextV3;
+}
+
+export type VersionedSiteReleaseContext =
+  SiteReleaseContextByVersion[keyof SiteReleaseContextByVersion];
+
 export interface LoadSiteReleaseV3Options {
   readonly mediaAssets: Iterable<ResponsiveImageAsset>;
 }
