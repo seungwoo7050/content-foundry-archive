@@ -45,6 +45,12 @@ describe("generated route claims", () => {
         outputKind: "machine",
         source: "fixed release-identity route",
       },
+      "/sitemap.xml": {
+        kind: "fixed-sitemap",
+        navigable: false,
+        outputKind: "machine",
+        source: "fixed sitemap route",
+      },
       "/article/government24-resident-registration-guide": {
         kind: "article",
         navigable: true,
@@ -69,6 +75,7 @@ describe("generated route claims", () => {
   it.each([
     ["/archive", "fixed-archive", "fixed archive route"],
     ["/404", "fixed-not-found", "fixed not-found route"],
+    ["/sitemap.xml", "fixed-sitemap", "fixed sitemap route"],
     [
       "/article/government24-resident-registration-guide",
       "article",

@@ -18,6 +18,7 @@ export type RouteClaimKind =
   | "fixed-archive"
   | "fixed-not-found"
   | "fixed-release-identity"
+  | "fixed-sitemap"
   | "article"
   | "category"
   | "page";
@@ -64,6 +65,13 @@ export function getRouteClaims(
       navigable: false,
       outputKind: "machine",
       source: "fixed release-identity route",
+    },
+    {
+      path: "/sitemap.xml",
+      kind: "fixed-sitemap",
+      navigable: false,
+      outputKind: "machine",
+      source: "fixed sitemap route",
     },
     ...bundle.articles.map((article, index) => ({
       path: article.seo.canonicalPath,
