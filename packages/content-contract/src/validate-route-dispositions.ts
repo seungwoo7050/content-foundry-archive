@@ -1,9 +1,12 @@
 import { ContractError, type ContractIssue } from "./errors.js";
-import type { ReleaseBundleDocuments } from "./read-bundle-documents.js";
+import type { ReleaseBundleDocumentsByVersion } from "./read-bundle-documents.js";
 
-export function validateRouteDispositions(
-  bundle: ReleaseBundleDocuments,
-): ReleaseBundleDocuments {
+type DispositionBundle =
+  ReleaseBundleDocumentsByVersion[keyof ReleaseBundleDocumentsByVersion];
+
+export function validateRouteDispositions<T extends DispositionBundle>(
+  bundle: T,
+): T {
   const issues: ContractIssue[] = [];
   const sourcePaths = new Map<string, number>();
   const redirects = new Map<string, { readonly index: number; readonly to: string }>();

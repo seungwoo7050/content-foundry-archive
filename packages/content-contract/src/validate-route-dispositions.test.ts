@@ -1,8 +1,12 @@
 import { fileURLToPath } from "node:url";
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { readReleaseBundleDocuments } from "./read-bundle-documents.js";
+import {
+  type ReleaseBundleDocumentsByVersion,
+  readReleaseBundleDocuments,
+  readReleaseBundleDocumentsForVersion,
+} from "./read-bundle-documents.js";
 import { validateRouteDispositions } from "./validate-route-dispositions.js";
 
 const fixture = fileURLToPath(
@@ -12,6 +16,15 @@ const fixture = fileURLToPath(
   ),
 );
 const reference = readReleaseBundleDocuments(fixture);
+const referenceV3 = readReleaseBundleDocumentsForVersion(
+  "3.0.0",
+  fileURLToPath(
+    new URL(
+      "../vendor/3.0.0/fixtures/bundles/valid/site-a-minimal/",
+      import.meta.url,
+    ),
+  ),
+);
 
 const expectInvalid = (bundle: typeof reference, message: string) => {
   expect(() => validateRouteDispositions(bundle)).toThrowError(
@@ -25,6 +38,25 @@ const expectInvalid = (bundle: typeof reference, message: string) => {
 describe("validateRouteDispositions", () => {
   it("accepts the empty reference disposition list", () => {
     expect(validateRouteDispositions(structuredClone(reference))).toBeDefined();
+  });
+
+  it("preserves canonical v3 dispositions and rejects a v3 self-redirect", () => {
+    const bundle = validateRouteDispositions(structuredClone(referenceV3));
+    expectTypeOf(bundle).toEqualTypeOf<
+      ReleaseBundleDocumentsByVersion["3.0.0"]
+    >();
+    bundle.redirects.items.push({
+      type: "redirect",
+      fromPath: "/old",
+      toPath: "/old",
+      status: 308,
+    });
+
+    expect(() => validateRouteDispositions(bundle)).toThrowError(
+      expect.objectContaining({
+        issues: [expect.objectContaining({ message: "self-redirect is forbidden" })],
+      }),
+    );
   });
 
   it("rejects a self-redirect", () => {
