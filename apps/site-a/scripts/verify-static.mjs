@@ -92,6 +92,10 @@ const notFound = readArtifact("404.html");
 const identity = JSON.parse(readArtifact("_release.json"));
 
 assert.match(home, /<h1 id="home-title">생활메모<\/h1>/);
+assert.match(
+  home,
+  /<nav aria-label="주요 메뉴"><ul><li><a href="\/">홈<\/a><\/li><li><a href="\/category\/daily-admin">생활·행정<\/a><\/li><\/ul><\/nav>/,
+);
 assert.match(article, /<h1>정부24 주민등록등본 발급 방법<\/h1>/);
 assert.match(staticPage, /<h1>소개<\/h1>/);
 assert.match(

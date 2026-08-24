@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+import { ReleaseNavigation } from "../components/release-navigation";
 import {
   createReleaseIdentity,
   createReleaseIdentityMetadata,
@@ -65,6 +66,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
             {bundle.site.name}
           </a>
           <p>{bundle.site.description}</p>
+          <ReleaseNavigation items={bundle.navigation.items} />
         </header>
         <main id="main-content">{children}</main>
         <footer>
