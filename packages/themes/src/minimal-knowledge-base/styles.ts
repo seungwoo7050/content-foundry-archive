@@ -22,7 +22,7 @@ export const MINIMAL_KNOWLEDGE_BASE_STYLES = `
 .kb-rail-header{display:grid;gap:.15rem}
 .kb-rail-header>a{width:fit-content;color:var(--color-text);font-size:1.25rem;font-weight:850;letter-spacing:-.035em;text-decoration:none}
 .kb-rail-header>a:before{display:inline-block;width:.62rem;height:.62rem;margin-right:.55rem;background:var(--color-primary);border-radius:.14rem;content:""}
-.kb-rail-header p{max-width:34rem;margin:.2rem 0 .85rem;color:var(--color-text-muted);font-size:.88rem;line-height:1.55}
+.kb-rail-header p{max-width:34rem;margin:.2rem 0 .85rem;color:var(--color-text-muted);font-size:.88rem;line-height:1.55;word-break:keep-all}
 .kb-knowledge-rail nav>ul{display:flex;gap:.4rem;margin:0;padding:.15rem .15rem .45rem;overflow-x:auto;list-style:none;scrollbar-width:thin}
 .kb-knowledge-rail ul ul{display:none}
 .kb-knowledge-rail nav a{display:flex;align-items:center;min-height:44px;padding:.55rem .8rem;color:var(--color-text);white-space:nowrap;text-decoration:none;border:1px solid var(--color-border);border-radius:.55rem;background:var(--color-surface)}
@@ -42,7 +42,7 @@ export const MINIMAL_KNOWLEDGE_BASE_STYLES = `
 
 .kb-home-route>header{max-width:50rem;padding:clamp(1.5rem,4vw,3.25rem) 0 1rem}
 .kb-home-route>header h1{max-width:12ch}
-.kb-home-route>header p{max-width:40rem;margin:1.15rem 0 0;color:var(--color-text-muted);font-size:clamp(1.05rem,2vw,1.25rem);line-height:1.65}
+.kb-home-route>header p{max-width:40rem;margin:1.15rem 0 0;color:var(--color-text-muted);font-size:clamp(1.05rem,2vw,1.25rem);line-height:1.65;word-break:keep-all}
 .kb-home-search{margin:1.75rem 0 3rem;padding:clamp(1.25rem,3vw,2rem);background:linear-gradient(135deg,var(--color-primary),var(--focus-ring));border-radius:1rem;box-shadow:0 1rem 2.5rem rgba(19,33,58,.14)}
 .kb-home-search h2{margin:0}
 .kb-home-search a{display:flex;align-items:center;justify-content:space-between;min-height:56px;color:var(--color-on-primary);text-decoration:none}

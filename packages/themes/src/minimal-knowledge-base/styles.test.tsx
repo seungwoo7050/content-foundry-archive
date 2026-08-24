@@ -38,6 +38,12 @@ describe("Minimal Knowledge Base styles", () => {
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain("min-height:100vh");
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain("scroll-margin-top:1rem");
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      "line-height:1.55;word-break:keep-all",
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      "line-height:1.65;word-break:keep-all",
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
       ".kb-category-grid>ul>li:only-child",
     );
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
