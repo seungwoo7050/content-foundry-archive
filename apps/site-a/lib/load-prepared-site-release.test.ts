@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -7,7 +7,10 @@ import type { BuildTargetConfig } from "@content-foundry/site-core";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { loadPreparedSiteRelease } from "./load-prepared-site-release";
-import { loadValidatedSiteReleaseV3 } from "./load-site-release";
+import {
+  loadValidatedSiteRelease,
+  loadValidatedSiteReleaseV3,
+} from "./load-site-release";
 import { writeSiteMediaProjection } from "./site-media-projection";
 
 const fixture = (version: "2.0.0" | "3.0.0") =>
@@ -40,16 +43,20 @@ afterEach(() => {
 });
 
 describe("loadPreparedSiteRelease", () => {
-  it("loads v2 without consulting a stale projection", () => {
+  it("binds a verified v2 projection without adding niche components", async () => {
+    const releaseConfig = config(fixture("2.0.0"));
+    const validated = loadValidatedSiteRelease(releaseConfig);
+    if (validated.contractVersion !== "2.0.0") throw new Error("expected v2");
     const path = projectionPath();
-    writeFileSync(path, "stale projection");
+    await writeSiteMediaProjection(path, validated.bundle, []);
 
-    const context = loadPreparedSiteRelease(config(fixture("2.0.0")), {
-      projectionPath: path,
-    });
+    const context = loadPreparedSiteRelease(releaseConfig, { projectionPath: path });
 
     expect(context.contractVersion).toBe("2.0.0");
+    if (context.contractVersion !== "2.0.0") throw new Error("expected v2");
     expect(context.bundle.release.releaseId).toBe("REL-2026-000042");
+    expect([...context.mediaAssets.keys()]).toEqual([]);
+    expect("nicheComponents" in context).toBe(false);
   });
 
   it("binds a verified v3 projection to one validated release", async () => {
@@ -69,14 +76,18 @@ describe("loadPreparedSiteRelease", () => {
     expect(context.contractVersion).toBe("3.0.0");
     if (context.contractVersion !== "3.0.0") throw new Error("expected v3 context");
     expect([...context.mediaAssets.keys()]).toEqual(["MED-000045", "MED-000046"]);
+    expect([...context.nicheComponents.get("site-a")!.keys()]).toEqual([]);
     expect(context.bundle).toEqual(validated.bundle);
   });
 
-  it("fails closed when a v3 projection is unavailable", () => {
-    expect(() =>
-      loadPreparedSiteRelease(config(fixture("3.0.0")), {
-        projectionPath: projectionPath(),
-      }),
-    ).toThrowError(expect.objectContaining({ code: "BUILD_FAILED" }));
-  });
+  it.each(["2.0.0", "3.0.0"] as const)(
+    "fails closed when a %s projection is unavailable",
+    (version) => {
+      expect(() =>
+        loadPreparedSiteRelease(config(fixture(version)), {
+          projectionPath: projectionPath(),
+        }),
+      ).toThrowError(expect.objectContaining({ code: "BUILD_FAILED" }));
+    },
+  );
 });

@@ -42,6 +42,10 @@ export interface SiteReleaseContextV3 extends ValidatedSiteReleaseV3 {
   readonly mediaAssets: ResponsiveImageAssetRegistry;
 }
 
+export interface PreparedSiteReleaseContextV2 extends SiteReleaseContext {
+  readonly mediaAssets: ResponsiveImageAssetRegistry;
+}
+
 export interface SiteReleaseContextByVersion {
   readonly "2.0.0": SiteReleaseContext;
   readonly "3.0.0": SiteReleaseContextV3;
@@ -49,6 +53,14 @@ export interface SiteReleaseContextByVersion {
 
 export type VersionedSiteReleaseContext =
   SiteReleaseContextByVersion[keyof SiteReleaseContextByVersion];
+
+export interface PreparedSiteReleaseContextByVersion {
+  readonly "2.0.0": PreparedSiteReleaseContextV2;
+  readonly "3.0.0": SiteReleaseContextV3;
+}
+
+export type PreparedVersionedSiteReleaseContext =
+  PreparedSiteReleaseContextByVersion[keyof PreparedSiteReleaseContextByVersion];
 
 export type ValidatedVersionedSiteRelease =
   | SiteReleaseContext
@@ -135,6 +147,15 @@ export function bindValidatedSiteReleaseV3(
   validated: ValidatedSiteReleaseV3,
   mediaAssets: Iterable<ResponsiveImageAsset>,
 ): SiteReleaseContextV3 {
+  return bindValidatedSiteRelease(validated, mediaAssets);
+}
+
+export function bindValidatedSiteRelease<
+  T extends ValidatedVersionedSiteRelease,
+>(
+  validated: T,
+  mediaAssets: Iterable<ResponsiveImageAsset>,
+): T & { readonly mediaAssets: ResponsiveImageAssetRegistry } {
   return {
     ...validated,
     mediaAssets: createResponsiveImageAssetRegistry(
