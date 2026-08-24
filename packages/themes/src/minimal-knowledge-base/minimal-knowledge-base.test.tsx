@@ -73,6 +73,14 @@ function routeAt(index: number): HtmlRouteViewModel {
   return route;
 }
 
+function getListRoute(kind: "archive" | "category") {
+  const route = routes.find((candidate) => candidate.kind === kind);
+  if (!route || (route.kind !== "archive" && route.kind !== "category")) {
+    throw new Error(`Missing ${kind} fixture.`);
+  }
+  return route;
+}
+
 describe("Minimal Knowledge Base", () => {
   it("implements the exact module identity and complete route matrix", () => {
     expectTypeOf(minimalKnowledgeBaseTheme).toExtend<ThemeModule>();
@@ -184,6 +192,45 @@ describe("Minimal Knowledge Base", () => {
     expect(render({ ...home, aboutTeaser: null })).not.toContain("home-about-teaser-heading");
     expect(render(withoutTeaser)).not.toContain("home-about-teaser-heading");
   });
+
+  it.each(["category", "archive"] as const)(
+    "omits pagination markup from a one-page %s list",
+    (kind) => {
+      expect(render(getListRoute(kind)))
+        .not.toContain('aria-label="목록 페이지 이동"');
+    },
+  );
+
+  it.each([
+    ["category", "/category/life/page/2", "/category/life", "/category/life/page/3"],
+    ["archive", "/archive/page/2", "/archive", "/archive/page/3"],
+  ] as const)(
+    "renders real pagination anchors after the %s article list",
+    (kind, path, previousHref, nextHref) => {
+      const route = getListRoute(kind);
+      const html = render({
+        ...route,
+        path,
+        breadcrumbs: [{ href: path, label: route.heading }],
+        pagination: {
+          currentPage: 2,
+          pageCount: 3,
+          previous: { href: previousHref, label: "이전 페이지" },
+          next: { href: nextHref, label: "다음 페이지" },
+        },
+      });
+
+      expect(html.indexOf('href="/article/start"')).toBeLessThan(
+        html.indexOf('aria-label="목록 페이지 이동"'),
+      );
+      expect(html).toContain(
+        `<a href="${previousHref}" rel="prev">이전 페이지</a>`,
+      );
+      expect(html).toContain(
+        `<a href="${nextHref}" rel="next">다음 페이지</a>`,
+      );
+    },
+  );
 
   it("renders the complete answer-first article truth in order", () => {
     const article = routeAt(2);

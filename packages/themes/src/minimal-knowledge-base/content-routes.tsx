@@ -9,6 +9,7 @@ import type { ThemeAdSlotContext } from "../theme-ad-slot.js";
 import {
   ThemeArticleList,
   ThemeHomeAboutTeaser,
+  ThemePagination,
 } from "../theme-links.js";
 import { MinimalKnowledgeBaseArticle } from "./article-route.js";
 import { KnowledgeBreadcrumbs } from "./route-chrome.js";
@@ -55,6 +56,7 @@ function CategoryRoute({ route }: { readonly route: CategoryRouteViewModel }) {
       <section className="kb-category-articles">
         <h2>{route.articleSectionHeading}</h2>
         <ThemeArticleList articles={route.articles} headingLevel={3} />
+        <ThemePagination pagination={route.pagination} />
       </section>
       {route.topics.length > 0 ? (
         <section className="kb-category-topics">
@@ -82,6 +84,7 @@ function ArchiveRoute({ route }: { readonly route: ArchiveRouteViewModel }) {
       <KnowledgeBreadcrumbs route={route} />
       <header><h1>{route.heading}</h1><p>{route.description}</p></header>
       <ThemeArticleList articles={route.articles} headingLevel={2} ordered />
+      <ThemePagination pagination={route.pagination} />
     </div>
   );
 }
