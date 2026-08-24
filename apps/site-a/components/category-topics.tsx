@@ -1,9 +1,10 @@
-import type { PublicSiteTaxonomy } from "@content-foundry/content-contract";
-
-type Tag = PublicSiteTaxonomy["tags"][number];
+export interface CategoryTopic {
+  readonly id: string;
+  readonly label: string;
+}
 
 interface CategoryTopicsProps {
-  readonly tags: readonly Tag[];
+  readonly tags: readonly CategoryTopic[];
 }
 
 export function CategoryTopics({ tags }: CategoryTopicsProps) {

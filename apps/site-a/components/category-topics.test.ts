@@ -1,11 +1,14 @@
 import { resolve } from "node:path";
 
-import { loadReleaseBundle } from "@content-foundry/content-contract";
+import {
+  loadReleaseBundle,
+  type LoadedReleaseBundleV3,
+} from "@content-foundry/content-contract";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { CategoryTopics } from "./category-topics";
+import { CategoryTopics, type CategoryTopic } from "./category-topics";
 
 const fixture = resolve(
   process.cwd(),
@@ -14,6 +17,12 @@ const fixture = resolve(
 const bundle = loadReleaseBundle(fixture);
 
 describe("CategoryTopics", () => {
+  it("accepts v3 taxonomy tag records", () => {
+    expectTypeOf<
+      LoadedReleaseBundleV3["taxonomy"]["tags"][number]
+    >().toExtend<CategoryTopic>();
+  });
+
   it("renders referenced tag labels without inventing links", () => {
     expect(
       renderToStaticMarkup(
