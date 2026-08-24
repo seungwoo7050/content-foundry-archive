@@ -33,11 +33,12 @@ const asset: ResponsiveImageAsset = {
   ],
 };
 
-function render(value = asset) {
+function render(value = asset, priority = false) {
   return renderToStaticMarkup(
     createElement(ImageBlock, {
       block: { type: "image", mediaId, caption: "신청 <화면>" },
       assets: new Map([[mediaId, value]]),
+      priority,
     }),
   );
 }
@@ -52,10 +53,18 @@ describe("ImageBlock", () => {
     expect(html).toContain('width="16"');
     expect(html).toContain('height="9"');
     expect(html).toContain('loading="lazy"');
+    expect(html).toContain('fetchPriority="auto"');
     expect(html).toContain('decoding="async"');
     expect(html).toContain("신청 &lt;화면&gt;");
     expect(html).toContain("출처: 운영자 &amp; 촬영");
     expect(html).toContain("이용 조건: 승인 &lt;범위&gt;");
+  });
+
+  it("prioritizes an explicitly designated lead image", () => {
+    const html = render(asset, true);
+
+    expect(html).toContain('loading="eager"');
+    expect(html).toContain('fetchPriority="high"');
   });
 
   it("preserves an explicit empty alt attribute", () => {

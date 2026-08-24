@@ -6,6 +6,10 @@ export function renderArticleHero(
   mediaAssets: ResponsiveImageAssetRegistry,
 ) {
   return mediaId === null ? null : (
-    <ImageBlock assets={mediaAssets} block={{ type: "image", mediaId }} />
+    <ImageBlock
+      assets={mediaAssets}
+      block={{ type: "image", mediaId }}
+      priority
+    />
   );
 }

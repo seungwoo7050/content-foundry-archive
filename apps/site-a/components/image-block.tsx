@@ -11,6 +11,7 @@ export type PublishedImageBlockV3 = Extract<
 interface ImageBlockProps {
   readonly block: PublishedImageBlockV3;
   readonly assets: ResponsiveImageAssetRegistry;
+  readonly priority?: boolean;
 }
 
 export class MissingResponsiveImageAssetError extends Error {
@@ -22,7 +23,7 @@ export class MissingResponsiveImageAssetError extends Error {
   }
 }
 
-export function ImageBlock({ block, assets }: ImageBlockProps) {
+export function ImageBlock({ block, assets, priority = false }: ImageBlockProps) {
   const asset = assets.get(block.mediaId);
   if (asset === undefined) throw new MissingResponsiveImageAssetError(block.mediaId);
   const srcSet = asset.derivatives
@@ -45,8 +46,9 @@ export function ImageBlock({ block, assets }: ImageBlockProps) {
         <img
           alt={asset.fallback.alt}
           decoding="async"
+          fetchPriority={priority ? "high" : "auto"}
           height={asset.fallback.height}
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
           src={asset.fallback.publicPath}
           width={asset.fallback.width}
         />

@@ -37,6 +37,8 @@ describe("renderArticleHero", () => {
 
     expect(html).toContain('src="/_media/MED-000045/source.png"');
     expect(html).toContain('alt="v2 대표 발급 화면"');
+    expect(html).toContain('loading="eager"');
+    expect(html).toContain('fetchPriority="high"');
   });
 
   it("omits a null hero", () => {
