@@ -1,4 +1,8 @@
 import type { ArticleRouteViewModel } from "../content-route-view-model.js";
+import {
+  getThemeAdSlot,
+  type ThemeAdSlotContext,
+} from "../theme-ad-slot.js";
 import { ThemeArticleList } from "../theme-links.js";
 import { KnowledgeBreadcrumbs } from "./route-chrome.js";
 
@@ -66,8 +70,10 @@ function ArticleContents({ route }: { readonly route: ArticleRouteViewModel }) {
 }
 
 export function MinimalKnowledgeBaseArticle({
+  context = {},
   route,
 }: {
+  readonly context?: ThemeAdSlotContext;
   readonly route: ArticleRouteViewModel;
 }) {
   return (
@@ -79,6 +85,9 @@ export function MinimalKnowledgeBaseArticle({
           <h1>{route.heading}</h1>
           <p>{route.description}</p>
         </header>
+        {route.advertisingEligible
+          ? getThemeAdSlot(context, "article-after-summary")
+          : null}
         <ArticleTrust route={route} />
         <ArticleContents route={route} />
         {route.hero ? <div className="kb-article-hero">{route.hero}</div> : null}
@@ -95,6 +104,9 @@ export function MinimalKnowledgeBaseArticle({
             {route.readerActions}
           </section>
         ) : null}
+        {route.advertisingEligible
+          ? getThemeAdSlot(context, "article-end")
+          : null}
       </article>
     </div>
   );

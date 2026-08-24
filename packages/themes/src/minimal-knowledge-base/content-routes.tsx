@@ -5,6 +5,7 @@ import type {
   HomeRouteViewModel,
   StaticPageRouteViewModel,
 } from "../content-route-view-model.js";
+import type { ThemeAdSlotContext } from "../theme-ad-slot.js";
 import { ThemeArticleList } from "../theme-links.js";
 import { MinimalKnowledgeBaseArticle } from "./article-route.js";
 import { KnowledgeBreadcrumbs } from "./route-chrome.js";
@@ -82,14 +83,16 @@ function unreachable(value: never): never {
 }
 
 export function MinimalKnowledgeBaseContentRoute({
+  context = {},
   route,
 }: {
+  readonly context?: ThemeAdSlotContext;
   readonly route: ContentRouteViewModel;
 }) {
   switch (route.kind) {
     case "home": return <HomeRoute route={route} />;
     case "category": return <CategoryRoute route={route} />;
-    case "article": return <MinimalKnowledgeBaseArticle route={route} />;
+    case "article": return <MinimalKnowledgeBaseArticle context={context} route={route} />;
     case "static-page": return <StaticPageRoute route={route} />;
     case "archive": return <ArchiveRoute route={route} />;
     default: return unreachable(route);

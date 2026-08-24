@@ -5,6 +5,7 @@ import type { HtmlRouteViewModel, ThemePageViewModel } from "../html-route-view-
 import { HTML_ROUTE_KINDS } from "../html-route-view-model.js";
 import type { ArticleListItemViewModel, SiteShellViewModel } from "../presentation-view-model.js";
 import { SKIN_TOKENS } from "../skin.js";
+import type { ThemeAdSlots } from "../theme-ad-slot.js";
 import type { ThemeModule } from "../theme-module.js";
 import { minimalKnowledgeBaseTheme } from "./index.js";
 
@@ -55,9 +56,13 @@ const routes = [
   { ...base("/old", "제공 종료"), kind: "retired", statusCode: 410, action: { href: "/archive", label: "전체 글" }, recoveryLinks },
 ] satisfies readonly HtmlRouteViewModel[];
 
-function render(route: HtmlRouteViewModel) {
+function render(route: HtmlRouteViewModel, adSlots?: ThemeAdSlots) {
   return renderToStaticMarkup(minimalKnowledgeBaseTheme.renderRoute(
-    { shell, route }, { skinId: "calm-blue", colors: SKIN_TOKENS["calm-blue"] },
+    { shell, route }, {
+      skinId: "calm-blue",
+      colors: SKIN_TOKENS["calm-blue"],
+      ...(adSlots ? { adSlots } : {}),
+    },
   ));
 }
 
@@ -74,7 +79,10 @@ describe("Minimal Knowledge Base", () => {
     expect(minimalKnowledgeBaseTheme.id).toBe("minimal-knowledge-base");
     expect(minimalKnowledgeBaseTheme.qualityExpectations.routeKinds).toBe(HTML_ROUTE_KINDS);
     expect(routes.map(({ kind }) => kind)).toEqual(HTML_ROUTE_KINDS);
-    expect(minimalKnowledgeBaseTheme.supportedSlots).toEqual([]);
+    expect(minimalKnowledgeBaseTheme.supportedSlots).toEqual([
+      "article-after-summary",
+      "article-end",
+    ]);
   });
 
   it.each(routes)("renders $kind through the complete KB shell", (route) => {
@@ -129,8 +137,41 @@ describe("Minimal Knowledge Base", () => {
     expect(html).not.toMatch(/data-ad|ad-slot/);
   });
 
+  it("places only two separated article slots for eligible content", () => {
+    const article = routeAt(2);
+    if (article.kind !== "article") throw new Error("Expected article fixture");
+    const adSlots: ThemeAdSlots = {
+      "home-feed": <i data-test-slot="home-feed" />,
+      "article-after-summary": <i data-test-slot="article-after-summary" />,
+      "article-mid-1": <i data-test-slot="article-mid-1" />,
+      "article-mid-2": <i data-test-slot="article-mid-2" />,
+      "article-end": <i data-test-slot="article-end" />,
+      "desktop-sidebar": <i data-test-slot="desktop-sidebar" />,
+    };
+    const eligible = { ...article, advertisingEligible: true };
+    const html = render(eligible, adSlots);
+    const positions = [
+      "시작 안내 설명",
+      'data-test-slot="article-after-summary"',
+      "이 안내의 정보",
+      "독자 기능",
+      'data-test-slot="article-end"',
+    ].map((value) => html.indexOf(value));
+
+    expect(positions.every((position) => position >= 0)).toBe(true);
+    expect(positions).toEqual([...positions].sort((left, right) => left - right));
+    expect(html.match(/data-test-slot=/g)).toHaveLength(2);
+    expect(html).not.toMatch(/data-test-slot="(?:home-feed|article-mid-[12]|desktop-sidebar)"/);
+    expect(render(eligible)).not.toContain("data-test-slot");
+    expect(render({ ...eligible, advertisingEligible: false }, adSlots))
+      .not.toContain("data-test-slot");
+    for (const route of routes.filter(({ kind }) => kind !== "article")) {
+      expect(render(route, adSlots)).not.toContain("data-test-slot");
+    }
+  });
+
   it("renders static, archive, search, missing, and retired facts without invented claims", () => {
-    const html = routes.slice(3).map(render).join("\n");
+    const html = routes.slice(3).map((route) => render(route)).join("\n");
     expect(html).toContain("정적 본문");
     expect(html).toContain("시작 안내");
     expect(html).toContain("검색 클라이언트");

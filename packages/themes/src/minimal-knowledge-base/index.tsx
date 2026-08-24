@@ -1,18 +1,27 @@
-import type { HtmlRouteViewModel } from "../html-route-view-model.js";
+import type {
+  HtmlRouteViewModel,
+  ThemeRenderContext,
+} from "../html-route-view-model.js";
 import { HTML_ROUTE_KINDS } from "../html-route-view-model.js";
 import type { ThemeModule } from "../theme-module.js";
 import { MinimalKnowledgeBaseContentRoute } from "./content-routes.js";
 import { MinimalKnowledgeBaseShell } from "./shell.js";
 import { MinimalKnowledgeBaseStateRoute } from "./state-routes.js";
 
-function RouteContent({ route }: { readonly route: HtmlRouteViewModel }) {
+function RouteContent({
+  context,
+  route,
+}: {
+  readonly context: ThemeRenderContext;
+  readonly route: HtmlRouteViewModel;
+}) {
   switch (route.kind) {
     case "home":
     case "category":
     case "article":
     case "static-page":
     case "archive":
-      return <MinimalKnowledgeBaseContentRoute route={route} />;
+      return <MinimalKnowledgeBaseContentRoute context={context} route={route} />;
     case "search":
     case "not-found":
     case "retired":
@@ -22,7 +31,10 @@ function RouteContent({ route }: { readonly route: HtmlRouteViewModel }) {
 
 export const minimalKnowledgeBaseTheme = Object.freeze({
   id: "minimal-knowledge-base",
-  supportedSlots: Object.freeze([]),
+  supportedSlots: Object.freeze([
+    "article-after-summary",
+    "article-end",
+  ] as const),
   qualityExpectations: Object.freeze({
     routeKinds: HTML_ROUTE_KINDS,
     density: "dense",
@@ -31,7 +43,7 @@ export const minimalKnowledgeBaseTheme = Object.freeze({
   renderRoute(model, context) {
     return (
       <MinimalKnowledgeBaseShell context={context} shell={model.shell}>
-        <RouteContent route={model.route} />
+        <RouteContent context={context} route={model.route} />
       </MinimalKnowledgeBaseShell>
     );
   },
