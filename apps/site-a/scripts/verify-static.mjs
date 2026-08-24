@@ -98,6 +98,7 @@ const staticPage = readArtifact(staticPageRelativePath);
 const category = readArtifact(categoryRelativePath);
 const archive = readArtifact("archive.html");
 const notFound = readArtifact("404.html");
+const robots = readArtifact("robots.txt");
 const sitemap = readArtifact("sitemap.xml");
 const identity = JSON.parse(readArtifact("_release.json"));
 const expectedIdentities = {
@@ -121,6 +122,7 @@ const expectedIdentities = {
   },
 };
 assert.deepEqual(identity, expectedIdentities[identity.contractVersion]);
+assert.equal(robots, "User-Agent: *\nDisallow: /\n\n");
 
 const sitemapEntries = [...sitemap.matchAll(
   /<url>\s*<loc>([^<]+)<\/loc>(?:\s*<lastmod>([^<]+)<\/lastmod>)?\s*<\/url>/g,
