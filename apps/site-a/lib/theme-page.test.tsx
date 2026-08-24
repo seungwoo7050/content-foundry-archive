@@ -64,6 +64,16 @@ describe("renderThemePage", () => {
     }
   });
 
+  it("passes provider-neutral nodes to the selected theme", () => {
+    const html = renderToStaticMarkup(renderThemePage(
+      withDefaults("friendly-mobile-utility"),
+      route,
+      { "home-feed": <aside data-test-slot="home-feed">광고 슬롯</aside> },
+    ));
+
+    expect(html).toContain('data-test-slot="home-feed"');
+  });
+
   it("passes only the projected shell and route to the renderer", () => {
     const element = renderThemePage(
       withDefaults("clean-personal-blog"), route,
