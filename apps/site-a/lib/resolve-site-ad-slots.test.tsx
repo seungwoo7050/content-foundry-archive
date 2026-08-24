@@ -4,7 +4,11 @@ import { describe, expect, it } from "vitest";
 import { resolveSiteAdSlots } from "./resolve-site-ad-slots";
 
 const enabledSource = {
-  config: { adsEnabled: true },
+  config: {
+    mode: "production",
+    adsEnabled: true,
+    analyticsEnabled: false,
+  },
   bundle: {
     site: {
       ads: {
@@ -12,6 +16,7 @@ const enabledSource = {
         enabled: true,
         publicClientId: "ca-pub-1234567890123456",
       },
+      analytics: { provider: "disabled", publicMeasurementId: null },
       defaultTheme: "friendly-mobile-utility",
     },
   },
@@ -20,7 +25,11 @@ const enabledSource = {
 describe("Site A manual ad slot resolution", () => {
   it("keeps a disabled build empty even when unit input is unusable", () => {
     expect(resolveSiteAdSlots({
-      config: { adsEnabled: false },
+      config: {
+        mode: "template",
+        adsEnabled: false,
+        analyticsEnabled: false,
+      },
       bundle: {
         site: {
           ...enabledSource.bundle.site,

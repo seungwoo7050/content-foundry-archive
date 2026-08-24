@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-import { resolveConsentBuildConfig } from "@content-foundry/site-core";
-
 import { GoogleProviderHead } from "../components/google-provider-head";
 import {
   createReleaseIdentity,
   createReleaseIdentityMetadata,
 } from "../lib/release-identity";
-import { resolveSiteAnalyticsConfig } from "../lib/site-analytics-config";
-import { resolveSiteGoogleCmpConfig } from "../lib/site-google-cmp-config";
+import { resolveSiteProviderConfig } from "../lib/site-provider-config";
 import { getVersionedSiteReleaseContext } from "../lib/site-release";
 import "./globals.css";
 
@@ -58,18 +55,15 @@ export function generateMetadata(): Metadata {
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const context = getVersionedSiteReleaseContext();
-  const consent = resolveConsentBuildConfig(process.env);
-  const analytics = resolveSiteAnalyticsConfig(context, consent);
-  const cmp = resolveSiteGoogleCmpConfig(
-    context.config.mode === "production",
-    consent,
-    context.bundle.site.ads,
-  );
+  const providers = resolveSiteProviderConfig(context, process.env);
 
   return (
     <html lang={context.bundle.site.locale}>
       <head>
-        <GoogleProviderHead analytics={analytics} cmp={cmp} />
+        <GoogleProviderHead
+          analytics={providers.analytics}
+          cmp={providers.cmp}
+        />
       </head>
       <body>{children}</body>
     </html>

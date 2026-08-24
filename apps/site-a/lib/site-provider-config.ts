@@ -1,6 +1,6 @@
 import {
   createAdsTxtRecord, MANUAL_AD_UNITS_INPUT_NAME,
-  type AdvertisingProviderConfig, type AdvertisingReleaseIdentity,
+  type AdvertisingProviderConfig,
 } from "@content-foundry/advertising";
 import type { AnalyticsProviderConfig, AnalyticsReleaseIdentity } from "@content-foundry/analytics";
 import {
@@ -25,7 +25,7 @@ export interface SiteProviderSource {
   };
   readonly bundle: {
     readonly site: {
-      readonly ads: AdvertisingReleaseIdentity;
+      readonly ads: unknown;
       readonly analytics: AnalyticsReleaseIdentity;
       readonly defaultTheme: ThemeId;
     };
