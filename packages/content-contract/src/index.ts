@@ -70,6 +70,10 @@ export {
   type ContractIssue,
 } from "./errors.js";
 export {
+  type SupportedContractVersion,
+  SUPPORTED_CONTRACT_VERSIONS,
+} from "./contract-version.js";
+export {
   type ContractDocumentKind,
   validateContractDocument,
 } from "./validate-document.js";

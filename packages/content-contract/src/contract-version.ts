@@ -5,8 +5,6 @@ export const SUPPORTED_CONTRACT_VERSIONS = Object.freeze(["2.0.0"] as const);
 export type SupportedContractVersion =
   (typeof SUPPORTED_CONTRACT_VERSIONS)[number];
 
-export const SUPPORTED_CONTRACT_VERSION = SUPPORTED_CONTRACT_VERSIONS[0];
-
 export function resolveSupportedContractVersion(
   value: unknown,
 ): SupportedContractVersion {
