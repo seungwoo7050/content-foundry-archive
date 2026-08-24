@@ -14,6 +14,7 @@ import { prepareSiteMedia } from "./prepare-site-media";
 import { writeSiteMediaProjection } from "./site-media-projection";
 
 export interface SiteBuildArtifactPaths {
+  readonly dispositionPath: string;
   readonly projectionPath: string;
   readonly publicDirectory: string;
 }

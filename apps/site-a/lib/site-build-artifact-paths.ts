@@ -7,6 +7,7 @@ export function resolveSiteBuildArtifactPaths(
 ): SiteBuildArtifactPaths {
   const root = resolve(appDirectory);
   return {
+    dispositionPath: join(root, ".site-build/route-dispositions.json"),
     projectionPath: join(root, ".site-build/media-projection.json"),
     publicDirectory: join(root, "public"),
   };

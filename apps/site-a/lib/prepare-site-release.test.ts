@@ -63,6 +63,7 @@ function workspace() {
   roots.push(root);
   return {
     root,
+    dispositionPath: join(root, ".site-build/route-dispositions.json"),
     projectionPath: join(root, ".site-build/media-projection.json"),
     publicDirectory: join(root, "public"),
     immutableObjectDirectory: join(root, "immutable"),
@@ -109,6 +110,7 @@ describe("prepareSiteRelease", () => {
     const workspacePaths = workspace();
     writePriorArtifacts(workspacePaths);
     const paths = {
+      dispositionPath: workspacePaths.dispositionPath,
       projectionPath: workspacePaths.projectionPath,
       publicDirectory: workspacePaths.publicDirectory,
     };
@@ -152,6 +154,7 @@ describe("prepareSiteRelease", () => {
 
     await expect(
       prepareSiteRelease(config(fixture("3.0.0")), {
+        dispositionPath: paths.dispositionPath,
         projectionPath: paths.projectionPath,
         publicDirectory: paths.publicDirectory,
       }),

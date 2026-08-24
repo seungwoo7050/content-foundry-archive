@@ -57,6 +57,7 @@ function workspace() {
   const root = mkdtempSync(join(tmpdir(), "site-build-artifacts-"));
   roots.push(root);
   const paths: SiteBuildArtifactPaths = {
+    dispositionPath: join(root, ".site-build/route-dispositions.json"),
     projectionPath: join(root, ".site-build/media-projection.json"),
     publicDirectory: join(root, "public"),
   };

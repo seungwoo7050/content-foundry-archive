@@ -9,6 +9,9 @@ describe("resolveSiteBuildArtifactPaths", () => {
     const appDirectory = resolve("/workspace/apps/site-a");
 
     expect(resolveSiteBuildArtifactPaths(appDirectory)).toEqual({
+      dispositionPath: resolve(
+        "/workspace/apps/site-a/.site-build/route-dispositions.json",
+      ),
       projectionPath: resolve(
         "/workspace/apps/site-a/.site-build/media-projection.json",
       ),
