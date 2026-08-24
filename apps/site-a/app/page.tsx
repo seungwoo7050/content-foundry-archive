@@ -15,6 +15,21 @@ export default function HomePage() {
         <p>{bundle.site.description}</p>
       </section>
 
+      {bundle.site.search.enabled ? (
+        <section aria-labelledby="home-search" className="home-search">
+          <h2 id="home-search">필요한 안내 찾기</h2>
+          <p>
+            제목, 카테고리, 주제로 게시된 안내를 찾아보세요. 검색어는 외부로
+            전송하지 않습니다.
+          </p>
+          <p>
+            {/* Static export intentionally uses native navigation. */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+            <a href="/search">사이트 검색</a>
+          </p>
+        </section>
+      ) : null}
+
       <section aria-labelledby="latest-articles" className="home-feed">
         <h2 id="latest-articles">최근 안내</h2>
         <ul className="article-list">
