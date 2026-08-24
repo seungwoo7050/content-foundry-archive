@@ -464,6 +464,9 @@ assert.match(
 assert.match(notFound, /페이지를 찾을 수 없습니다/);
 assert.match(notFound, /<p>404<\/p>/);
 assert.match(notFound, /href="\/">생활메모 홈으로 돌아가기<\/a>/);
+assert.match(notFound, /<meta name="robots" content="noindex, nofollow"/);
+assert.doesNotMatch(notFound, /<link rel="canonical"/);
+assert.match(notFound, /<title>페이지를 찾을 수 없습니다 \| 생활메모<\/title>/);
 assert.match(search, /<h1>검색<\/h1>/);
 assert.match(search, /<label for="site-search-query">찾고 싶은 안내<\/label>/);
 assert.match(search, /<input id="site-search-query" type="search"/);
