@@ -44,7 +44,10 @@ describe("route disposition source claims", () => {
   });
 
   it.each([
+    ["/", "fixed-home", "fixed home route"],
+    ["/archive", "fixed-archive", "fixed archive route"],
     ["/404", "fixed-not-found", "fixed not-found route"],
+    ["/_release.json", "fixed-release-identity", "fixed release-identity route"],
     [
       "/article/government24-resident-registration-guide",
       "article",
