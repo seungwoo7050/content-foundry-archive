@@ -17,7 +17,10 @@ const staticPageRelativePath = "about.html";
 const categorySlug = "daily-admin";
 const categoryRelativePath = `category/${categorySlug}.html`;
 const allowedClientModules = new Set([
+  join(appRoot, "components/ga4-tag.tsx"),
+  join(appRoot, "components/manual-ad-slot.tsx"),
   join(appRoot, "components/search-controller.tsx"),
+  join(appRoot, "lib/use-google-cmp-consent.ts"),
 ]);
 
 function readArtifact(relativePath) {
