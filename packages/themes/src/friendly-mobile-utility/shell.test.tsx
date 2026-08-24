@@ -45,7 +45,7 @@ describe("Friendly Mobile Utility shell", () => {
 
     expect(html).toContain('data-theme="friendly-mobile-utility"');
     expect(html).toContain('href="#main-content">본문으로 바로가기</a>');
-    expect(html).toContain('<main class="fmu-main" data-route-kind="static-page" id="main-content">');
+    expect(html).toContain('<main class="fmu-main" data-route-kind="static-page" id="main-content" tabindex="-1">');
     expect(html).toContain('<a href="/guide/start">시작</a>');
     expect(html).toContain('aria-current="page">소개</span>');
     expect(html).toContain('<p>© 2026 생활메모</p>');

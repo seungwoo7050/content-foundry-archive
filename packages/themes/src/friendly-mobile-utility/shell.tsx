@@ -74,7 +74,12 @@ export function FriendlyMobileShell({
           </div>
         </div>
       </header>
-      <main className="fmu-main" data-route-kind={routeKind} id="main-content">
+      <main
+        className="fmu-main"
+        data-route-kind={routeKind}
+        id="main-content"
+        tabIndex={-1}
+      >
         {children}
       </main>
       <footer className="fmu-footer">
