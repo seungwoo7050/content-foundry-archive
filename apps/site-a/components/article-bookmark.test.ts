@@ -1,9 +1,10 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   ArticleBookmark, articleBookmarkStorageKey, decodeArticleBookmarks,
   encodeArticleBookmarks, readArticleBookmark, toggleArticleBookmark,
+  toggleArticleBookmarkWithAnalytics,
 } from "./article-bookmark";
 
 function memoryStorage() {
@@ -35,6 +36,24 @@ describe("ArticleBookmark", () => {
     expect(readArticleBookmark(denied, "site-a", "ART-000123")).toBe("unavailable");
     const writeDenied = { getItem: () => null, setItem: () => { throw new Error("denied"); } };
     expect(toggleArticleBookmark(writeDenied, "site-a", "ART-000123")).toBe("unavailable");
+  });
+
+  it("emits one ID-only event only when an article becomes bookmarked", () => {
+    const storage = memoryStorage();
+    const emit = vi.fn().mockReturnValue(true);
+
+    expect(toggleArticleBookmarkWithAnalytics(
+      storage, "site-a", "ART-000123", emit,
+    )).toBe("bookmarked");
+    expect(emit).toHaveBeenCalledWith({
+      eventName: "bookmark_local",
+      articleId: "ART-000123",
+    });
+
+    expect(toggleArticleBookmarkWithAnalytics(
+      storage, "site-a", "ART-000123", emit,
+    )).toBe("not-bookmarked");
+    expect(emit).toHaveBeenCalledTimes(1);
   });
 
   it("announces an honest status while browser storage is unchecked", () => {

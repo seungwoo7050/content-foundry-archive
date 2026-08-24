@@ -2,6 +2,8 @@
 
 import { useSyncExternalStore } from "react";
 
+import { emitAnalyticsEvent } from "./analytics-event-dispatcher";
+
 type BookmarkStorage = Pick<Storage, "getItem" | "setItem">;
 type BookmarkState = "bookmarked" | "not-bookmarked" | "unavailable";
 
@@ -67,6 +69,19 @@ export function toggleArticleBookmark(
   }
 }
 
+export function toggleArticleBookmarkWithAnalytics(
+  storage: BookmarkStorage,
+  siteId: string,
+  articleId: string,
+  emit: typeof emitAnalyticsEvent = emitAnalyticsEvent,
+): BookmarkState {
+  const next = toggleArticleBookmark(storage, siteId, articleId);
+  if (next === "bookmarked") {
+    emit({ eventName: "bookmark_local", articleId });
+  }
+  return next;
+}
+
 function subscribe(listener: () => void) {
   window.addEventListener("storage", listener);
   window.addEventListener(bookmarkChangeEvent, listener);
@@ -99,7 +114,7 @@ export function ArticleBookmark({ siteId, articleId }: {
 
   function handleClick() {
     try {
-      toggleArticleBookmark(window.localStorage, siteId, articleId);
+      toggleArticleBookmarkWithAnalytics(window.localStorage, siteId, articleId);
     } finally {
       window.dispatchEvent(new Event(bookmarkChangeEvent));
     }
