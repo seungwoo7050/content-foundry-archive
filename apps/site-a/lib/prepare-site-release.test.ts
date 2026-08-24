@@ -8,12 +8,15 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { createElement, Fragment } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 import type { MediaManifest } from "@content-foundry/content-contract";
 import type { BuildTargetConfig } from "@content-foundry/site-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const loaderOverride = vi.hoisted(() => ({
+  contentMediaId: undefined as string | undefined,
   mediaManifest: undefined as MediaManifest | undefined,
   validatedReleaseDirectory: undefined as string | undefined,
 }));
@@ -28,6 +31,29 @@ vi.mock("./load-site-release", async (importOriginal) => {
         releaseDirectory:
           loaderOverride.validatedReleaseDirectory ?? config.releaseDirectory,
       });
+      if (
+        context.contractVersion === "2.0.0" &&
+        loaderOverride.contentMediaId &&
+        loaderOverride.mediaManifest
+      ) {
+        const image = { type: "image" as const, mediaId: loaderOverride.contentMediaId };
+        return {
+          ...context,
+          bundle: {
+            ...context.bundle,
+            mediaManifest: loaderOverride.mediaManifest,
+            articles: context.bundle.articles.map((article) => ({
+              ...article,
+              heroMediaId: image.mediaId,
+              content: [...article.content, image],
+            })),
+            pages: context.bundle.pages.map((page) => ({
+              ...page,
+              content: [...page.content, image],
+            })),
+          },
+        };
+      }
       return loaderOverride.mediaManifest
         ? {
             ...context,
@@ -38,6 +64,9 @@ vi.mock("./load-site-release", async (importOriginal) => {
   };
 });
 
+import { VersionedContentBlocks } from "../components/versioned-content-blocks";
+import { renderArticleHero } from "./article-hero";
+import { loadPreparedSiteRelease } from "./load-prepared-site-release";
 import { prepareSiteRelease } from "./prepare-site-release";
 
 const fixture = (version: "2.0.0" | "3.0.0") =>
@@ -112,12 +141,63 @@ function writePriorArtifacts(paths: ReturnType<typeof workspace>) {
 }
 
 afterEach(() => {
+  loaderOverride.contentMediaId = undefined;
   loaderOverride.mediaManifest = undefined;
   loaderOverride.validatedReleaseDirectory = undefined;
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 
 describe("prepareSiteRelease", () => {
+  it("prepares, binds, and statically renders media-bearing v2 rollback content", async () => {
+    const paths = workspace();
+    const manifest = v2MediaManifest("immutable-object");
+    const mediaId = manifest.items[0]!.id;
+    loaderOverride.contentMediaId = mediaId;
+    loaderOverride.mediaManifest = manifest;
+    writeV3Objects(paths.immutableObjectDirectory);
+
+    await prepareSiteRelease(config(fixture("2.0.0")), paths);
+    const context = loadPreparedSiteRelease(config(fixture("2.0.0")), {
+      projectionPath: paths.projectionPath,
+    });
+    if (context.contractVersion !== "2.0.0") throw new Error("expected v2");
+    const article = context.bundle.articles[0]!;
+    const page = context.bundle.pages[0]!;
+    const articleHtml = renderToStaticMarkup(
+      createElement(
+        Fragment,
+        null,
+        renderArticleHero(article.heroMediaId, context.mediaAssets),
+        createElement(VersionedContentBlocks, {
+          blocks: article.content,
+          contractVersion: "2.0.0",
+          mediaAssets: context.mediaAssets,
+        }),
+      ),
+    );
+    const pageHtml = renderToStaticMarkup(
+      createElement(VersionedContentBlocks, {
+        blocks: page.content,
+        contractVersion: "2.0.0",
+        mediaAssets: context.mediaAssets,
+      }),
+    );
+    const asset = context.mediaAssets.get(mediaId)!;
+
+    expect(articleHtml.split(asset.fallback.publicPath)).toHaveLength(3);
+    expect(pageHtml).toContain(asset.fallback.publicPath);
+    expect(existsSync(join(paths.publicDirectory, asset.fallback.relativePath))).toBe(
+      true,
+    );
+    expect(
+      existsSync(join(paths.publicDirectory, asset.derivatives[0]!.relativePath)),
+    ).toBe(true);
+    expect(JSON.parse(readFileSync(paths.projectionPath, "utf8"))).toMatchObject({
+      contractVersion: "2.0.0",
+      assets: [{ fallback: { mediaId } }],
+    });
+  });
+
   it("publishes an empty v2 media projection", async () => {
     const paths = workspace();
     writePriorArtifacts(paths);
