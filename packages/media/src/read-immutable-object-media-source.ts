@@ -27,7 +27,12 @@ export function createImmutableObjectMediaSourceReader(
     try {
       bytes = await loadObject(media.path);
     } catch {
-      bytes = null;
+      throw new ContractError(
+        "TEMPORARY",
+        `Immutable media source is temporarily unavailable: ${media.id}`,
+        [{ path: `${recordPath}/path`, message: "immutable object loader failed" }],
+        true,
+      );
     }
     if (bytes === null) {
       throw new ContractError(

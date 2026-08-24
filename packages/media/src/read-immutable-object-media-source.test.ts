@@ -46,15 +46,27 @@ describe("immutable-object media source reader", () => {
     expect(loadObject).not.toHaveBeenCalled();
   });
 
-  it.each([
-    ["missing", async () => null],
-    ["loader failure", async () => Promise.reject(new Error("private provider detail"))],
-  ])("rejects an unavailable object: %s", async (_label, loadObject) => {
+  it("rejects a missing immutable object as an integrity failure", async () => {
     await expect(
-      createImmutableObjectMediaSourceReader(loadObject)(media, recordPath),
+      createImmutableObjectMediaSourceReader(async () => null)(media, recordPath),
     ).rejects.toMatchObject({
       code: "INTEGRITY_FAILED",
       issues: [{ path: `${recordPath}/path`, message: "immutable object is unavailable" }],
+      retryable: false,
     });
+  });
+
+  it("normalizes loader exceptions as retryable without leaking provider details", async () => {
+    const secret = "https://token@private-object-store.example/source";
+    const failure = createImmutableObjectMediaSourceReader(async () =>
+      Promise.reject(new Error(secret)),
+    )(media, recordPath);
+
+    await expect(failure).rejects.toMatchObject({
+      code: "TEMPORARY",
+      issues: [{ path: `${recordPath}/path`, message: "immutable object loader failed" }],
+      retryable: true,
+    });
+    await expect(failure).rejects.not.toThrow(secret);
   });
 });
