@@ -1,5 +1,6 @@
 import { ArticleBookmark } from "./article-bookmark";
 import { ArticleFeedback } from "./article-feedback";
+import { ArticleReadingAnalytics } from "./article-reading-analytics";
 import { ArticleShareButton } from "./article-share-button";
 
 export interface ArticleReaderActionsProps {
@@ -17,6 +18,7 @@ export function ArticleReaderActions({
 }: ArticleReaderActionsProps) {
   return (
     <section aria-label="기사 독자 기능">
+      <ArticleReadingAnalytics articleId={articleId} />
       {localBookmarksEnabled ? (
         <ArticleBookmark siteId={siteId} articleId={articleId} />
       ) : null}

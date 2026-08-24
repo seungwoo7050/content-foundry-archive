@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 
 import { ArticleBookmark } from "./article-bookmark";
 import { ArticleFeedback } from "./article-feedback";
+import { ArticleReadingAnalytics } from "./article-reading-analytics";
 import {
   ArticleReaderActions,
   type ArticleReaderActionsProps,
@@ -34,6 +35,9 @@ describe("ArticleReaderActions", () => {
     const bookmark = children.find(
       (child) => isValidElement(child) && child.type === ArticleBookmark,
     );
+    const reading = children.find(
+      (child) => isValidElement(child) && child.type === ArticleReadingAnalytics,
+    );
     const share = children.find(
       (child) => isValidElement(child) && child.type === ArticleShareButton,
     );
@@ -43,6 +47,9 @@ describe("ArticleReaderActions", () => {
 
     expect(bookmark).toMatchObject({
       props: { siteId: "site-a", articleId: "ART-000123" },
+    });
+    expect(reading).toMatchObject({
+      props: { articleId: "ART-000123" },
     });
     expect(share).toMatchObject({
       props: {
