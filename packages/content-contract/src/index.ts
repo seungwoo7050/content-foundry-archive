@@ -83,3 +83,8 @@ export {
   type LoadedReleaseBundle,
   type LoadReleaseBundleOptions,
 } from "./load-release-bundle.js";
+export {
+  type LoadedReleaseBundleV3,
+  type V3ReleaseConsumerContext,
+  validateV3ReleaseConsumerContext,
+} from "./validate-v3-release-consumer-context.js";
