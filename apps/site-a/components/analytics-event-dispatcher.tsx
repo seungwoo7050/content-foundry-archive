@@ -78,6 +78,32 @@ export function resolveInternalLinkEvent(
     : null;
 }
 
+export function resolveClassifiedExternalLinkEvent(
+  data: Readonly<Record<string, string | undefined>>,
+): AnalyticsEventDetail | null {
+  if (
+    data.analyticsEvent === "external_official_click" &&
+    data.analyticsTargetId !== undefined
+  ) {
+    return {
+      eventName: "external_official_click",
+      targetId: data.analyticsTargetId,
+    };
+  }
+  if (
+    data.analyticsEvent === "affiliate_click" &&
+    data.analyticsPartnerId !== undefined &&
+    data.analyticsPlacement !== undefined
+  ) {
+    return {
+      eventName: "affiliate_click",
+      partnerId: data.analyticsPartnerId,
+      placement: data.analyticsPlacement,
+    };
+  }
+  return null;
+}
+
 export function AnalyticsEventDispatcher({
   projection,
 }: {
@@ -105,6 +131,11 @@ export function AnalyticsEventDispatcher({
       if (!(event.target instanceof Element)) return;
       const anchor = event.target.closest<HTMLAnchorElement>("a[href]");
       if (anchor === null) return;
+      const classified = resolveClassifiedExternalLinkEvent(anchor.dataset);
+      if (classified !== null) {
+        dispatchCurrent(classified);
+        return;
+      }
       const detail = resolveInternalLinkEvent(
         projection,
         anchor.href,

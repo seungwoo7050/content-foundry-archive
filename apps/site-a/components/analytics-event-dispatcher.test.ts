@@ -8,6 +8,7 @@ import type { SiteAnalyticsRouteProjection } from "../lib/site-analytics-route-p
 import {
   dispatchAnalyticsEvent,
   resolveAnalyticsEventContext,
+  resolveClassifiedExternalLinkEvent,
   resolveInternalLinkEvent,
 } from "./analytics-event-dispatcher";
 
@@ -86,6 +87,33 @@ describe("Site A analytics event dispatch", () => {
       "/about",
       "https://guides.example.kr",
     )).toBeNull();
+  });
+
+  it("resolves only complete classified external action details", () => {
+    expect(resolveClassifiedExternalLinkEvent({
+      analyticsEvent: "external_official_click",
+      analyticsTargetId: "government-service",
+    })).toEqual({
+      eventName: "external_official_click",
+      targetId: "government-service",
+    });
+    expect(resolveClassifiedExternalLinkEvent({
+      analyticsEvent: "affiliate_click",
+      analyticsPartnerId: "comparison-partner",
+      analyticsPlacement: "article-body",
+    })).toEqual({
+      eventName: "affiliate_click",
+      partnerId: "comparison-partner",
+      placement: "article-body",
+    });
+    expect(resolveClassifiedExternalLinkEvent({
+      analyticsEvent: "affiliate_click",
+      analyticsPartnerId: "comparison-partner",
+    })).toBeNull();
+    expect(resolveClassifiedExternalLinkEvent({
+      analyticsEvent: "unknown",
+      analyticsTargetId: "government-service",
+    })).toBeNull();
   });
 
   it("sends a validated event after analytics consent", () => {
