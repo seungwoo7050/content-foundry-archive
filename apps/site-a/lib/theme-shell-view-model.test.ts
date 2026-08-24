@@ -43,6 +43,7 @@ describe("theme shell view model", () => {
           children: [],
         },
       ],
+      footerNavigation: [{ href: "/about", label: "소개" }],
       footerText: "© 2026 생활메모 · 운영: 생활메모",
     });
     expect(shell).not.toHaveProperty("bundle");
@@ -86,5 +87,23 @@ describe("theme shell view model", () => {
       },
     ]);
     expect(shell.footerText).toBe("© 2031 생활메모 · 운영: 생활메모");
+  });
+
+  it("projects available trust pages in fixed policy order", () => {
+    const pages = [
+      { ...bundle.pages[0]!, path: "/privacy", title: "개인정보" },
+      { ...bundle.pages[0]!, path: "/contact", title: "문의" },
+      { ...bundle.pages[0]!, path: "/advertising-disclosure", title: "광고 안내" },
+      bundle.pages[0]!,
+      { ...bundle.pages[0]!, path: "/unlisted", title: "기타" },
+    ];
+
+    expect(createThemeShellViewModel({ ...bundle, pages }).footerNavigation)
+      .toEqual([
+        { href: "/about", label: "소개" },
+        { href: "/contact", label: "문의" },
+        { href: "/privacy", label: "개인정보" },
+        { href: "/advertising-disclosure", label: "광고 안내" },
+      ]);
   });
 });

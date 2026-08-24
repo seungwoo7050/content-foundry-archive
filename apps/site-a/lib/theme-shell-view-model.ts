@@ -20,7 +20,18 @@ export interface ThemeShellSource {
   readonly navigation: {
     readonly items: readonly ThemeShellNavigationRecord[];
   };
+  readonly pages: readonly {
+    readonly path: string;
+    readonly title: string;
+  }[];
 }
+
+export const SITE_FOOTER_PAGE_PATHS = Object.freeze([
+  "/about",
+  "/contact",
+  "/privacy",
+  "/advertising-disclosure",
+] as const);
 
 function createNavigationItem(
   item: ThemeShellNavigationRecord,
@@ -35,6 +46,7 @@ export function createThemeShellViewModel(
   bundle: ThemeShellSource,
 ): SiteShellViewModel {
   const releaseYear = new Date(bundle.release.createdAt).getUTCFullYear();
+  const pageByPath = new Map(bundle.pages.map((page) => [page.path, page]));
 
   return {
     locale: bundle.site.locale,
@@ -42,6 +54,10 @@ export function createThemeShellViewModel(
     brand: { href: "/", label: bundle.site.name },
     description: bundle.site.description,
     primaryNavigation: bundle.navigation.items.map(createNavigationItem),
+    footerNavigation: SITE_FOOTER_PAGE_PATHS.flatMap((path) => {
+      const page = pageByPath.get(path);
+      return page ? [{ href: page.path, label: page.title }] : [];
+    }),
     footerText: `© ${releaseYear} ${bundle.site.name} · 운영: ${bundle.site.author.displayName}`,
   };
 }
