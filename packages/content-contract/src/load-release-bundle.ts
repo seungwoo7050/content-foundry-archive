@@ -12,12 +12,23 @@ import { validateGalleryAltText } from "./validate-gallery-alt-text.js";
 import { validatePublicKeys } from "./validate-public-keys.js";
 import { validateReleaseIdentity } from "./validate-release-identity.js";
 import { validateRouteDispositions } from "./validate-route-dispositions.js";
+import {
+  type LoadedReleaseBundleV3,
+  type V3ReleaseConsumerContext,
+  validateV3ReleaseConsumerContext,
+} from "./validate-v3-release-consumer-context.js";
 
 export type LoadedReleaseBundle = ReleaseBundleDocuments;
 
 export interface LoadReleaseBundleOptions {
   readonly expectedSiteId?: string;
   readonly expectedReleaseId?: string;
+}
+
+export interface LoadV3ReleaseBundleOptions extends LoadReleaseBundleOptions {
+  readonly resolveConsumerContext: (
+    bundle: LoadedReleaseBundleV3,
+  ) => V3ReleaseConsumerContext;
 }
 
 type VersionedReleaseBundle =
@@ -102,4 +113,16 @@ export function loadReleaseBundle(
   options: LoadReleaseBundleOptions = {},
 ): LoadedReleaseBundle {
   return validateLoadedReleaseBundle(readReleaseBundleDocuments(root), options);
+}
+
+export function loadV3ReleaseBundle(
+  root: string,
+  options: LoadV3ReleaseBundleOptions,
+): LoadedReleaseBundleV3 {
+  const { resolveConsumerContext, ...identityOptions } = options;
+  const bundle = loadReleaseBundleForVersion("3.0.0", root, identityOptions);
+  return validateV3ReleaseConsumerContext(
+    bundle,
+    resolveConsumerContext(bundle),
+  );
 }
