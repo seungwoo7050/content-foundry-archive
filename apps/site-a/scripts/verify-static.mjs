@@ -220,6 +220,21 @@ const expectedIdentities = {
   },
 };
 assert.deepEqual(identity, expectedIdentities[identity.contractVersion]);
+for (const [label, html] of [
+  ["home", home],
+  ["article", article],
+  ["static page", staticPage],
+  ["category", category],
+  ["archive", archive],
+  ["search", search],
+  ["404", notFound],
+]) {
+  assert.equal(
+    readMeta(html, "content-foundry-build-config-checksum"),
+    identity.buildConfigChecksum,
+    `${label} build config metadata does not match release identity`,
+  );
+}
 assert.equal(adsTxt, "");
 assert.equal(robots, "User-Agent: *\nDisallow: /\n\n");
 

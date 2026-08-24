@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import type { Metadata } from "next";
 
 import {
   createBuildConfigProjection,
@@ -15,4 +16,10 @@ export function createBuildConfigChecksum(
     .update(canonicalJson, "utf8")
     .digest("hex");
   return `sha256:${digest}`;
+}
+
+export function createBuildConfigChecksumMetadata(
+  checksum: BuildConfigChecksum,
+): NonNullable<Metadata["other"]> {
+  return { "content-foundry-build-config-checksum": checksum };
 }

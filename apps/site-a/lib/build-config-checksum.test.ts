@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { createBuildConfigChecksum } from "./build-config-checksum";
+import {
+  createBuildConfigChecksum,
+  createBuildConfigChecksumMetadata,
+} from "./build-config-checksum";
 import { loadSiteRelease } from "./load-site-release";
 import { resolveSiteBuildConfig } from "./site-build-config";
 import { resolveSiteLaunchConfig } from "./site-launch-config";
@@ -26,6 +29,9 @@ describe("public build configuration checksum", () => {
     expect(checksum).toMatch(/^sha256:[0-9a-f]{64}$/);
     expect(moved).toBe(checksum);
     expect(createBuildConfigChecksum(source)).toBe(checksum);
+    expect(createBuildConfigChecksumMetadata(checksum)).toEqual({
+      "content-foundry-build-config-checksum": checksum,
+    });
   });
 
   it("changes when an effective build fact changes", () => {
