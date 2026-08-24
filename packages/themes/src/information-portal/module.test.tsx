@@ -21,6 +21,7 @@ const item: ArticleListItemViewModel = {
   link: { href: "/article/guide", label: "생활 안내" },
   summary: "필요한 절차",
   date: { kind: "published", dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
+  estimatedReadingTime: { minutes: 2, label: "예상 읽기 시간 약 2분" },
   category: { href: "/category/life", label: "생활" },
   topics: ["절차"],
 };
@@ -78,7 +79,7 @@ describe("Information Portal route and skin matrix", () => {
         expect(html).toContain(`data-route-kind="${route.kind}"`);
         expect(html).toContain(`<h1>${route.heading}</h1>`);
         expect(html).toContain('<main class="ip-main"');
-        expect(html).not.toMatch(/ranking|trending|popular|count|reading.?time|verified|newsletter|bookmark|saved|순위|인기|조회|읽기 시간|검증됨|뉴스레터|저장/i);
+        expect(html).not.toMatch(/ranking|trending|popular|count|verified|newsletter|bookmark|saved|순위|인기|조회|검증됨|뉴스레터|저장/i);
         if (route.kind === "article") expect(html).not.toMatch(/adsbygoogle|data-ad-|>광고</i);
       });
     }

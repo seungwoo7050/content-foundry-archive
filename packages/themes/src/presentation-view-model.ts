@@ -16,6 +16,11 @@ export interface ArticleCardDateViewModel extends DateViewModel {
   readonly kind: "published" | "updated";
 }
 
+export interface EstimatedReadingTimeViewModel {
+  readonly minutes: number;
+  readonly label: string;
+}
+
 export interface NavigationItemViewModel {
   readonly link: LinkViewModel;
   readonly children: readonly NavigationItemViewModel[];
@@ -35,6 +40,7 @@ export interface ArticleListItemViewModel {
   readonly link: LinkViewModel;
   readonly summary: string;
   readonly date: ArticleCardDateViewModel;
+  readonly estimatedReadingTime: EstimatedReadingTimeViewModel;
   readonly category: LinkViewModel | null;
   readonly topics: readonly string[];
 }

@@ -8,6 +8,7 @@ const related = {
   link: { href: "/article/next", label: "다음 안내" },
   summary: "연관 절차",
   date: { kind: "published", dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
+  estimatedReadingTime: { minutes: 2, label: "예상 읽기 시간 약 2분" },
   category: null,
   topics: [],
 } as const;

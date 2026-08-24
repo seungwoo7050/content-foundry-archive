@@ -5,6 +5,7 @@ import type {
   ArticleListItemViewModel,
   CategoryLinkViewModel,
   DateViewModel,
+  EstimatedReadingTimeViewModel,
   LinkViewModel,
   NavigationItemViewModel,
   SiteShellViewModel,
@@ -40,6 +41,8 @@ describe("shared presentation facts", () => {
     expectTypeOf<ArticleCardDateViewModel["kind"]>().toEqualTypeOf<
       "published" | "updated"
     >();
+    expectTypeOf<ArticleListItemViewModel["estimatedReadingTime"]>()
+      .toEqualTypeOf<EstimatedReadingTimeViewModel>();
     expectTypeOf<ArticleListItemViewModel["category"]>().toEqualTypeOf<
       LinkViewModel | null
     >();

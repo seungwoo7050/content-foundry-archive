@@ -21,6 +21,7 @@ const article: ArticleListItemViewModel = {
   link: { href: "/article/guide", label: "생활 안내" },
   summary: "필요한 절차를 정리합니다.",
   date: { kind: "published", dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
+  estimatedReadingTime: { minutes: 2, label: "예상 읽기 시간 약 2분" },
   category: { href: "/category/life", label: "생활" },
   topics: ["절차"],
 };
@@ -79,7 +80,7 @@ describe("Friendly Mobile Utility route matrix", () => {
       expect(html).toContain(`<h1>${route.heading}</h1>`);
       expect(html).toContain('<main class="fmu-main"');
       expect(html).toContain(shell.footerText);
-      expect(html).not.toMatch(/saved|bookmark|reading.?time|verification|popular|ranking|trending|저장|읽기 시간|검증됨|인기|순위/i);
+      expect(html).not.toMatch(/saved|bookmark|verification|popular|ranking|trending|저장|검증됨|인기|순위/i);
       if (route.kind === "home") expect(html).toContain("생활 절차 안내");
       if (route.kind === "article") {
         expect(html).toContain('href="#step">신청 단계</a>');

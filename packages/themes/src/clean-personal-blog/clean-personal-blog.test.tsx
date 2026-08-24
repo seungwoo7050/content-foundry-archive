@@ -20,6 +20,7 @@ const item: ArticleListItemViewModel = {
   link: { href: "/article/guide", label: "안내 글" },
   summary: "안내 요약",
   date: { kind: "published", dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
+  estimatedReadingTime: { minutes: 2, label: "예상 읽기 시간 약 2분" },
   category: { href: "/category/life", label: "생활" },
   topics: ["신청"],
 };
@@ -73,7 +74,7 @@ describe("Clean Personal Blog", () => {
     expect(html).toContain(markers[route.kind]);
     expect(html).toContain('id="main-content" tabindex="-1"');
     for (const color of Object.values(SKIN_TOKENS[skinId])) expect(html).toContain(color);
-    expect(html).not.toMatch(/author bio|email|social|reading.?time|popular|newsletter|save|data-ad|ad-slot/i);
+    expect(html).not.toMatch(/author bio|email|social|popular|newsletter|save|data-ad|ad-slot/i);
   });
 
   it("uses a concise masthead and roomy single-column reading shell", () => {

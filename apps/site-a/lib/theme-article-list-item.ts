@@ -2,6 +2,10 @@ import { ContractError, type ContractIssue } from "@content-foundry/content-cont
 import type { ArticleListItemViewModel } from "@content-foundry/themes";
 
 import { getArticleCardDate } from "./article-card-date";
+import {
+  getEstimatedReadingTimeMinutes,
+  type ArticleReadingTimeSource,
+} from "./article-reading-time";
 
 interface ThemeArticleTaxonRecord {
   readonly id: string;
@@ -17,7 +21,7 @@ export interface ThemeArticleListSource {
   };
 }
 
-export interface ThemeArticleListRecord {
+export interface ThemeArticleListRecord extends ArticleReadingTimeSource {
   readonly title: string;
   readonly summary: string;
   readonly publishedAt: string;
@@ -64,6 +68,10 @@ export function createThemeArticleListItem(
     dateStyle: "long",
     timeZone: bundle.site.timeZone,
   }).format(new Date(displayDate.dateTime));
+  const estimatedReadingTimeMinutes = getEstimatedReadingTimeMinutes(
+    article,
+    bundle.site.locale,
+  );
 
   return {
     link: { href: article.seo.canonicalPath, label: article.title },
@@ -72,6 +80,10 @@ export function createThemeArticleListItem(
       kind: displayDate.kind,
       dateTime: displayDate.dateTime,
       label: dateLabel,
+    },
+    estimatedReadingTime: {
+      minutes: estimatedReadingTimeMinutes,
+      label: `예상 읽기 시간 약 ${estimatedReadingTimeMinutes}분`,
     },
     category: { href: `/category/${category.slug}`, label: category.label },
     topics,

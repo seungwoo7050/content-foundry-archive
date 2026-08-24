@@ -32,6 +32,7 @@ const articles: readonly ArticleListItemViewModel[] = Array.from(
     link: { href: `/article/${index + 1}`, label: `안내 ${index + 1}` },
     summary: `안내 ${index + 1} 요약`,
     date: { kind: "published", dateTime: `2026-08-2${index + 1}T00:00:00Z`, label: `2026년 8월 2${index + 1}일` },
+    estimatedReadingTime: { minutes: 2, label: "예상 읽기 시간 약 2분" },
     category: { href: "/category/life", label: "생활" },
     topics: ["신청"],
   }),
@@ -122,7 +123,7 @@ describe("Editorial Utility", () => {
     for (const color of Object.values(SKIN_TOKENS[skinId])) {
       expect(html).toContain(color);
     }
-    expect(html).not.toMatch(/읽는 시간|reading time|저장|save|뉴스레터|newsletter|popular|evergreen|popularity|ranking/i);
+    expect(html).not.toMatch(/저장|save|뉴스레터|newsletter|popular|evergreen|popularity|ranking/i);
   });
 
   it("uses the first actual article as lead, then secondary and latest groups", () => {

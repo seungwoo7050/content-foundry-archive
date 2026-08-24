@@ -24,6 +24,7 @@ const articleItem: ArticleListItemViewModel = {
   link: { href: "/article/start", label: "시작 안내" },
   summary: "글 요약",
   date: { kind: "published", dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
+  estimatedReadingTime: { minutes: 2, label: "예상 읽기 시간 약 2분" },
   category: { href: "/category/life", label: "생활" },
   topics: ["신청"],
 };

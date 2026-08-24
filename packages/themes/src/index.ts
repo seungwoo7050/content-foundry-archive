@@ -4,6 +4,7 @@ export {
   type ArticleSourceViewModel,
   type CategoryLinkViewModel,
   type DateViewModel,
+  type EstimatedReadingTimeViewModel,
   type FaqItemViewModel,
   type LinkViewModel,
   type NavigationItemViewModel,

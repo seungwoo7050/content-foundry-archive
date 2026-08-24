@@ -52,6 +52,10 @@ describe("archive theme view model", () => {
             dateTime: "2026-08-20T01:00:00Z",
             label: "2026년 8월 20일",
           },
+          estimatedReadingTime: {
+            minutes: 1,
+            label: "예상 읽기 시간 약 1분",
+          },
           category: { href: "/category/daily-admin", label: "생활·행정" },
           topics: ["정부24"],
         },

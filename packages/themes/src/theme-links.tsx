@@ -142,13 +142,21 @@ export function ThemeArticleList({
   const Heading = headingLevel === 2 ? "h2" : "h3";
   return (
     <List>
-      {articles.map(({ link, summary, date, category, topics }) => (
+      {articles.map(({
+        link,
+        summary,
+        date,
+        estimatedReadingTime,
+        category,
+        topics,
+      }) => (
         <li key={link.href}>
           <article>
             <p>
               {category ? <><a href={category.href}>{category.label}</a>{" "}</> : null}
               <span>{date.kind === "published" ? "게시" : "업데이트"}</span>{" "}
-              <time dateTime={date.dateTime}>{date.label}</time>
+              <time dateTime={date.dateTime}>{date.label}</time>{" "}
+              <span>{estimatedReadingTime.label}</span>
             </p>
             <Heading><a href={link.href}>{link.label}</a></Heading>
             <p>{summary}</p>
