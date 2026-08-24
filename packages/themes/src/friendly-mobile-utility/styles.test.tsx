@@ -24,4 +24,11 @@ describe("Friendly Mobile Utility styles", () => {
     expect(FRIENDLY_MOBILE_STYLES).toContain("var(--color-surface-muted)");
     expect(FRIENDLY_MOBILE_STYLES).not.toMatch(/saved|bookmark|popular|ranking/i);
   });
+
+  it("preserves readable content for print and reduced-motion readers", () => {
+    expect(FRIENDLY_MOBILE_STYLES).toContain("prefers-reduced-motion:reduce");
+    expect(FRIENDLY_MOBILE_STYLES).toContain("@media print");
+    expect(FRIENDLY_MOBILE_STYLES).toContain('.fmu-body a[href^="http"]::after');
+    expect(FRIENDLY_MOBILE_STYLES).toContain('.fmu aside[aria-label="광고"]');
+  });
 });
