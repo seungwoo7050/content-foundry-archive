@@ -21,6 +21,7 @@ const allowedClientModules = new Set([
   join(appRoot, "components/analytics-event-dispatcher.tsx"),
   join(appRoot, "components/article-bookmark.tsx"),
   join(appRoot, "components/article-feedback.tsx"),
+  join(appRoot, "components/article-reading-analytics.tsx"),
   join(appRoot, "components/article-share-button.tsx"),
   join(appRoot, "components/ga4-tag.tsx"),
   join(appRoot, "components/manual-ad-slot.tsx"),
