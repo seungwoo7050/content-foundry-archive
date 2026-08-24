@@ -73,4 +73,23 @@ describe("createCategoryMetadata", () => {
       twitter: { description: fallback },
     });
   });
+
+  it("self-canonicalizes additional category pages", () => {
+    expect(
+      createCategoryMetadata(context, getFixtureCategory(), 2),
+    ).toMatchObject({
+      title: "생활·행정 2페이지",
+      description: "생활과 행정 절차 안내 2페이지입니다.",
+      alternates: {
+        canonical: "https://example.com/category/daily-admin/page/2",
+      },
+      openGraph: {
+        title: "생활·행정 2페이지",
+        url: "https://example.com/category/daily-admin/page/2",
+      },
+      twitter: { title: "생활·행정 2페이지" },
+    });
+    expect(() => createCategoryMetadata(context, getFixtureCategory(), 0))
+      .toThrow(RangeError);
+  });
 });
