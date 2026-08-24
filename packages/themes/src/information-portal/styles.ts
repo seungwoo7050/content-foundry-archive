@@ -1,0 +1,55 @@
+import type { CSSProperties } from "react";
+
+import type { SemanticColorTokens } from "../skin.js";
+
+type PortalColorProperty =
+  | `--color-${
+      | "canvas"
+      | "surface"
+      | "surface-muted"
+      | "text"
+      | "text-muted"
+      | "primary"
+      | "on-primary"
+      | "border"
+      | "success"
+      | "warning"
+      | "danger"}`
+  | "--focus-ring";
+
+type PortalColorStyle = CSSProperties &
+  Readonly<Record<PortalColorProperty, string>>;
+
+export function createPortalColorStyle(
+  colors: SemanticColorTokens,
+): PortalColorStyle {
+  return {
+    "--color-canvas": colors.canvas,
+    "--color-surface": colors.surface,
+    "--color-surface-muted": colors.surfaceMuted,
+    "--color-text": colors.text,
+    "--color-text-muted": colors.textMuted,
+    "--color-primary": colors.primary,
+    "--color-on-primary": colors.onPrimary,
+    "--color-border": colors.border,
+    "--color-success": colors.success,
+    "--color-warning": colors.warning,
+    "--color-danger": colors.danger,
+    "--focus-ring": colors.focusRing,
+  };
+}
+
+export const INFORMATION_PORTAL_STYLES = `
+.ip,.ip *{box-sizing:border-box}.ip{min-height:100vh;background:var(--color-canvas);color:var(--color-text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}.ip a{color:var(--color-primary);text-underline-offset:.2em}.ip a:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
+.ip-skip{position:absolute;top:-5rem;left:1rem;z-index:3;padding:.65rem 1rem;background:var(--color-primary);color:var(--color-on-primary)!important}.ip-skip:focus{top:.5rem}.ip-masthead{background:var(--color-surface);border-bottom:1px solid var(--color-border)}
+.ip-brand-row,.ip-nav-row,.ip-main,.ip-footer-inner{width:min(100%,76rem);margin-inline:auto}.ip-brand-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem 1rem;padding:.9rem 1rem}.ip-brand{font-size:1.35rem;font-weight:850;text-decoration:none}.ip-description{margin:0;color:var(--color-text-muted);font-size:.9rem}
+.ip-nav-row{padding:0 1rem .7rem}.ip-nav-row ul{display:flex;flex-wrap:wrap;gap:.25rem;margin:0;padding:0;list-style:none}.ip-nav-row ul ul{margin-left:.5rem}.ip-nav-row a,.ip-action{display:inline-flex;min-height:44px;align-items:center;padding:.45rem .75rem;border:1px solid var(--color-border);background:var(--color-surface-muted);font-weight:700;text-decoration:none}
+.ip-main{display:grid;gap:.8rem;padding:.8rem 1rem 1.25rem}.ip-panel{border:1px solid var(--color-border);background:var(--color-surface);padding:.85rem}.ip-muted{background:var(--color-surface-muted)}.ip-stack{display:grid;gap:.8rem}.ip-intro h1{margin:.15rem 0;font-size:clamp(1.65rem,5vw,2.4rem);line-height:1.2}.ip-intro p{margin:.25rem 0;color:var(--color-text-muted)}
+.ip-breadcrumbs ol{display:flex;flex-wrap:wrap;gap:.25rem;margin:0;padding:0;list-style:none;font-size:.85rem}.ip-breadcrumbs li+li:before{content:"›";margin-right:.25rem;color:var(--color-text-muted)}
+.ip-search-action{display:flex;min-height:56px;align-items:center;justify-content:space-between;width:100%;padding:.75rem 1rem;background:var(--color-primary);color:var(--color-on-primary)!important;font-size:1.05rem;font-weight:800;text-decoration:none}.ip-directory{display:grid;grid-template-columns:1fr;gap:.5rem}.ip-directory article{border-top:3px solid var(--color-primary);background:var(--color-surface);padding:.75rem}.ip-directory h3,.ip-directory p{margin:.2rem 0}
+.ip-list>ul,.ip-list>ol{display:grid;grid-template-columns:1fr;gap:.55rem;margin:0;padding:0;list-style:none}.ip-list article{height:100%;border:1px solid var(--color-border);background:var(--color-surface);padding:.75rem}.ip-list article>p:first-child{color:var(--color-text-muted);font-size:.82rem}.ip-list h2,.ip-list h3{margin:.2rem 0}.ip-topics{display:flex;flex-wrap:wrap;gap:.4rem;margin:0;padding:0;list-style:none}.ip-topics li{border:1px solid var(--color-border);background:var(--color-surface-muted);padding:.3rem .55rem}
+.ip-article-layout{display:grid;gap:.8rem}.ip-article-main,.ip-article-rail{display:grid;align-content:start;gap:.8rem}.ip-summary{border-left:4px solid var(--color-primary)}.ip-body{min-width:0;overflow-wrap:anywhere}.ip-body :where(img,video,iframe){max-width:100%;height:auto}.ip-body table{display:block;max-width:100%;overflow-x:auto}.ip-trust dl{display:grid;grid-template-columns:max-content 1fr;gap:.25rem .6rem;margin-bottom:0}.ip-trust dt{font-weight:800}.ip-trust dd{margin:0}.ip-toc ol{margin-bottom:0;padding-left:1.25rem}
+.ip-state{max-width:46rem;margin-inline:auto;text-align:center;padding-block:2rem}.ip-code{color:var(--color-danger);font-weight:850}.ip-footer{border-top:1px solid var(--color-border);background:var(--color-surface);padding:1rem}.ip-footer p{margin:0;color:var(--color-text-muted);font-size:.9rem}
+@media (min-width:44rem){.ip-directory{grid-template-columns:repeat(3,minmax(0,1fr))}.ip-list>ul,.ip-list>ol{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:64rem){.ip-article-layout{grid-template-columns:minmax(0,1fr) minmax(15rem,20rem)}.ip-article-main{grid-column:1}.ip-article-rail{grid-column:2}.ip-list>ul,.ip-list>ol{grid-template-columns:repeat(3,minmax(0,1fr))}}
+`;
