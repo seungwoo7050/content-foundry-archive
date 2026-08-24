@@ -87,6 +87,7 @@ function writePriorArtifacts(paths: ReturnType<typeof workspace>) {
   mkdirSync(dirname(paths.projectionPath), { recursive: true });
   writeFileSync(join(paths.publicDirectory, "_media/generated.webp"), "generated");
   writeFileSync(paths.projectionPath, "projection");
+  writeFileSync(paths.dispositionPath, "prior dispositions");
 }
 
 afterEach(() => {
@@ -104,6 +105,10 @@ describe("prepareSiteRelease", () => {
     );
     expect(existsSync(join(paths.publicDirectory, "_media"))).toBe(false);
     expect(existsSync(paths.projectionPath)).toBe(false);
+    expect(JSON.parse(readFileSync(paths.dispositionPath, "utf8"))).toMatchObject({
+      release: { releaseId: "REL-2026-000042" },
+      items: [],
+    });
   });
 
   it("requires an immutable-object directory for a validated v3 release", async () => {
@@ -122,6 +127,9 @@ describe("prepareSiteRelease", () => {
     expect(
       readFileSync(join(paths.publicDirectory, "_media/generated.webp"), "utf8"),
     ).toBe("generated");
+    expect(readFileSync(workspacePaths.dispositionPath, "utf8")).toBe(
+      "prior dispositions",
+    );
   });
 
   it("preserves prior artifacts when the selected release is invalid", async () => {
@@ -135,10 +143,30 @@ describe("prepareSiteRelease", () => {
     expect(
       readFileSync(join(paths.publicDirectory, "_media/generated.webp"), "utf8"),
     ).toBe("generated");
+    expect(readFileSync(paths.dispositionPath, "utf8")).toBe(
+      "prior dispositions",
+    );
+  });
+
+  it("restores prior dispositions when v3 media publication fails", async () => {
+    const paths = workspace();
+    writePriorArtifacts(paths);
+
+    await expect(
+      prepareSiteRelease(config(fixture("3.0.0")), paths),
+    ).rejects.toMatchObject({ code: "TEMPORARY" });
+    expect(readFileSync(paths.projectionPath, "utf8")).toBe("projection");
+    expect(
+      readFileSync(join(paths.publicDirectory, "_media/generated.webp"), "utf8"),
+    ).toBe("generated");
+    expect(readFileSync(paths.dispositionPath, "utf8")).toBe(
+      "prior dispositions",
+    );
   });
 
   it("publishes the complete v3 projection", async () => {
     const paths = workspace();
+    writePriorArtifacts(paths);
     writeV3Objects(paths.immutableObjectDirectory);
 
     await expect(prepareSiteRelease(config(fixture("3.0.0")), paths)).resolves.toBe(
@@ -146,6 +174,10 @@ describe("prepareSiteRelease", () => {
     );
     expect(readFileSync(paths.projectionPath, "utf8")).toContain("REL-2026-000043");
     expect(existsSync(join(paths.publicDirectory, "_media"))).toBe(true);
+    expect(JSON.parse(readFileSync(paths.dispositionPath, "utf8"))).toMatchObject({
+      release: { releaseId: "REL-2026-000043" },
+      items: [],
+    });
   });
 
   it("prepares an empty v3 media manifest without an immutable-object root", async () => {
@@ -162,6 +194,10 @@ describe("prepareSiteRelease", () => {
     expect(JSON.parse(readFileSync(paths.projectionPath, "utf8"))).toMatchObject({
       contractVersion: "3.0.0",
       assets: [],
+    });
+    expect(JSON.parse(readFileSync(paths.dispositionPath, "utf8"))).toMatchObject({
+      release: { releaseId: "REL-2026-000043" },
+      items: [],
     });
   });
 });

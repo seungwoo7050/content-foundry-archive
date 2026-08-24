@@ -237,9 +237,16 @@ assertSafeHtml("archive", archive);
 assertSafeHtml("404", notFound);
 
 const projectionPath = join(appRoot, ".site-build/media-projection.json");
+const dispositionPath = join(appRoot, ".site-build/route-dispositions.json");
 const publicMediaRoot = join(appRoot, "public/_media");
 const exportedMediaRoot = join(outRoot, "_media");
 assert.ok(!existsSync(join(outRoot, ".site-build")), "Private build state was exported");
+const dispositions = JSON.parse(readFileSync(dispositionPath, "utf8"));
+assert.deepEqual(dispositions, {
+  schemaVersion: "1.0.0",
+  release: releaseIdentity,
+  items: [],
+});
 
 if (identity.contractVersion === "2.0.0") {
   assert.ok(!existsSync(projectionPath), "v2 retained a media projection");
