@@ -11,7 +11,7 @@ import {
   findCategoryBySlug,
   getCategoryStaticParams,
 } from "../../../lib/category-route";
-import { getSiteReleaseContext } from "../../../lib/site-release";
+import { getVersionedSiteReleaseContext } from "../../../lib/site-release";
 
 export const dynamicParams = false;
 
@@ -20,14 +20,14 @@ interface CategoryPageProps {
 }
 
 export function generateStaticParams() {
-  return getCategoryStaticParams(getSiteReleaseContext().bundle);
+  return getCategoryStaticParams(getVersionedSiteReleaseContext().bundle);
 }
 
 export async function generateMetadata({
   params,
 }: CategoryPageProps): Promise<Metadata> {
   const { category: slug } = await params;
-  const context = getSiteReleaseContext();
+  const context = getVersionedSiteReleaseContext();
   const category = findCategoryBySlug(context.bundle, slug);
 
   if (!category) {
@@ -39,7 +39,7 @@ export async function generateMetadata({
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category: slug } = await params;
-  const { bundle } = getSiteReleaseContext();
+  const { bundle } = getVersionedSiteReleaseContext();
   const category = findCategoryBySlug(bundle, slug);
 
   if (!category) {
