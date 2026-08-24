@@ -119,6 +119,9 @@ describe("Minimal Knowledge Base", () => {
     const home = render(routeAt(0));
     expect(home.indexOf("kb-home-search")).toBeLessThan(home.indexOf("kb-category-grid"));
     expect(home.indexOf("kb-category-grid")).toBeLessThan(home.indexOf("kb-latest-articles"));
+    expect(home).toContain(
+      '<section aria-labelledby="kb-home-categories-title" class="kb-category-grid"><h2 id="kb-home-categories-title">카테고리</h2>',
+    );
     expect(home).toContain("생활 안내 모음");
     const category = render(routeAt(1));
     expect(category.indexOf("kb-category-scope")).toBeLessThan(category.indexOf("kb-category-articles"));

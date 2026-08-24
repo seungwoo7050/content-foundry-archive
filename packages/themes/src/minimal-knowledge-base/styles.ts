@@ -47,6 +47,7 @@ export const MINIMAL_KNOWLEDGE_BASE_STYLES = `
 .kb-home-search h2{margin:0}
 .kb-home-search a{display:flex;align-items:center;justify-content:space-between;min-height:56px;color:var(--color-on-primary);text-decoration:none}
 .kb-home-search a:after{display:grid;width:2.5rem;height:2.5rem;place-items:center;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:.7rem;content:"→"}
+.kb-category-grid>h2{margin-bottom:1rem}
 .kb-category-grid>ul{display:grid;gap:1rem;margin:0;padding:0;list-style:none}
 .kb-category-grid>ul>li{display:grid;align-content:start;min-height:9.5rem;padding:1.25rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:.8rem;box-shadow:0 .35rem 1.25rem rgba(19,33,58,.045);transition:border-color .18s ease,background-color .18s ease}
 .kb-category-grid>ul>li:hover{background:var(--color-surface-muted);border-color:var(--color-primary)}

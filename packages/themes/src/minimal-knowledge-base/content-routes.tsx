@@ -23,8 +23,12 @@ function HomeRoute({ route }: { readonly route: HomeRouteViewModel }) {
         </section>
       ) : null}
       {route.categories.length > 0 ? (
-        <section className="kb-category-grid">
-          <ul aria-label={route.heading}>{route.categories.map((category) => (
+        <section
+          aria-labelledby="kb-home-categories-title"
+          className="kb-category-grid"
+        >
+          <h2 id="kb-home-categories-title">카테고리</h2>
+          <ul>{route.categories.map((category) => (
             <li key={category.href}>
               <a href={category.href}>{category.label}</a>
               <p>{category.description}</p>
