@@ -19,7 +19,7 @@ export function createReleaseBuildMetadata(
   bundle: ReleaseIdentitySource & GeneratedRouteSource,
 ): ReleaseBuildMetadata {
   const routeCount = [...getRouteClaims(bundle).values()].filter(
-    ({ kind }) => kind !== "fixed-release-identity",
+    ({ outputKind }) => outputKind === "html",
   ).length;
 
   return {

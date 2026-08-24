@@ -21,33 +21,48 @@ describe("generated route claims", () => {
 
   it("preserves fixed and release-record provenance", () => {
     expect(Object.fromEntries(getRouteClaims(bundle))).toEqual({
-      "/": { kind: "fixed-home", navigable: true, source: "fixed home route" },
+      "/": {
+        kind: "fixed-home",
+        navigable: true,
+        outputKind: "html",
+        source: "fixed home route",
+      },
       "/archive": {
         kind: "fixed-archive",
         navigable: true,
+        outputKind: "html",
         source: "fixed archive route",
       },
       "/404": {
         kind: "fixed-not-found",
         navigable: false,
+        outputKind: "html",
         source: "fixed not-found route",
       },
       "/_release.json": {
         kind: "fixed-release-identity",
         navigable: false,
+        outputKind: "machine",
         source: "fixed release-identity route",
       },
       "/article/government24-resident-registration-guide": {
         kind: "article",
         navigable: true,
+        outputKind: "html",
         source: "/articles/0/seo/canonicalPath",
       },
       "/category/daily-admin": {
         kind: "category",
         navigable: true,
+        outputKind: "html",
         source: "/taxonomy/categories/0/slug",
       },
-      "/about": { kind: "page", navigable: true, source: "/pages/0/path" },
+      "/about": {
+        kind: "page",
+        navigable: true,
+        outputKind: "html",
+        source: "/pages/0/path",
+      },
     });
   });
 
