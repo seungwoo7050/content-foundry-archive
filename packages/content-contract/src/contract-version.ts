@@ -1,6 +1,9 @@
 import { ContractError } from "./errors.js";
 
-export const SUPPORTED_CONTRACT_VERSIONS = Object.freeze(["2.0.0"] as const);
+export const SUPPORTED_CONTRACT_VERSIONS = Object.freeze([
+  "2.0.0",
+  "3.0.0",
+] as const);
 
 export type SupportedContractVersion =
   (typeof SUPPORTED_CONTRACT_VERSIONS)[number];

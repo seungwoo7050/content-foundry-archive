@@ -36,12 +36,34 @@ describe("validateReleaseFromEnvironment", () => {
     );
   });
 
-  it("keeps v3 closed before support activation", () => {
+  it("requires explicit consumer context for v3", () => {
     expect(() =>
       validateReleaseFromEnvironment(
         { CONTENT_RELEASE_DIR: fixture("3.0.0") },
         packageDirectory,
       ),
-    ).toThrowError(expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }));
+    ).toThrowError(
+      expect.objectContaining({ name: "ReleaseValidationUsageError" }),
+    );
+  });
+
+  it("validates v3 with the declared consumer context", () => {
+    expect(
+      validateReleaseFromEnvironment(
+        {
+          CONTENT_RELEASE_DIR: fixture("3.0.0"),
+          CONTENT_RELEASE_V3_CONSUMER_CONTEXT_FILE:
+            "fixtures/site-a-v3-consumer-context.json",
+        },
+        packageDirectory,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        validationScope: "contract-consumer",
+        contractVersion: "3.0.0",
+        releaseId: "REL-2026-000043",
+        siteId: "site-a",
+      }),
+    );
   });
 });

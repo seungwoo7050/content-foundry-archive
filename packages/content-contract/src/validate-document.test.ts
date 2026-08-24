@@ -54,7 +54,7 @@ describe("contract document validation", () => {
   );
 
   it.each(validFixtures)(
-    "accepts a valid v3 %s fixture through versioned validation",
+    "accepts a valid v3 %s fixture through public and versioned validation",
     (kind, path) => {
       const v3Path =
         kind === "content-block"
@@ -62,8 +62,10 @@ describe("contract document validation", () => {
           : kind === "media-manifest"
             ? "bundles/valid/site-a-minimal/media/media-manifest.json"
             : path;
+      const value = readV3Fixture(v3Path);
+      expect(validateContractDocument("3.0.0", kind, value)).toBeDefined();
       expect(
-        validateContractDocumentForVersion("3.0.0", kind, readV3Fixture(v3Path)),
+        validateContractDocumentForVersion("3.0.0", kind, value),
       ).toBeDefined();
     },
   );
@@ -139,7 +141,7 @@ describe("contract document validation", () => {
   it("rejects an unsupported explicit version before schema validation", () => {
     expect(() =>
       validateContractDocument(
-        "3.0.0" as "2.0.0",
+        "4.0.0" as "2.0.0",
         "release",
         readFixture("invalid/release-unsupported-version.json"),
       ),

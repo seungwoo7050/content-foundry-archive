@@ -52,17 +52,20 @@ describe("readReleaseBundleDocuments", () => {
     expect(bundle.pages[0]?.content.at(-1)?.type).toBe("action-link");
   });
 
-  it("keeps canonical v3 unavailable through the public reader", () => {
+  it("keeps canonical v3 unavailable through the legacy reader", () => {
     expect(() => readReleaseBundleDocuments(fixture("3.0.0"))).toThrowError(
       expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }),
     );
   });
 
-  it("assembles only currently supported release documents", () => {
-    const bundle = readSupportedReleaseBundleDocuments(fixture("2.0.0"));
-    expect(bundle.release.contractVersion).toBe("2.0.0");
-    expect(() =>
-      readSupportedReleaseBundleDocuments(fixture("3.0.0")),
-    ).toThrowError(expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }));
+  it("assembles every supported release document version", () => {
+    expect(
+      readSupportedReleaseBundleDocuments(fixture("2.0.0")).release
+        .contractVersion,
+    ).toBe("2.0.0");
+    expect(
+      readSupportedReleaseBundleDocuments(fixture("3.0.0")).release
+        .contractVersion,
+    ).toBe("3.0.0");
   });
 });

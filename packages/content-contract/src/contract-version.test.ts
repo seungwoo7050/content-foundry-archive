@@ -6,12 +6,13 @@ import {
 } from "./contract-version.js";
 
 describe("resolveSupportedContractVersion", () => {
-  it("resolves the complete supported v2 version", () => {
-    expect(SUPPORTED_CONTRACT_VERSIONS).toEqual(["2.0.0"]);
+  it("resolves the complete supported version range", () => {
+    expect(SUPPORTED_CONTRACT_VERSIONS).toEqual(["2.0.0", "3.0.0"]);
     expect(resolveSupportedContractVersion("2.0.0")).toBe("2.0.0");
+    expect(resolveSupportedContractVersion("3.0.0")).toBe("3.0.0");
   });
 
-  it.each(["3.0.0", "4.0.0", undefined, 2])(
+  it.each(["4.0.0", undefined, 2])(
     "rejects unsupported version %s",
     (version) => {
       expect(() => resolveSupportedContractVersion(version)).toThrowError(

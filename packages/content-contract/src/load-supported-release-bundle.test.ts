@@ -32,23 +32,45 @@ describe("loadSupportedReleaseBundle", () => {
     expect(resolveV3ConsumerContext).not.toHaveBeenCalled();
   });
 
-  it("keeps v3 closed before the support tuple is activated", () => {
-    const resolveV3ConsumerContext = vi.fn(() => ({
-      generatedRoutes: new Set<string>(),
-      nicheComponentRegistry: {},
+  it("loads v3 through its required consumer context", () => {
+    const resolveV3ConsumerContext = vi.fn((bundle) => ({
+      generatedRoutes: new Set([
+        "/about",
+        "/article/government24-resident-registration-guide",
+      ]),
+      nicheComponentRegistry: { [bundle.release.siteId]: [] },
     }));
 
+    const bundle = loadSupportedReleaseBundle(fixture("3.0.0"), {
+      resolveV3ConsumerContext,
+    });
+
+    expect(bundle.release.contractVersion).toBe("3.0.0");
+    expect(resolveV3ConsumerContext).toHaveBeenCalledOnce();
+    expect(resolveV3ConsumerContext).toHaveBeenCalledWith(bundle);
+  });
+
+  it("rejects incomplete v3 consumer routes", () => {
     expect(() =>
       loadSupportedReleaseBundle(fixture("3.0.0"), {
-        resolveV3ConsumerContext,
+        resolveV3ConsumerContext: () => ({
+          generatedRoutes: new Set([
+            "/article/government24-resident-registration-guide",
+          ]),
+          nicheComponentRegistry: { "site-a": [] },
+        }),
       }),
-    ).toThrowError(expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }));
-    expect(resolveV3ConsumerContext).not.toHaveBeenCalled();
+    ).toThrowError(
+      expect.objectContaining({
+        code: "REFERENCE_INVALID",
+        issues: [expect.objectContaining({ path: "/articles/0/content/3/path" })],
+      }),
+    );
   });
 
   it("requires the v3 consumer resolver on the dual-version boundary", () => {
     if (false) {
-      // @ts-expect-error The supported loader must fail closed for a v3 input.
+      // @ts-expect-error Runtime discovery requires the v3 resolver for any input.
       loadSupportedReleaseBundle(fixture("2.0.0"), {});
     }
     expect(true).toBe(true);

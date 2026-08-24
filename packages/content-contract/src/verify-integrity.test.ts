@@ -101,13 +101,13 @@ describe("verifyReleaseIntegrity", () => {
     expect(release.releaseId).toBe("REL-2026-000043");
   });
 
-  it("dispatches only currently supported release integrity", () => {
+  it("dispatches every supported release integrity version", () => {
     expect(
       verifySupportedReleaseIntegrity(copyFixture()).contractVersion,
     ).toBe("2.0.0");
-    expect(() =>
-      verifySupportedReleaseIntegrity(copyFixture(v3Fixture)),
-    ).toThrowError(expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }));
+    expect(
+      verifySupportedReleaseIntegrity(copyFixture(v3Fixture)).contractVersion,
+    ).toBe("3.0.0");
   });
 
   it("detects a modified v3 article through the internal version boundary", () => {

@@ -1,0 +1,11 @@
+{
+  "generatedRoutes": [
+    "/",
+    "/about",
+    "/article/government24-resident-registration-guide",
+    "/category/daily-admin"
+  ],
+  "nicheComponentRegistry": {
+    "site-a": []
+  }
+}
