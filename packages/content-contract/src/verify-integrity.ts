@@ -5,6 +5,7 @@ import {
 } from "node:fs";
 import { createHash } from "node:crypto";
 import { join, posix, relative, sep } from "node:path";
+import { TextDecoder } from "node:util";
 
 import canonicalize from "canonicalize";
 
@@ -19,6 +20,10 @@ import {
 
 const ZERO_CHECKSUM = `sha256:${"0".repeat(64)}`;
 const MANIFEST_LINE = /^([0-9a-f]{64})  ([^\\]+)$/;
+const RELEASE_DECODER = new TextDecoder("utf-8", {
+  fatal: true,
+  ignoreBOM: true,
+});
 
 interface ChecksumEntry {
   readonly hash: string;
@@ -136,8 +141,23 @@ function countTopLevelField(source: string, field: string) {
 }
 
 function readReleaseManifest(root: string): ParsedReleaseManifest {
+  let bytes: Buffer;
   try {
-    const source = readFileSync(join(root, "release.json"), "utf8");
+    bytes = readFileSync(join(root, "release.json"));
+  } catch (error) {
+    throw new ContractError("CONTRACT_INVALID", "Cannot parse release.json", [
+      { path: "/release.json", message: String(error) },
+    ]);
+  }
+
+  let source: string;
+  try {
+    source = RELEASE_DECODER.decode(bytes);
+  } catch {
+    return fail("release.json must be valid UTF-8");
+  }
+
+  try {
     const release = JSON.parse(source) as Record<string, unknown>;
     return { release, source };
   } catch (error) {
@@ -186,12 +206,14 @@ function verifyReleaseIntegrityWithManifest(
   }
   const expected = release.bundleChecksum;
   release.bundleChecksum = ZERO_CHECKSUM;
-  const normalized = canonicalize(release);
+  let normalized: string | undefined;
+  try {
+    normalized = canonicalize(release);
+  } catch {
+    return fail("release.json cannot be canonicalized");
+  }
   if (normalized === undefined) {
-    throw new ContractError(
-      "INTEGRITY_FAILED",
-      "release.json cannot be canonicalized",
-    );
+    return fail("release.json cannot be canonicalized");
   }
   const actualBundleChecksum = `sha256:${createHash("sha256")
     .update(normalized)

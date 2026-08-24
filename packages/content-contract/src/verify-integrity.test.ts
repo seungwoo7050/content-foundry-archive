@@ -124,6 +124,43 @@ describe("verifyReleaseIntegrity", () => {
     );
   });
 
+  it("classifies a lone surrogate as an integrity failure", () => {
+    const root = copyFixture(v3Fixture);
+    const path = releasePath(root);
+    writeFileSync(
+      path,
+      readFileSync(path, "utf8").replace("calm-blue", "\\ud800"),
+    );
+
+    expect(() =>
+      verifyReleaseIntegrityForVersion("3.0.0", root),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "INTEGRITY_FAILED",
+        message: "release.json cannot be canonicalized",
+      }),
+    );
+  });
+
+  it("rejects invalid release manifest UTF-8", () => {
+    const root = copyFixture(v3Fixture);
+    const path = releasePath(root);
+    const bytes = readFileSync(path);
+    const invalidByte = bytes.indexOf("calm-blue");
+    if (invalidByte < 0) throw new TypeError("Expected default skin fixture");
+    bytes[invalidByte] = 0xff;
+    writeFileSync(path, bytes);
+
+    expect(() =>
+      verifyReleaseIntegrityForVersion("3.0.0", root),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "INTEGRITY_FAILED",
+        message: "release.json must be valid UTF-8",
+      }),
+    );
+  });
+
   it("rejects an internal version mismatch before integrity validation", () => {
     const root = copyFixture();
     const article = join(root, "articles", "ART-000123.json");
