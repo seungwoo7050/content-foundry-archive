@@ -42,9 +42,9 @@ function run(command, args, environment) {
 function releaseEnvironment(version, immutableObjectDirectory = "") {
   const environment = { ...process.env };
   for (const key of productionOnlyKeys) delete environment[key];
+  delete environment.CI;
   return {
     ...environment,
-    CI: "true",
     RELEASE_MODE: "preview",
     CONTENT_RELEASE_DIR: join(
       fixtureRoot,
@@ -71,14 +71,17 @@ try {
     writeFileSync(target, Buffer.from(encoded, "base64"));
   }
 
-  const v3Environment = releaseEnvironment("3.0.0", objectRoot);
-  run("pnpm", ["run", "build"], v3Environment);
-  run("pnpm", ["run", "verify:static"], v3Environment);
-  const v2Environment = releaseEnvironment("2.0.0");
-  run("pnpm", ["run", "build"], v2Environment);
-  run("pnpm", ["run", "verify:static"], v2Environment);
+  for (const [version, immutableObjectDirectory] of [
+    ["4.0.0", objectRoot],
+    ["3.0.0", objectRoot],
+    ["2.0.0", ""],
+  ]) {
+    const environment = releaseEnvironment(version, immutableObjectDirectory);
+    run("pnpm", ["run", "build"], environment);
+    run("pnpm", ["run", "verify:static"], environment);
+  }
 } finally {
   rmSync(objectRoot, { recursive: true, force: true });
 }
 
-console.log("Site A paired v3/v2 static exports verified.");
+console.log("Site A v4/v3/v2 static exports verified.");
