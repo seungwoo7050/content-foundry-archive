@@ -19,7 +19,7 @@ export interface SiteBuildArtifactPaths {
   readonly publicDirectory: string;
 }
 
-export interface PrepareV3SiteBuildOptions extends SiteBuildArtifactPaths {
+export interface PrepareSupportedSiteBuildOptions extends SiteBuildArtifactPaths {
   readonly immutableObjectDirectory: string;
   readonly releaseDirectory: string;
 }
@@ -70,9 +70,9 @@ function normalizeFailure(error: unknown): never {
   throw failure("Site build artifacts cannot be prepared");
 }
 
-export async function prepareV3SiteBuildArtifacts(
+export async function prepareSupportedSiteBuildArtifacts(
   bundle: SiteBuildMediaBundle,
-  options: PrepareV3SiteBuildOptions,
+  options: PrepareSupportedSiteBuildOptions,
 ): Promise<readonly ResponsiveImageAsset[]> {
   const buildDirectory = dirname(options.projectionPath);
   await ensureOwnedDirectory(buildDirectory, "Generated build path");
@@ -127,6 +127,8 @@ export async function prepareV3SiteBuildArtifacts(
     }
   }
 }
+
+export const prepareV3SiteBuildArtifacts = prepareSupportedSiteBuildArtifacts;
 
 export async function clearGeneratedSiteBuildArtifacts(
   paths: SiteBuildArtifactPaths,

@@ -9,12 +9,13 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 
-import type { MediaManifestV3 } from "@content-foundry/content-contract";
+import type { MediaManifest } from "@content-foundry/content-contract";
 import type { BuildTargetConfig } from "@content-foundry/site-core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const loaderOverride = vi.hoisted(() => ({
-  mediaManifest: undefined as MediaManifestV3 | undefined,
+  mediaManifest: undefined as MediaManifest | undefined,
+  validatedReleaseDirectory: undefined as string | undefined,
 }));
 
 vi.mock("./load-site-release", async (importOriginal) => {
@@ -22,8 +23,12 @@ vi.mock("./load-site-release", async (importOriginal) => {
   return {
     ...loader,
     loadValidatedSiteRelease: (config: BuildTargetConfig) => {
-      const context = loader.loadValidatedSiteRelease(config);
-      return loaderOverride.mediaManifest && context.contractVersion === "3.0.0"
+      const context = loader.loadValidatedSiteRelease({
+        ...config,
+        releaseDirectory:
+          loaderOverride.validatedReleaseDirectory ?? config.releaseDirectory,
+      });
+      return loaderOverride.mediaManifest
         ? {
             ...context,
             bundle: { ...context.bundle, mediaManifest: loaderOverride.mediaManifest },
@@ -45,6 +50,22 @@ const payloads = [
   "iVBORw0KGgoAAAANSUhEUgAAABAAAAAJCAYAAAA7KqwyAAAAFklEQVR42mO48+f5f0oww6gBowYAMQDDohr/igFCLQAAAABJRU5ErkJggg==",
 ].map((value) => Buffer.from(value, "base64"));
 const roots: string[] = [];
+
+function v2MediaManifest(source: "bundle" | "immutable-object"): MediaManifest {
+  const manifest = JSON.parse(
+    readFileSync(join(fixture("3.0.0"), "media/media-manifest.json"), "utf8"),
+  ) as MediaManifest;
+  const media = manifest.items[0]!;
+  return {
+    items: [
+      {
+        ...media,
+        source,
+        path: source === "bundle" ? "media/v2-source.png" : media.path,
+      },
+    ],
+  };
+}
 
 function config(releaseDirectory: string): BuildTargetConfig {
   return {
@@ -74,7 +95,7 @@ function writeV3Objects(root: string) {
   const releaseDirectory = fixture("3.0.0");
   const manifest = JSON.parse(
     readFileSync(join(releaseDirectory, "media/media-manifest.json"), "utf8"),
-  ) as MediaManifestV3;
+  ) as MediaManifest;
   manifest.items.forEach((media, index) => {
     const target = join(root, media.path);
     mkdirSync(dirname(target), { recursive: true });
@@ -92,19 +113,26 @@ function writePriorArtifacts(paths: ReturnType<typeof workspace>) {
 
 afterEach(() => {
   loaderOverride.mediaManifest = undefined;
+  loaderOverride.validatedReleaseDirectory = undefined;
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 
 describe("prepareSiteRelease", () => {
-  it("validates v2 before clearing only its generated artifacts", async () => {
+  it("publishes an empty v2 media projection", async () => {
     const paths = workspace();
     writePriorArtifacts(paths);
 
     await expect(prepareSiteRelease(config(fixture("2.0.0")), paths)).resolves.toBe(
       "2.0.0",
     );
-    expect(existsSync(join(paths.publicDirectory, "_media"))).toBe(false);
-    expect(existsSync(paths.projectionPath)).toBe(false);
+    expect(existsSync(join(paths.publicDirectory, "_media"))).toBe(true);
+    expect(existsSync(join(paths.publicDirectory, "_media/generated.webp"))).toBe(
+      false,
+    );
+    expect(JSON.parse(readFileSync(paths.projectionPath, "utf8"))).toMatchObject({
+      contractVersion: "2.0.0",
+      assets: [],
+    });
     expect(JSON.parse(readFileSync(paths.dispositionPath, "utf8"))).toMatchObject({
       release: { releaseId: "REL-2026-000042" },
       items: [],
@@ -130,6 +158,56 @@ describe("prepareSiteRelease", () => {
     expect(readFileSync(workspacePaths.dispositionPath, "utf8")).toBe(
       "prior dispositions",
     );
+  });
+
+  it("requires v2 immutable media configuration and restores prior artifacts", async () => {
+    const paths = workspace();
+    writePriorArtifacts(paths);
+    loaderOverride.mediaManifest = v2MediaManifest("immutable-object");
+    const withoutImmutableDirectory = {
+      dispositionPath: paths.dispositionPath,
+      projectionPath: paths.projectionPath,
+      publicDirectory: paths.publicDirectory,
+    };
+
+    await expect(
+      prepareSiteRelease(config(fixture("2.0.0")), withoutImmutableDirectory),
+    ).rejects.toThrow("IMMUTABLE_MEDIA_DIR is required for contract 2.0.0");
+    await expect(
+      prepareSiteRelease(config(fixture("2.0.0")), paths),
+    ).rejects.toMatchObject({ code: "TEMPORARY" });
+    expect(readFileSync(paths.projectionPath, "utf8")).toBe("projection");
+    expect(readFileSync(paths.dispositionPath, "utf8")).toBe("prior dispositions");
+    expect(
+      readFileSync(join(paths.publicDirectory, "_media/generated.webp"), "utf8"),
+    ).toBe("generated");
+  });
+
+  it("uses the release directory for v2 bundle-source media", async () => {
+    const paths = workspace();
+    const releaseDirectory = join(paths.root, "release");
+    loaderOverride.validatedReleaseDirectory = fixture("2.0.0");
+    const manifest = v2MediaManifest("bundle");
+    loaderOverride.mediaManifest = manifest;
+    const source = manifest.items[0]!;
+    mkdirSync(dirname(join(releaseDirectory, source.path)), { recursive: true });
+    writeFileSync(join(releaseDirectory, source.path), payloads[0]!);
+
+    await expect(
+      prepareSiteRelease(config(releaseDirectory), {
+        dispositionPath: paths.dispositionPath,
+        projectionPath: paths.projectionPath,
+        publicDirectory: paths.publicDirectory,
+      }),
+    ).resolves.toBe("2.0.0");
+    const projection = JSON.parse(readFileSync(paths.projectionPath, "utf8")) as {
+      assets: Array<{ fallback: { relativePath: string } }>;
+    };
+    expect(
+      readFileSync(
+        join(paths.publicDirectory, projection.assets[0]!.fallback.relativePath),
+      ),
+    ).toEqual(payloads[0]);
   });
 
   it("preserves prior artifacts when the selected release is invalid", async () => {

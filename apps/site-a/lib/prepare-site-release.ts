@@ -2,8 +2,7 @@ import { BuildTargetConfigError, type BuildTargetConfig } from "@content-foundry
 
 import { loadValidatedSiteRelease } from "./load-site-release";
 import {
-  clearGeneratedSiteBuildArtifacts,
-  prepareV3SiteBuildArtifacts,
+  prepareSupportedSiteBuildArtifacts,
   type SiteBuildArtifactPaths,
 } from "./prepare-site-build";
 import { withRouteDispositionArtifact } from "./route-disposition-artifact-transaction";
@@ -20,31 +19,20 @@ export async function prepareSiteRelease(
 ): Promise<"2.0.0" | "3.0.0"> {
   const context = loadValidatedSiteRelease(config);
   resolveSiteLaunchConfig(context, options.environment ?? {});
-  if (context.contractVersion === "2.0.0") {
-    return withRouteDispositionArtifact(
-      options.dispositionPath,
-      context.bundle,
-      async () => {
-        await clearGeneratedSiteBuildArtifacts(options);
-        return context.contractVersion;
-      },
-    );
-  }
-
   const immutableObjectDirectory = options.immutableObjectDirectory?.trim();
   const requiresImmutableObjects = context.bundle.mediaManifest.items.some(
     ({ source }) => source === "immutable-object",
   );
   if (requiresImmutableObjects && !immutableObjectDirectory) {
     throw new BuildTargetConfigError(
-      "IMMUTABLE_MEDIA_DIR is required for contract 3.0.0",
+      `IMMUTABLE_MEDIA_DIR is required for contract ${context.contractVersion}`,
     );
   }
   return withRouteDispositionArtifact(
     options.dispositionPath,
     context.bundle,
     async () => {
-      await prepareV3SiteBuildArtifacts(context.bundle, {
+      await prepareSupportedSiteBuildArtifacts(context.bundle, {
         ...options,
         immutableObjectDirectory:
           immutableObjectDirectory ?? config.releaseDirectory,
