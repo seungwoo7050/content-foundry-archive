@@ -36,6 +36,7 @@ describe("theme shell view model", () => {
       skipLink: { href: "#main-content", label: "본문으로 바로가기" },
       brand: { href: "/", label: "생활메모" },
       description: "실생활에 도움이 되는 정보를 정리하는 1인 운영 블로그",
+      searchLink: { href: "/search", label: "검색" },
       primaryNavigation: [
         { link: { href: "/", label: "홈" }, children: [] },
         {
@@ -49,6 +50,15 @@ describe("theme shell view model", () => {
     expect(shell).not.toHaveProperty("bundle");
     expect(shell).not.toHaveProperty("contractVersion");
     expect(shell.primaryNavigation[0]).not.toHaveProperty("id");
+  });
+
+  it("omits the search entry point when the release disables search", () => {
+    const shell = createThemeShellViewModel({
+      ...bundle,
+      site: { ...bundle.site, search: { enabled: false } },
+    });
+
+    expect(shell.searchLink).toBeNull();
   });
 
   it("recursively projects navigation and uses the release year", () => {

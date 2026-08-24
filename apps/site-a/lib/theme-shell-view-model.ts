@@ -16,6 +16,7 @@ export interface ThemeShellSource {
     readonly name: string;
     readonly description: string;
     readonly author: { readonly displayName: string };
+    readonly search: { readonly enabled: boolean };
   };
   readonly navigation: {
     readonly items: readonly ThemeShellNavigationRecord[];
@@ -53,6 +54,9 @@ export function createThemeShellViewModel(
     skipLink: { href: "#main-content", label: "본문으로 바로가기" },
     brand: { href: "/", label: bundle.site.name },
     description: bundle.site.description,
+    searchLink: bundle.site.search.enabled
+      ? { href: "/search", label: "검색" }
+      : null,
     primaryNavigation: bundle.navigation.items.map(createNavigationItem),
     footerNavigation: SITE_FOOTER_PAGE_PATHS.flatMap((path) => {
       const page = pageByPath.get(path);
