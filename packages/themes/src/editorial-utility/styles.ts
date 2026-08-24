@@ -41,6 +41,8 @@ export const EDITORIAL_UTILITY_STYLES = `
 .editorial-topic-list li { padding: .35rem .7rem; background: var(--editorial-surface-muted); border: 1px solid var(--editorial-border); }
 .editorial-article-header { max-width: 62rem; margin: 2rem auto 2.5rem; }
 .editorial-article-header h1 { font-size: clamp(2.4rem, 7vw, 4.8rem); }
+.editorial-article-header > .theme-article-topics { display: flex; flex-wrap: wrap; gap: .45rem; margin: 1.25rem 0 0; padding: 0; list-style: none; }
+.editorial-article-header > .theme-article-topics li { padding: .25rem .65rem; background: var(--editorial-surface-muted); border: 1px solid var(--editorial-border); color: var(--editorial-text-muted); font-size: .88rem; }
 .editorial-article-meta { display: flex; flex-wrap: wrap; gap: .65rem 1.25rem; margin-block: 1.5rem; }
 .editorial-article-meta div { display: flex; gap: .35rem; }
 .editorial-article-meta dt { color: var(--editorial-text-muted); }

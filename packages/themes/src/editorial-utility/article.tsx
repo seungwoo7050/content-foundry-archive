@@ -3,7 +3,7 @@ import {
   getThemeAdSlot,
   type ThemeAdSlotContext,
 } from "../theme-ad-slot.js";
-import { ThemeArticleList } from "../theme-links.js";
+import { ThemeArticleList, ThemeArticleTopics } from "../theme-links.js";
 
 function ArticleMetadata({ route }: { readonly route: ArticleRouteViewModel }) {
   return (
@@ -87,6 +87,7 @@ export function EditorialArticle({
         {route.category ? <p><a href={route.category.href}>{route.category.label}</a></p> : null}
         <h1>{route.heading}</h1>
         <p className="editorial-dek">{route.description}</p>
+        <ThemeArticleTopics topics={route.topics} />
         <ArticleMetadata route={route} />
       </header>
       {route.advertisingEligible
