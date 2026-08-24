@@ -67,7 +67,7 @@ export function InformationPortalShell({
           <ThemeNavigation ariaLabel="주요 메뉴" items={shell.primaryNavigation} />
         </div>
       </header>
-      <main className="ip-main" data-route-kind={routeKind} id="main-content">
+      <main className="ip-main" data-route-kind={routeKind} id="main-content" tabIndex={-1}>
         {children}
       </main>
       <footer className="ip-footer">

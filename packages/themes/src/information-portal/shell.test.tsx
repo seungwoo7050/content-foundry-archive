@@ -38,7 +38,9 @@ describe("Information Portal shell", () => {
     expect(html).toContain('data-theme="information-portal"');
     expect(html).toContain('class="ip-brand-row"');
     expect(html).toContain('href="/category/life/apply">신청</a>');
-    expect(html).toContain('<main class="ip-main" data-route-kind="static-page" id="main-content">');
+    expect(html).toContain(
+      '<main class="ip-main" data-route-kind="static-page" id="main-content" tabindex="-1">',
+    );
     expect(html).toContain('aria-current="page">소개</span>');
     expect(html).toContain("© 2026 생활메모");
     expect(html.match(/<main\b/g)).toHaveLength(1);
