@@ -1,4 +1,5 @@
 import type { StateRouteViewModel } from "../state-route-view-model.js";
+import { ThemeRecoveryLinks } from "../theme-links.js";
 
 function Search({ route }: { readonly route: Extract<StateRouteViewModel, { kind: "search" }> }) {
   return (
@@ -20,6 +21,7 @@ function Status({
       <h1>{route.heading}</h1>
       <p>{route.description}</p>
       <p><a className="editorial-state__action" href={route.action.href}>{route.action.label}</a></p>
+      <ThemeRecoveryLinks items={route.recoveryLinks} />
     </section>
   );
 }
