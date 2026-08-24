@@ -140,6 +140,31 @@ describe("Editorial Utility", () => {
     expect(html).toContain('href="/search">사이트 검색</a>');
   });
 
+  it("renders release-provided editorial groups as distinct factual sections", () => {
+    const home = routes[0]!;
+    if (home.kind !== "home") throw new Error("Expected home fixture");
+    const html = render({
+      ...home,
+      featuredArticles: [articles[0]!],
+      currentArticles: [articles[1]!],
+      evergreenArticles: [articles[2]!],
+      latestArticles: [articles[3]!],
+      categoryHighlights: [{ category: home.categories[0]!, articles: [articles[0]!] }],
+    });
+    const section = (className: string) => html.match(
+      new RegExp(`<section class="${className} editorial-section">[\\s\\S]*?<\\/section>`),
+    )?.[0];
+
+    expect(section("editorial-home-featured")).toContain("<h2>선정 안내</h2>");
+    expect(section("editorial-home-current")).toContain("<h2>지금 확인할 안내</h2>");
+    expect(section("editorial-home-reference")).toContain("<h2>기본 안내</h2>");
+    expect(section("editorial-home-latest")).toContain("<h2>최근 안내</h2>");
+    expect(section("editorial-home-category-highlight")).toContain(
+      '<h2><a href="/category/life">생활</a></h2><p>생활 절차 안내</p>',
+    );
+    expect(html).not.toMatch(/인기|급상승|popular|trending|ranking/i);
+  });
+
   it("marks only the exact current masthead navigation link", () => {
     const category = render(routes[1]!);
     const article = render(routes[2]!);

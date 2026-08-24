@@ -25,6 +25,23 @@ function RouteHeader({
   return <header className="editorial-route-header"><h1>{heading}</h1><p>{description}</p></header>;
 }
 
+function HomeArticleGroup({
+  articles,
+  className,
+  heading,
+}: {
+  readonly articles: HomeRouteViewModel["articles"] | undefined;
+  readonly className: string;
+  readonly heading: string;
+}) {
+  return articles && articles.length > 0 ? (
+    <section className={`${className} editorial-section`}>
+      <h2>{heading}</h2>
+      <ThemeArticleList articles={articles} headingLevel={3} />
+    </section>
+  ) : null;
+}
+
 function Home({
   context,
   route,
@@ -35,6 +52,11 @@ function Home({
   const lead = route.articles.slice(0, 1);
   const secondary = route.articles.slice(1, 3);
   const latest = route.articles.slice(3);
+  const hasEditorialGroups = route.featuredArticles !== undefined
+    || route.currentArticles !== undefined
+    || route.evergreenArticles !== undefined
+    || route.latestArticles !== undefined
+    || route.categoryHighlights !== undefined;
   return (
     <div className="editorial-home" data-route="home">
       <RouteHeader heading={route.heading} description={route.description} />
@@ -51,21 +73,36 @@ function Home({
           {route.searchLink ? <a href={route.searchLink.href}>{route.searchLink.label}</a> : null}
         </div>
       ) : null}
-      {lead.length > 0 ? (
-        <section className="editorial-home-lead" aria-label="첫 안내">
-          <ThemeArticleList articles={lead} headingLevel={2} />
-        </section>
-      ) : null}
-      {secondary.length > 0 ? (
-        <section className="editorial-home-secondary editorial-section" aria-label="이어지는 안내">
-          <ThemeArticleList articles={secondary} headingLevel={2} />
-        </section>
-      ) : null}
-      <section className="editorial-latest editorial-section">
-        <h2>{route.articleSectionHeading}</h2>
-        <ThemeArticleList articles={latest} headingLevel={3} />
+      {hasEditorialGroups ? <>
+        <HomeArticleGroup articles={route.featuredArticles} className="editorial-home-featured" heading="선정 안내" />
+        <HomeArticleGroup articles={route.currentArticles} className="editorial-home-current" heading="지금 확인할 안내" />
+        <HomeArticleGroup articles={route.evergreenArticles} className="editorial-home-reference" heading="기본 안내" />
+        <HomeArticleGroup articles={route.latestArticles} className="editorial-home-latest" heading={route.articleSectionHeading} />
+        {route.categoryHighlights?.map(({ category, articles }) => (
+          <section className="editorial-home-category-highlight editorial-section" key={category.href}>
+            <h2><a href={category.href}>{category.label}</a></h2>
+            <p>{category.description}</p>
+            {articles.length > 0 ? <ThemeArticleList articles={articles} headingLevel={3} /> : null}
+          </section>
+        ))}
         {getThemeAdSlot(context, "home-feed")}
-      </section>
+      </> : <>
+        {lead.length > 0 ? (
+          <section className="editorial-home-lead" aria-label="첫 안내">
+            <ThemeArticleList articles={lead} headingLevel={2} />
+          </section>
+        ) : null}
+        {secondary.length > 0 ? (
+          <section className="editorial-home-secondary editorial-section" aria-label="이어지는 안내">
+            <ThemeArticleList articles={secondary} headingLevel={2} />
+          </section>
+        ) : null}
+        <section className="editorial-latest editorial-section">
+          <h2>{route.articleSectionHeading}</h2>
+          <ThemeArticleList articles={latest} headingLevel={3} />
+          {getThemeAdSlot(context, "home-feed")}
+        </section>
+      </>}
       <ThemeHomeAboutTeaser teaser={route.aboutTeaser} />
     </div>
   );
