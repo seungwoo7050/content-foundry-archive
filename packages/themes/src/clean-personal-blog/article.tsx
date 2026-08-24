@@ -65,6 +65,12 @@ export function CleanPersonalArticle({ route }: { readonly route: ArticleRouteVi
       ) : null}
       <div className="personal-body">{route.body}</div>
       <ArticleEvidence route={route} />
+      {route.readerActions !== null && route.readerActions !== undefined ? (
+        <section aria-labelledby="personal-reader-actions-title" className="personal-section">
+          <h2 id="personal-reader-actions-title">글 읽기 도구</h2>
+          {route.readerActions}
+        </section>
+      ) : null}
       {route.relatedSectionHeading && route.relatedArticles.length > 0 ? (
         <section aria-labelledby="personal-related-title" className="personal-related personal-section">
           <h2 id="personal-related-title">{route.relatedSectionHeading}</h2>
