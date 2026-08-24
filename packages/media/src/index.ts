@@ -1,6 +1,11 @@
 export { exportImageSources } from "./export-image-sources.js";
 export { exportStaticImageSource } from "./export-static-image-source.js";
 export {
+  generateResponsiveImageAsset,
+  type GeneratedResponsiveImageAsset,
+  type GeneratedResponsiveImageDerivative,
+} from "./generate-responsive-image-asset.js";
+export {
   createBundleMediaSourceReader,
   type MediaSourceReader,
 } from "./read-bundle-media-source.js";
