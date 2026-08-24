@@ -38,4 +38,34 @@ describe("Information Portal styles", () => {
     expect(INFORMATION_PORTAL_STYLES).toContain('.ip-body a[href^="http"]::after');
     expect(INFORMATION_PORTAL_STYLES).not.toMatch(/data-ad-|adsbygoogle/i);
   });
+
+  it("gives home groups dense hierarchy without cropping artwork", () => {
+    for (const className of [
+      "ip-home-featured",
+      "ip-home-current",
+      "ip-home-reference",
+      "ip-home-latest",
+      "ip-home-category-highlight",
+    ]) {
+      expect(INFORMATION_PORTAL_STYLES).toContain(`.${className}`);
+    }
+    expect(INFORMATION_PORTAL_STYLES).toContain(
+      ".content-image img{display:block;width:100%;max-width:100%;height:auto}",
+    );
+    expect(INFORMATION_PORTAL_STYLES).toContain(
+      ".ip-home-featured>ul>li:first-child{grid-column:1/-1}",
+    );
+    expect(INFORMATION_PORTAL_STYLES).toContain(
+      ".ip-home-reference>ul{grid-template-columns:repeat(4,minmax(0,1fr))}",
+    );
+    expect(INFORMATION_PORTAL_STYLES).toContain("@media (max-width:30rem)");
+    expect(INFORMATION_PORTAL_STYLES).toContain("break-inside:avoid");
+    expect(INFORMATION_PORTAL_STYLES).not.toMatch(/object-fit\s*:\s*cover/i);
+
+    const groupStyles = INFORMATION_PORTAL_STYLES.slice(
+      INFORMATION_PORTAL_STYLES.indexOf(":is(.ip-home-featured"),
+      INFORMATION_PORTAL_STYLES.indexOf(".ip-article-reading-time"),
+    );
+    expect(groupStyles).not.toMatch(/#[0-9a-f]{3,8}|rgba?\(|hsla?\(/i);
+  });
 });
