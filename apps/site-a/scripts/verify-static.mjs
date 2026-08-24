@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import {
   existsSync,
   readFileSync,
@@ -84,12 +85,36 @@ function listSourceFiles(root) {
   });
 }
 
+function listFiles(root) {
+  return readdirSync(root).flatMap((entry) => {
+    const path = join(root, entry);
+    return statSync(path).isDirectory() ? listFiles(path) : [path];
+  });
+}
+
 const home = readArtifact("index.html");
 const article = readArtifact(articleRelativePath);
 const staticPage = readArtifact(staticPageRelativePath);
 const category = readArtifact(categoryRelativePath);
 const notFound = readArtifact("404.html");
 const identity = JSON.parse(readArtifact("_release.json"));
+const expectedIdentities = {
+  "2.0.0": {
+    releaseId: "REL-2026-000042",
+    siteId: "site-a",
+    contractVersion: "2.0.0",
+    bundleChecksum:
+      "sha256:0a8f03190b0a5d63fefc52e3efab08080a08263a6c8d716f0e4936382eee6f27",
+  },
+  "3.0.0": {
+    releaseId: "REL-2026-000043",
+    siteId: "site-a",
+    contractVersion: "3.0.0",
+    bundleChecksum:
+      "sha256:45a1c3f057fb59b3a7fd28e5e87a8c41eb299d0446c71949e5d4e32d2a92d745",
+  },
+};
+assert.deepEqual(identity, expectedIdentities[identity.contractVersion]);
 
 assert.match(home, /<h1 id="home-title">생활메모<\/h1>/);
 assert.match(
@@ -103,9 +128,15 @@ assert.match(
   /<h1>생활·행정<\/h1><p>생활과 행정 절차 안내<\/p>/,
 );
 assert.match(category, /<h2 id="category-recent">최근 안내<\/h2>/);
+const expectedCategoryDate =
+  identity.contractVersion === "3.0.0"
+    ? ["2026-08-24T02:30:00Z", "2026년 8월 24일"]
+    : ["2026-08-20T01:00:00Z", "2026년 8월 20일"];
 assert.match(
   category,
-  /<time dateTime="2026-08-20T01:00:00Z">2026년 8월 20일<\/time>/,
+  new RegExp(
+    `<time dateTime="${expectedCategoryDate[0]}">${expectedCategoryDate[1]}<\\/time>`,
+  ),
 );
 assert.match(
   category,
@@ -180,6 +211,72 @@ assertSafeHtml("article", article);
 assertSafeHtml("static page", staticPage);
 assertSafeHtml("category", category);
 assertSafeHtml("404", notFound);
+
+const projectionPath = join(appRoot, ".site-build/media-projection.json");
+const publicMediaRoot = join(appRoot, "public/_media");
+const exportedMediaRoot = join(outRoot, "_media");
+assert.ok(!existsSync(join(outRoot, ".site-build")), "Private build state was exported");
+
+if (identity.contractVersion === "2.0.0") {
+  assert.ok(!existsSync(projectionPath), "v2 retained a media projection");
+  assert.ok(!existsSync(publicMediaRoot), "v2 retained public media");
+  assert.ok(!existsSync(exportedMediaRoot), "v2 exported media");
+  assert.doesNotMatch(article, /content-gallery|data-action-kind|\/_media\//);
+  assert.doesNotMatch(staticPage, /data-action-kind|\/_media\//);
+} else {
+  const mediaHashes = [
+    "216154d9fcffafb56f3bd8d846eebdb9ae1b5dc8aaeeea88ce621d1ceb5798e7",
+    "6ece129d56e4d016fd870514dee9310d37dd4f504b6c145509f52b7ef315ca67",
+  ];
+  const expectedMedia = mediaHashes.flatMap((hash) => [
+    `${hash}/source.png`,
+    `${hash}/webp-q82/16w.webp`,
+  ]).sort();
+  const exportedMedia = listFiles(exportedMediaRoot)
+    .map((path) => path.slice(exportedMediaRoot.length + 1))
+    .sort();
+  assert.deepEqual(exportedMedia, expectedMedia);
+  assert.deepEqual(
+    listFiles(publicMediaRoot)
+      .map((path) => path.slice(publicMediaRoot.length + 1))
+      .sort(),
+    expectedMedia,
+  );
+
+  for (const hash of mediaHashes) {
+    const source = readFileSync(join(exportedMediaRoot, hash, "source.png"));
+    assert.equal(createHash("sha256").update(source).digest("hex"), hash);
+    const derivative = readFileSync(
+      join(exportedMediaRoot, hash, "webp-q82/16w.webp"),
+    );
+    assert.equal(derivative.subarray(0, 4).toString("ascii"), "RIFF");
+    assert.equal(derivative.subarray(8, 12).toString("ascii"), "WEBP");
+  }
+
+  assert.match(article, /<figcaption>발급 화면 순서<\/figcaption>/);
+  assert.match(article, /alt="파란색으로 표시된 발급 화면 순서 1단계"/);
+  assert.match(article, /alt="초록색으로 표시된 발급 화면 순서 2단계"/);
+  assert.match(article, /data-action-kind="internal"><a href="\/about">/);
+  assert.match(
+    staticPage,
+    /data-action-kind="internal"><a href="\/article\/government24-resident-registration-guide">/,
+  );
+  for (const relativePath of expectedMedia) {
+    assert.match(article, new RegExp(escapePattern(`/_media/${relativePath}`)));
+  }
+
+  const projection = JSON.parse(readFileSync(projectionPath, "utf8"));
+  assert.deepEqual(
+    {
+      contractVersion: projection.contractVersion,
+      siteId: projection.siteId,
+      releaseId: projection.releaseId,
+      bundleChecksum: projection.bundleChecksum,
+    },
+    identity,
+  );
+  assert.equal(projection.assets.length, 2);
+}
 
 for (const sourceRoot of ["app", "components", "lib"]) {
   for (const sourcePath of listSourceFiles(join(appRoot, sourceRoot))) {
