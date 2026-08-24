@@ -17,9 +17,12 @@ export {
   type SkinId,
 } from "./skin.js";
 export {
+  STATE_RECOVERY_LINK_KINDS,
   type NotFoundRouteViewModel,
   type RetiredRouteViewModel,
   type SearchRouteViewModel,
+  type StateRecoveryLinkKind,
+  type StateRecoveryLinkViewModel,
   type StateRouteViewModel,
 } from "./state-route-view-model.js";
 export { THEME_IDS, type ThemeId } from "./theme-id.js";
