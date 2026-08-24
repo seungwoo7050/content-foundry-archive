@@ -5,7 +5,7 @@ import {
   getThemeAdSlot,
   type ThemeAdSlotContext,
 } from "../theme-ad-slot.js";
-import { ThemeArticleList } from "../theme-links.js";
+import { ThemeArticleList, ThemeHomeAboutTeaser } from "../theme-links.js";
 import { FriendlyArticle } from "./article.js";
 import { FriendlyRouteIntro } from "./shell.js";
 
@@ -39,6 +39,7 @@ export function renderFriendlyContentRoute(
             <ThemeArticleList articles={route.articles} headingLevel={3} />
             {getThemeAdSlot(context, "home-feed")}
           </section>
+          <ThemeHomeAboutTeaser teaser={route.aboutTeaser} />
         </div>
       );
     case "category":

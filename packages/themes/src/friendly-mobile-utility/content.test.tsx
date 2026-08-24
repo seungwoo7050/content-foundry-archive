@@ -24,6 +24,11 @@ describe("Friendly Mobile Utility content routes", () => {
       }],
       categories: [{ href: "/category/life", label: "생활", description: "생활 절차를 확인합니다." }],
       searchLink: { href: "/search", label: "사이트 검색" },
+      aboutTeaser: {
+        href: "/about",
+        label: "소개",
+        description: "한 명의 운영자가 정보를 확인하고 정리합니다.",
+      },
     };
 
     const html = renderToStaticMarkup(renderFriendlyContentRoute(route));
@@ -32,7 +37,24 @@ describe("Friendly Mobile Utility content routes", () => {
     expect(html).toContain('href="/category/life">생활</a>');
     expect(html).toContain("생활 절차를 확인합니다.");
     expect(html).toContain('href="/article/start">신청 안내</a>');
+    expect(html.match(/<section aria-labelledby="home-about-teaser-heading">/g)).toHaveLength(1);
+    expect(html).toContain("한 명의 운영자가 정보를 확인하고 정리합니다.");
+    expect(html).toContain('<a href="/about">소개</a>');
     expect(html).not.toMatch(/popular|trending|ranking|인기|순위/i);
   });
 
+  it.each([undefined, null])("omits a %s about teaser", (aboutTeaser) => {
+    const route: HomeRouteViewModel = {
+      ...base,
+      kind: "home",
+      articleSectionHeading: "최근 안내",
+      articles: [],
+      categories: [],
+      searchLink: null,
+      ...(aboutTeaser === undefined ? {} : { aboutTeaser }),
+    };
+
+    expect(renderToStaticMarkup(renderFriendlyContentRoute(route)))
+      .not.toContain("home-about-teaser-heading");
+  });
 });
