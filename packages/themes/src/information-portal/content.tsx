@@ -8,6 +8,7 @@ import {
 import {
   ThemeArticleList,
   ThemeHomeAboutTeaser,
+  ThemePagination,
 } from "../theme-links.js";
 import { InformationPortalArticle } from "./article.js";
 import { PortalRouteIntro } from "./shell.js";
@@ -55,6 +56,7 @@ export function renderInformationPortalContent(
           <section aria-labelledby="ip-category-list" className="ip-list">
             <h2 id="ip-category-list">{route.articleSectionHeading}</h2>
             <ThemeArticleList articles={route.articles} headingLevel={3} />
+            <ThemePagination pagination={route.pagination} />
           </section>
         </div>
       );
@@ -68,6 +70,7 @@ export function renderInformationPortalContent(
           <PortalRouteIntro route={route} />
           <section aria-label={route.heading} className="ip-list">
             <ThemeArticleList articles={route.articles} headingLevel={2} ordered />
+            <ThemePagination pagination={route.pagination} />
           </section>
         </div>
       );

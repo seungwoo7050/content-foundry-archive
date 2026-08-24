@@ -2,9 +2,11 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import type {
+  ArchiveRouteViewModel,
   CategoryRouteViewModel,
   HomeRouteViewModel,
 } from "../content-route-view-model.js";
+import type { PaginationViewModel } from "../presentation-view-model.js";
 import { renderInformationPortalContent } from "./content.js";
 
 const base = {
@@ -13,6 +15,31 @@ const base = {
   description: "필요한 안내를 모았습니다.",
   breadcrumbs: [{ href: "/", label: "생활메모" }],
 } as const;
+
+function renderListRoute(kind: "archive" | "category", pagination: PaginationViewModel) {
+  const basePath = kind === "archive" ? "/archive" : "/category/life";
+  const path = pagination.currentPage === 1
+    ? basePath
+    : `${basePath}/page/${pagination.currentPage}`;
+  const shared = {
+    path,
+    heading: kind === "archive" ? "전체 안내" : "생활",
+    description: "페이지로 나눈 안내 목록입니다.",
+    breadcrumbs: [{ href: path, label: "현재 목록" }],
+    articles: [],
+    pagination,
+  };
+  const route: ArchiveRouteViewModel | CategoryRouteViewModel = kind === "archive"
+    ? { ...shared, kind }
+    : {
+        ...shared,
+        kind,
+        articleSectionHeading: "최근 안내",
+        topicSectionHeading: null,
+        topics: [],
+      };
+  return renderToStaticMarkup(renderInformationPortalContent(route));
+}
 
 describe("Information Portal discovery routes", () => {
   it("prioritizes search, described categories, and supplied latest content", () => {
@@ -79,4 +106,44 @@ describe("Information Portal discovery routes", () => {
     expect(html).toContain('<ul class="ip-topics"><li>신청</li><li>발급</li></ul>');
     expect(html).toContain('<h2 id="ip-category-list">최근 안내</h2>');
   });
+
+  it.each(["category", "archive"] as const)(
+    "omits pagination markup from a one-page %s list",
+    (kind) => {
+      const html = renderListRoute(kind, {
+        currentPage: 1,
+        pageCount: 1,
+        previous: null,
+        next: null,
+      });
+
+      expect(html).not.toContain('aria-label="목록 페이지 이동"');
+    },
+  );
+
+  it.each([
+    ["category", "/category/life", "/category/life/page/3"],
+    ["archive", "/archive", "/archive/page/3"],
+  ] as const)(
+    "renders real pagination anchors after the %s article list",
+    (kind, previousHref, nextHref) => {
+      const html = renderListRoute(kind, {
+        currentPage: 2,
+        pageCount: 3,
+        previous: { href: previousHref, label: "이전 페이지" },
+        next: { href: nextHref, label: "다음 페이지" },
+      });
+      const emptyArticleList = kind === "archive" ? "<ol></ol>" : "<ul></ul>";
+
+      expect(html.indexOf(emptyArticleList)).toBeLessThan(
+        html.indexOf('aria-label="목록 페이지 이동"'),
+      );
+      expect(html).toContain(
+        `<a href="${previousHref}" rel="prev">이전 페이지</a>`,
+      );
+      expect(html).toContain(
+        `<a href="${nextHref}" rel="next">다음 페이지</a>`,
+      );
+    },
+  );
 });
