@@ -177,6 +177,42 @@ describe("Minimal Knowledge Base", () => {
     expect(category.indexOf("kb-category-articles")).toBeLessThan(category.indexOf("kb-category-topics"));
   });
 
+  it("renders projected home groups as distinct knowledge paths", () => {
+    const home = routeAt(0);
+    if (home.kind !== "home") throw new Error("Expected home fixture");
+    const html = render({
+      ...home,
+      currentArticles: [articleItem],
+      featuredArticles: [articleItem],
+      evergreenArticles: [articleItem],
+      latestArticles: [articleItem],
+      categoryHighlights: [{ category: home.categories[0]!, articles: [articleItem] }],
+    });
+    const groups = [
+      "kb-home-current",
+      "kb-home-featured",
+      "kb-home-reference",
+      "kb-home-latest",
+      "kb-home-category-highlight",
+    ];
+
+    expect(groups.map((group) => html.indexOf(group)))
+      .toEqual([...groups.map((group) => html.indexOf(group))].sort((a, b) => a - b));
+    expect(html).toContain('<h2 id="kb-home-current-title">지금 확인할 안내</h2>');
+    expect(html).toContain('<h2 id="kb-home-featured-title">먼저 읽을 안내</h2>');
+    expect(html).toContain('<h2 id="kb-home-reference-title">기본 안내</h2>');
+    expect(html).toContain('<h2 id="kb-home-latest-title">최근 안내</h2>');
+    expect(html).toContain('<h2 id="kb-home-highlight-0"><a href="/category/life">생활</a></h2>');
+    expect(html).not.toContain('class="kb-latest-articles"');
+  });
+
+  it("keeps the legacy article list when presentation groups are absent", () => {
+    const html = render(routeAt(0));
+
+    expect(html).toContain('class="kb-latest-articles"');
+    expect(html).not.toContain("kb-home-article-group");
+  });
+
   it("renders one factual home introduction and omits absent variants", () => {
     const home = routeAt(0);
     if (home.kind !== "home") throw new Error("Expected home fixture");

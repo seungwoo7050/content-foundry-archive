@@ -14,7 +14,31 @@ import {
 import { MinimalKnowledgeBaseArticle } from "./article-route.js";
 import { KnowledgeBreadcrumbs } from "./route-chrome.js";
 
+function KnowledgeHomeGroup({
+  articles,
+  className,
+  heading,
+  headingId,
+}: {
+  readonly articles: HomeRouteViewModel["articles"] | undefined;
+  readonly className: string;
+  readonly heading: string;
+  readonly headingId: string;
+}) {
+  return articles && articles.length > 0 ? (
+    <section aria-labelledby={headingId} className={`${className} kb-home-article-group`}>
+      <h2 id={headingId}>{heading}</h2>
+      <ThemeArticleList articles={articles} headingLevel={3} />
+    </section>
+  ) : null;
+}
+
 function HomeRoute({ route }: { readonly route: HomeRouteViewModel }) {
+  const hasPresentation = route.featuredArticles !== undefined
+    || route.currentArticles !== undefined
+    || route.evergreenArticles !== undefined
+    || route.latestArticles !== undefined
+    || route.categoryHighlights !== undefined;
   return (
     <div className="kb-home-route" data-route="home">
       <header><h1>{route.heading}</h1><p>{route.description}</p></header>
@@ -37,10 +61,24 @@ function HomeRoute({ route }: { readonly route: HomeRouteViewModel }) {
           ))}</ul>
         </section>
       ) : null}
-      <section className="kb-latest-articles">
-        <h2>{route.articleSectionHeading}</h2>
-        <ThemeArticleList articles={route.articles} headingLevel={3} />
-      </section>
+      {hasPresentation ? <>
+        <KnowledgeHomeGroup articles={route.currentArticles} className="kb-home-current" heading="지금 확인할 안내" headingId="kb-home-current-title" />
+        <KnowledgeHomeGroup articles={route.featuredArticles} className="kb-home-featured" heading="먼저 읽을 안내" headingId="kb-home-featured-title" />
+        <KnowledgeHomeGroup articles={route.evergreenArticles} className="kb-home-reference" heading="기본 안내" headingId="kb-home-reference-title" />
+        <KnowledgeHomeGroup articles={route.latestArticles} className="kb-home-latest" heading={route.articleSectionHeading} headingId="kb-home-latest-title" />
+        {route.categoryHighlights?.map(({ category, articles }, index) => (
+          <section aria-labelledby={`kb-home-highlight-${index}`} className="kb-home-category-highlight kb-home-article-group" key={category.href}>
+            <h2 id={`kb-home-highlight-${index}`}><a href={category.href}>{category.label}</a></h2>
+            <p>{category.description}</p>
+            {articles.length > 0 ? <ThemeArticleList articles={articles} headingLevel={3} /> : null}
+          </section>
+        ))}
+      </> : (
+        <section className="kb-latest-articles">
+          <h2>{route.articleSectionHeading}</h2>
+          <ThemeArticleList articles={route.articles} headingLevel={3} />
+        </section>
+      )}
       <ThemeHomeAboutTeaser teaser={route.aboutTeaser} />
     </div>
   );
