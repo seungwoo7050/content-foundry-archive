@@ -13,6 +13,7 @@ import releaseSchema from "../vendor/2.0.0/schemas/release.schema.json" with { t
 import siteSchema from "../vendor/2.0.0/schemas/site.schema.json" with { type: "json" };
 import taxonomySchema from "../vendor/2.0.0/schemas/taxonomy.schema.json" with { type: "json" };
 
+import { resolveSupportedContractVersion } from "./contract-version.js";
 import { ContractError } from "./errors.js";
 import type {
   MediaManifest,
@@ -27,7 +28,7 @@ import type {
   PublishedStructuredContent,
 } from "./index.js";
 
-export const SUPPORTED_CONTRACT_VERSION = "2.0.0" as const;
+export { SUPPORTED_CONTRACT_VERSION } from "./contract-version.js";
 
 interface ContractDocuments {
   article: PublishedArticleProjection;
@@ -101,14 +102,9 @@ export function validateContractDocument<K extends ContractDocumentKind>(
     kind === "release" &&
     typeof value === "object" &&
     value !== null &&
-    "contractVersion" in value &&
-    value.contractVersion !== SUPPORTED_CONTRACT_VERSION
+    "contractVersion" in value
   ) {
-    throw new ContractError(
-      "CONTRACT_UNSUPPORTED",
-      `Unsupported contract version: ${String(value.contractVersion)}`,
-      [{ path: "/contractVersion", message: `expected ${SUPPORTED_CONTRACT_VERSION}` }],
-    );
+    resolveSupportedContractVersion(value.contractVersion);
   }
 
   const validator = validators.get(kind);

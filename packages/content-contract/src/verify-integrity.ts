@@ -8,12 +8,10 @@ import { join, posix, relative, sep } from "node:path";
 
 import canonicalize from "canonicalize";
 
+import { resolveSupportedContractVersion } from "./contract-version.js";
 import { ContractError } from "./errors.js";
 import type { PublicSiteReleaseManifest } from "./generated/release.js";
-import {
-  SUPPORTED_CONTRACT_VERSION,
-  validateContractDocument,
-} from "./validate-document.js";
+import { validateContractDocument } from "./validate-document.js";
 
 const ZERO_CHECKSUM = `sha256:${"0".repeat(64)}`;
 const MANIFEST_LINE = /^([0-9a-f]{64})  ([^\\]+)$/;
@@ -109,12 +107,7 @@ export function verifyReleaseIntegrity(
     ]);
   }
 
-  if (release.contractVersion !== SUPPORTED_CONTRACT_VERSION) {
-    throw new ContractError(
-      "CONTRACT_UNSUPPORTED",
-      `Unsupported contract version: ${String(release.contractVersion)}`,
-    );
-  }
+  resolveSupportedContractVersion(release.contractVersion);
 
   const checksums = readIntegrityFile(root, "checksums.txt");
   const entries = parseChecksums(checksums);
