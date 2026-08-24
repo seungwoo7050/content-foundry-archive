@@ -64,7 +64,7 @@ describe("Minimal Knowledge Base styles", () => {
 
   it("limits the home surface card to the final top-level about section", () => {
     const aboutSelector =
-      ".kb-home-route>section[aria-labelledby]:last-child";
+      '.kb-home-route>section[aria-labelledby="home-about-teaser-heading"]';
 
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(`${aboutSelector}{`);
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(`${aboutSelector} h2{`);
@@ -73,6 +73,27 @@ describe("Minimal Knowledge Base styles", () => {
     );
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).not.toContain(
       ".kb-home-route>section[aria-labelledby]{",
+    );
+  });
+
+  it("gives projected knowledge groups responsive hierarchy without cropping artwork", () => {
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      ".kb-home-current{padding:",
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      ".kb-home-category-highlight{padding-top:",
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      ".kb-home-article-group article>figure img{display:block;width:100%;height:auto;",
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      ".kb-category-grid>ul,.kb-home-article-group>ul,.kb-latest-articles>ul",
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      ".kb-home-current>ul{grid-template-columns:minmax(0,1fr)}",
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      ".kb-home-article-group>ul>li{margin-bottom:1rem;break-inside:avoid}",
     );
   });
 });
