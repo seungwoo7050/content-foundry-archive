@@ -15,6 +15,7 @@ export interface GeneratedResponsiveImageDerivative {
 }
 
 export interface GeneratedResponsiveImageAsset {
+  readonly source: VerifiedImageSource;
   readonly asset: ResponsiveImageAsset;
   readonly derivatives: readonly GeneratedResponsiveImageDerivative[];
 }
@@ -41,7 +42,7 @@ export async function generateResponsiveImageAsset(
         return { asset: derivative, bytes: data };
       }),
     );
-    return { asset, derivatives };
+    return { source, asset, derivatives };
   } catch {
     throw new ContractError(
       "BUILD_FAILED",
