@@ -23,9 +23,14 @@ describe("search index entries", () => {
     expectTypeOf<LoadedReleaseBundleV3["articles"][number]>().toExtend<SearchIndexArticleRecord>();
     expectTypeOf<LoadedReleaseBundleV3["taxonomy"]>().toExtend<SearchIndexTaxonomy>();
 
-    expect(
-      createSearchIndexEntry(bundle.articles[0]!, 0, bundle.taxonomy, "ko-KR"),
-    ).toMatchObject({
+    const entry = createSearchIndexEntry(
+      bundle.articles[0]!,
+      0,
+      bundle.taxonomy,
+      "ko-KR",
+    );
+
+    expect(entry).toMatchObject({
       id: "ART-000123",
       path: "/article/government24-resident-registration-guide",
       updatedAt: "2026-08-20T01:00:00Z",
@@ -40,6 +45,9 @@ describe("search index entries", () => {
         "준비하기",
       ]),
     });
+    expect(Object.keys(entry.category)).toEqual(["id", "slug", "label"]);
+    expect(Object.keys(entry.tags[0]!)).toEqual(["id", "slug", "label"]);
+    expect(Object.keys(entry.headings[0]!)).toEqual(["id", "text"]);
   });
 
   it("fails closed with every unresolved taxonomy reference", () => {

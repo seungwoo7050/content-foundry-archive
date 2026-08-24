@@ -36,6 +36,10 @@ export interface SearchIndexEntry {
   readonly keywords: readonly string[];
 }
 
+function projectTaxon({ id, slug, label }: SearchTaxonRecord): SearchTaxonRecord {
+  return { id, slug, label };
+}
+
 export function createSearchIndexEntry(
   article: SearchIndexArticleRecord,
   articleIndex: number,
@@ -43,8 +47,10 @@ export function createSearchIndexEntry(
   locale: string,
 ): SearchIndexEntry {
   const issues: ContractIssue[] = [];
-  const category = taxonomy.categories.find(({ id }) => id === article.categoryId);
-  if (!category) {
+  const categoryRecord = taxonomy.categories.find(
+    ({ id }) => id === article.categoryId,
+  );
+  if (!categoryRecord) {
     issues.push({
       path: `/articles/${articleIndex}/categoryId`,
       message: `unknown search category: ${article.categoryId}`,
@@ -60,7 +66,7 @@ export function createSearchIndexEntry(
     return [];
   });
 
-  if (!category || issues.length > 0) {
+  if (!categoryRecord || issues.length > 0) {
     throw new ContractError(
       "REFERENCE_INVALID",
       "Search index entry references missing taxonomy",
@@ -68,13 +74,17 @@ export function createSearchIndexEntry(
     );
   }
 
+  const category = projectTaxon(categoryRecord);
+  const projectedTags = tags.map(projectTaxon);
+  const headings = article.toc.map(({ id, text }) => ({ id, text }));
+
   const keywordValues = [
     article.title,
     article.summary,
     category.label,
     category.slug,
-    ...tags.flatMap((tag) => [tag.label, tag.slug]),
-    ...article.toc.map(({ text }) => text),
+    ...projectedTags.flatMap((tag) => [tag.label, tag.slug]),
+    ...headings.map(({ text }) => text),
   ];
 
   return {
@@ -84,8 +94,8 @@ export function createSearchIndexEntry(
     path: article.seo.canonicalPath,
     updatedAt: article.updatedAt,
     category,
-    tags,
-    headings: article.toc,
+    tags: projectedTags,
+    headings,
     keywords: [...new Set(keywordValues.map((value) => normalizeSearchText(value, locale)))].sort(),
   };
 }
