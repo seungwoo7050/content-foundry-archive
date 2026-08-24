@@ -1,5 +1,7 @@
 import type { PublishedContentBlockV3 } from "@content-foundry/content-contract";
 
+import { getSafeSourceHref } from "../lib/safe-source-url";
+
 export type LegacyContentBlockValue = Extract<
   PublishedContentBlockV3,
   {
@@ -25,11 +27,10 @@ const toneLabels = {
   warning: "주의",
 } as const;
 
-function assertExternalHttpUrl(value: string) {
-  const url = new URL(value);
-  if (url.protocol !== "http:" && url.protocol !== "https:") {
-    throw new Error(`Unsafe embed URL protocol: ${url.protocol}`);
-  }
+function safeExternalHttpUrl(value: string) {
+  const href = getSafeSourceHref(value);
+  if (!href) throw new Error("Unsafe embed URL");
+  return href;
 }
 
 export function LegacyContentBlock({ block }: LegacyContentBlockProps) {
@@ -91,15 +92,16 @@ export function LegacyContentBlock({ block }: LegacyContentBlockProps) {
           </table>
         </div>
       );
-    case "embed":
-      assertExternalHttpUrl(block.url);
+    case "embed": {
+      const href = safeExternalHttpUrl(block.url);
       return (
         <p className="content-embed">
-          <a href={block.url} rel="noreferrer noopener" target="_blank">
+          <a href={href} rel="noreferrer noopener" target="_blank">
             {block.provider}에서 원본 보기 (새 창)
           </a>
         </p>
       );
+    }
     default: {
       const unhandled: never = block;
       throw new Error(`Unhandled legacy content block: ${String(unhandled)}`);

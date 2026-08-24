@@ -75,13 +75,19 @@ describe("ContentBlocks", () => {
   });
 
   it("rejects unsafe embeds and unsupported images", () => {
-    expect(() =>
-      renderToStaticMarkup(
-        createElement(ContentBlocks, {
-          blocks: [{ type: "embed", provider: "unsafe", url: "javascript:alert(1)" }],
-        }),
-      ),
-    ).toThrow("Unsafe embed URL protocol");
+    for (const url of [
+      "javascript:alert(1)",
+      "https://reader:secret@example.com/video",
+      "not a URL",
+    ]) {
+      expect(() =>
+        renderToStaticMarkup(
+          createElement(ContentBlocks, {
+            blocks: [{ type: "embed", provider: "unsafe", url }],
+          }),
+        ),
+      ).toThrow("Unsafe embed URL");
+    }
 
     expect(() =>
       renderToStaticMarkup(
