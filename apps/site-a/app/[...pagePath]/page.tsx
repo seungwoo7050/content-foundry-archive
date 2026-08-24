@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { RetiredRoute } from "../../components/retired-route";
 import { VersionedContentBlocks } from "../../components/versioned-content-blocks";
 import { findGoneRoute } from "../../lib/gone-route";
 import type { VersionedSiteReleaseContext } from "../../lib/load-site-release";
@@ -12,6 +11,9 @@ import {
 } from "../../lib/page-route";
 import { createRetiredRouteMetadata } from "../../lib/retired-route-metadata";
 import { getVersionedSiteReleaseContext } from "../../lib/site-release";
+import { createStaticPageThemeViewModel } from "../../lib/static-page-theme-view-model";
+import { createRetiredThemeViewModel } from "../../lib/status-theme-view-model";
+import { renderThemePage } from "../../lib/theme-page";
 
 export const dynamicParams = false;
 
@@ -74,23 +76,20 @@ export default async function StaticPage({ params }: StaticPageProps) {
   if (!page) {
     const retiredRoute = findGoneRoute(bundle, `/${pagePath.join("/")}`);
     if (retiredRoute) {
-      return (
-        <RetiredRoute
-          path={retiredRoute.path}
-          replacementPath={retiredRoute.replacementPath}
-        />
+      return renderThemePage(
+        bundle,
+        createRetiredThemeViewModel(bundle, retiredRoute),
       );
     }
     notFound();
   }
 
-  return (
-    <article className="static-page">
-      <header>
-        <h1>{page.title}</h1>
-        <p>{page.summary}</p>
-      </header>
-      <div className="page-content">{renderPageContent(context, pagePath)}</div>
-    </article>
+  return renderThemePage(
+    bundle,
+    createStaticPageThemeViewModel(
+      context,
+      page,
+      renderPageContent(context, pagePath),
+    ),
   );
 }
