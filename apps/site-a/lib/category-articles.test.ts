@@ -6,7 +6,7 @@ import {
 } from "@content-foundry/content-contract";
 import { describe, expect, it } from "vitest";
 
-import { getCategoryArticles } from "./category-articles";
+import { getCategoryArticles, getCategoryTags } from "./category-articles";
 
 const fixture = resolve(
   process.cwd(),
@@ -55,5 +55,38 @@ describe("category article selection", () => {
     ]);
     expect(selectionBundle.articles).toEqual(originalOrder);
     expect(selected).not.toBe(selectionBundle.articles);
+  });
+
+  it("projects referenced tags in taxonomy order without duplicates", () => {
+    const existingTag = bundle.taxonomy.tags[0];
+    if (!existingTag) {
+      throw new Error("Site A fixture tag is missing");
+    }
+    const tags = [
+      existingTag,
+      { ...existingTag, id: "digital", slug: "digital" },
+      { ...existingTag, id: "unused", slug: "unused" },
+    ];
+    const articles = [
+      {
+        ...getFixtureArticle(),
+        id: "ART-000201",
+        tagIds: ["digital", existingTag.id],
+      },
+      {
+        ...getFixtureArticle(),
+        id: "ART-000202",
+        tagIds: [existingTag.id],
+      },
+    ];
+    const selectionBundle = {
+      ...bundle,
+      taxonomy: { ...bundle.taxonomy, tags },
+    };
+
+    expect(getCategoryTags(selectionBundle, articles).map(({ id }) => id)).toEqual([
+      existingTag.id,
+      "digital",
+    ]);
   });
 });

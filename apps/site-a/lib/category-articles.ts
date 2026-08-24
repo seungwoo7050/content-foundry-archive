@@ -29,3 +29,11 @@ export function getCategoryArticles(
     .filter((article) => article.categoryId === categoryId)
     .sort(compareByRecentUpdate);
 }
+
+export function getCategoryTags(
+  bundle: LoadedReleaseBundle,
+  articles: readonly PublishedArticleProjection[],
+) {
+  const tagIds = new Set(articles.flatMap((article) => article.tagIds));
+  return bundle.taxonomy.tags.filter((tag) => tagIds.has(tag.id));
+}
