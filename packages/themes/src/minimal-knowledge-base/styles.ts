@@ -23,6 +23,7 @@ export const MINIMAL_KNOWLEDGE_BASE_STYLES = `
 .kb-rail-header>a{width:fit-content;color:var(--color-text);font-size:1.25rem;font-weight:850;letter-spacing:-.035em;text-decoration:none}
 .kb-rail-header>a:before{display:inline-block;width:.62rem;height:.62rem;margin-right:.55rem;background:var(--color-primary);border-radius:.14rem;content:""}
 .kb-rail-header p{max-width:34rem;margin:.2rem 0 .85rem;color:var(--color-text-muted);font-size:.88rem;line-height:1.55;word-break:keep-all}
+.kb-rail-search{display:flex;align-items:center;justify-content:center;min-height:44px;margin:.15rem 0 .55rem;padding:.55rem .8rem;color:var(--color-on-primary)!important;background:var(--color-primary);border:1px solid var(--color-primary);border-radius:.55rem;font-weight:750;text-decoration:none}
 .kb-knowledge-rail nav>ul{display:flex;gap:.4rem;margin:0;padding:.15rem .15rem .45rem;overflow-x:auto;list-style:none;scrollbar-width:thin}
 .kb-knowledge-rail ul ul{display:none}
 .kb-knowledge-rail nav a{display:flex;align-items:center;min-height:44px;padding:.55rem .8rem;color:var(--color-text);white-space:nowrap;text-decoration:none;border:1px solid var(--color-border);border-radius:.55rem;background:var(--color-surface)}

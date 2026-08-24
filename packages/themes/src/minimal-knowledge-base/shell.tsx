@@ -52,6 +52,11 @@ export function MinimalKnowledgeBaseShell({
           <a href={shell.brand.href}>{shell.brand.label}</a>
           <p>{shell.description}</p>
         </header>
+        {shell.searchLink ? (
+          <a className="kb-rail-search" href={shell.searchLink.href}>
+            {shell.searchLink.label}
+          </a>
+        ) : null}
         <ThemeNavigation
           ariaLabel={shell.brand.label}
           currentPath={routePath}

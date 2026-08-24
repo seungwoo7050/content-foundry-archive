@@ -51,6 +51,9 @@ describe("Minimal Knowledge Base styles", () => {
       ".kb-answer-first>p.kb-article-duration{",
     );
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      ".kb-rail-search{display:flex;align-items:center;justify-content:center;min-height:44px;",
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
       "@media(prefers-reduced-motion:reduce)",
     );
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain("@media print");

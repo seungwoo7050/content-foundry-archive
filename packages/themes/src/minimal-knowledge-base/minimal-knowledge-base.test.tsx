@@ -133,6 +133,29 @@ describe("Minimal Knowledge Base", () => {
     );
   });
 
+  it("renders only a release-provided knowledge rail search entry", () => {
+    const renderShell = (shellModel: SiteShellViewModel) =>
+      renderToStaticMarkup(minimalKnowledgeBaseTheme.renderRoute(
+        { shell: shellModel, route: routeAt(3) },
+        { skinId: "calm-blue", colors: SKIN_TOKENS["calm-blue"] },
+      ));
+    const rail = (html: string) => html.match(
+      /<aside class="kb-knowledge-rail">[\s\S]*?<\/aside>/,
+    )?.[0];
+    const withSearch = rail(renderShell({
+      ...shell,
+      searchLink: { href: "/search", label: "사이트 검색" },
+    }));
+
+    expect(withSearch).toContain(
+      '<a class="kb-rail-search" href="/search">사이트 검색</a>',
+    );
+    expect(rail(renderShell(shell))).not.toContain("kb-rail-search");
+    expect(rail(renderShell({ ...shell, searchLink: null }))).not.toContain(
+      "kb-rail-search",
+    );
+  });
+
   it("keeps home and category knowledge sections in their intended order", () => {
     const home = render(routeAt(0));
     expect(home.indexOf("kb-home-search")).toBeLessThan(home.indexOf("kb-category-grid"));
