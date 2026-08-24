@@ -37,7 +37,11 @@ describe("home theme view model", () => {
       breadcrumbs: [{ href: "/", label: "생활메모" }],
       articleSectionHeading: "최근 안내",
       categories: [
-        { href: "/category/daily-admin", label: "생활·행정" },
+        {
+          href: "/category/daily-admin",
+          label: "생활·행정",
+          description: "생활과 행정 절차 안내",
+        },
       ],
       searchLink: { href: "/search", label: "사이트 검색" },
     });

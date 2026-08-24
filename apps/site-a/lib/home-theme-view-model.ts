@@ -10,11 +10,23 @@ interface HomeThemeArticleRecord extends ThemeArticleListRecord {
   readonly id: string;
 }
 
-export interface HomeThemeSource extends ThemeArticleListSource {
+interface HomeThemeTaxonRecord {
+  readonly id: string;
+  readonly slug: string;
+  readonly label: string;
+}
+
+export interface HomeThemeSource {
   readonly site: ThemeArticleListSource["site"] & {
     readonly name: string;
     readonly description: string;
     readonly search: { readonly enabled: boolean };
+  };
+  readonly taxonomy: {
+    readonly categories: readonly (HomeThemeTaxonRecord & {
+      readonly description: string;
+    })[];
+    readonly tags: readonly HomeThemeTaxonRecord[];
   };
   readonly articles: readonly HomeThemeArticleRecord[];
 }
@@ -43,9 +55,10 @@ export function createHomeThemeViewModel(
     articles: [...bundle.articles]
       .sort(compareRecentArticles)
       .map((article) => createThemeArticleListItem(bundle, article)),
-    categories: bundle.taxonomy.categories.map(({ slug, label }) => ({
+    categories: bundle.taxonomy.categories.map(({ slug, label, description }) => ({
       href: `/category/${slug}`,
       label,
+      description,
     })),
     searchLink: bundle.site.search.enabled
       ? { href: "/search", label: "사이트 검색" }
