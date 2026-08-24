@@ -3,6 +3,7 @@ import type { ResponsiveImageAsset } from "@content-foundry/media";
 import type { ResponsiveImageAssetRegistry } from "./responsive-image-asset-registry";
 
 export interface BrandPresentationSource {
+  readonly release: { readonly contractVersion: string };
   readonly presentation?: {
     readonly brand: {
       readonly logoMediaId: string | null;

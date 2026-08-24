@@ -1,4 +1,8 @@
-import type { LoadedReleaseBundleV4 } from "@content-foundry/content-contract";
+import type {
+  LoadedReleaseBundle,
+  LoadedReleaseBundleV3,
+  LoadedReleaseBundleV4,
+} from "@content-foundry/content-contract";
 import {
   projectResponsiveImageAsset,
   type ResponsiveImageAsset,
@@ -33,30 +37,43 @@ const asset: ResponsiveImageAsset = projectResponsiveImageAsset({
 
 describe("brand media assets", () => {
   it("accepts every supported release without inventing legacy slots", () => {
+    expectTypeOf<LoadedReleaseBundle>().toExtend<BrandPresentationSource>();
+    expectTypeOf<LoadedReleaseBundleV3>().toExtend<BrandPresentationSource>();
     expectTypeOf<LoadedReleaseBundleV4>().toExtend<BrandPresentationSource>();
-    expect(resolveBrandMediaAssets({}, new Map())).toEqual({
-      logo: null,
-      favicon: null,
-      socialImage: null,
-    });
+    expect(
+      resolveBrandMediaAssets(
+        { release: { contractVersion: "2.0.0" } },
+        new Map(),
+      ),
+    ).toEqual({ logo: null, favicon: null, socialImage: null });
   });
 
   it("resolves only explicit v4 brand references", () => {
-    const resolved = resolveBrandMediaAssets({ presentation: { brand: {
-      logoMediaId: null,
-      faviconMediaId: mediaId,
-      socialImageMediaId: mediaId,
-    } } }, new Map([[mediaId, asset]]));
+    const resolved = resolveBrandMediaAssets({
+      release: { contractVersion: "4.0.0" },
+      presentation: {
+        brand: {
+          logoMediaId: null,
+          faviconMediaId: mediaId,
+          socialImageMediaId: mediaId,
+        },
+      },
+    }, new Map([[mediaId, asset]]));
 
     expect(resolved).toEqual({ logo: null, favicon: asset, socialImage: asset });
   });
 
   it("fails closed when a prepared brand asset is absent", () => {
-    expect(() => resolveBrandMediaAssets({ presentation: { brand: {
-      logoMediaId: mediaId,
-      faviconMediaId: null,
-      socialImageMediaId: null,
-    } } }, new Map())).toThrow(
+    expect(() => resolveBrandMediaAssets({
+      release: { contractVersion: "4.0.0" },
+      presentation: {
+        brand: {
+          logoMediaId: mediaId,
+          faviconMediaId: null,
+          socialImageMediaId: null,
+        },
+      },
+    }, new Map())).toThrow(
       "Prepared logo brand asset is missing: MED-BRAND",
     );
   });
