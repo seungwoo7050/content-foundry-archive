@@ -1,7 +1,7 @@
-import { getSiteReleaseContext } from "../lib/site-release";
+import { getVersionedSiteReleaseContext } from "../lib/site-release";
 
 export default function HomePage() {
-  const { bundle } = getSiteReleaseContext();
+  const { bundle } = getVersionedSiteReleaseContext();
   const dateFormatter = new Intl.DateTimeFormat(bundle.site.locale, {
     dateStyle: "long",
     timeZone: bundle.site.timeZone,
