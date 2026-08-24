@@ -88,4 +88,53 @@ describe("Friendly Mobile Utility route matrix", () => {
       }
     });
   }
+
+  it("places only declared slots on their matching eligible routes", () => {
+    const adSlots = {
+      "home-feed": <aside data-test-slot="home-feed">홈 슬롯</aside>,
+      "article-after-summary": <aside data-test-slot="article-after-summary">요약 뒤 슬롯</aside>,
+      "article-end": <aside data-test-slot="article-end">글 끝 슬롯</aside>,
+      "desktop-sidebar": <aside data-test-slot="desktop-sidebar">미지원 슬롯</aside>,
+    } as const;
+    const render = (route: HtmlRouteViewModel) => renderToStaticMarkup(
+      friendlyMobileUtilityTheme.renderRoute(
+        { shell, route },
+        { skinId: "calm-blue", colors: SKIN_TOKENS["calm-blue"], adSlots },
+      ),
+    );
+    const home = routes.find((route) => route.kind === "home");
+    const eligibleArticle = routes.find((route) => route.kind === "article");
+
+    if (!home || !eligibleArticle || eligibleArticle.kind !== "article") {
+      throw new Error("Friendly route fixtures are incomplete.");
+    }
+
+    const homeHtml = render(home);
+    expect(homeHtml).toContain('data-test-slot="home-feed"');
+    expect(homeHtml.indexOf('href="/article/guide"')).toBeLessThan(
+      homeHtml.indexOf('data-test-slot="home-feed"'),
+    );
+    expect(homeHtml).not.toMatch(/data-test-slot="article-|data-test-slot="desktop-sidebar/);
+
+    const articleHtml = render(eligibleArticle);
+    expect(articleHtml).not.toContain('data-test-slot="home-feed"');
+    expect(articleHtml).not.toContain('data-test-slot="desktop-sidebar"');
+    expect(articleHtml.indexOf("이 글에서 확인할 내용")).toBeLessThan(
+      articleHtml.indexOf('data-test-slot="article-after-summary"'),
+    );
+    expect(articleHtml.indexOf('data-test-slot="article-after-summary"')).toBeLessThan(
+      articleHtml.indexOf("안내 정보"),
+    );
+    expect(articleHtml.indexOf("관련 안내")).toBeLessThan(
+      articleHtml.indexOf('data-test-slot="article-end"'),
+    );
+
+    const ineligibleArticle = { ...eligibleArticle, advertisingEligible: false };
+    expect(render(ineligibleArticle)).not.toContain("data-test-slot");
+    for (const route of routes) {
+      if (route.kind !== "home" && route.kind !== "article") {
+        expect(render(route)).not.toContain("data-test-slot");
+      }
+    }
+  });
 });

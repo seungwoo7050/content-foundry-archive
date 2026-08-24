@@ -1,4 +1,8 @@
 import type { ArticleRouteViewModel } from "../content-route-view-model.js";
+import {
+  getThemeAdSlot,
+  type ThemeAdSlotContext,
+} from "../theme-ad-slot.js";
 import { ThemeArticleList } from "../theme-links.js";
 import { FriendlyRouteIntro } from "./shell.js";
 
@@ -44,7 +48,13 @@ function ArticleEvidence({ route }: { readonly route: ArticleRouteViewModel }) {
   );
 }
 
-export function FriendlyArticle({ route }: { readonly route: ArticleRouteViewModel }) {
+export function FriendlyArticle({
+  context = {},
+  route,
+}: {
+  readonly context?: ThemeAdSlotContext;
+  readonly route: ArticleRouteViewModel;
+}) {
   return (
     <article className="fmu-stack">
       <FriendlyRouteIntro route={route} showDescription={false} />
@@ -54,6 +64,9 @@ export function FriendlyArticle({ route }: { readonly route: ArticleRouteViewMod
         <h2 id="fmu-summary">이 글에서 확인할 내용</h2>
         <p>{route.description}</p>
       </section>
+      {route.advertisingEligible
+        ? getThemeAdSlot(context, "article-after-summary")
+        : null}
       <ArticleTrust route={route} />
       {route.toc.length > 0 ? (
         <nav aria-labelledby="fmu-toc" className="fmu-panel">
@@ -69,6 +82,9 @@ export function FriendlyArticle({ route }: { readonly route: ArticleRouteViewMod
           <ThemeArticleList articles={route.relatedArticles} headingLevel={3} />
         </section>
       ) : null}
+      {route.advertisingEligible
+        ? getThemeAdSlot(context, "article-end")
+        : null}
     </article>
   );
 }

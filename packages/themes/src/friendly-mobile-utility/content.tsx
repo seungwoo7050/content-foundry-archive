@@ -1,12 +1,17 @@
 import type { ReactNode } from "react";
 
 import type { ContentRouteViewModel } from "../content-route-view-model.js";
+import {
+  getThemeAdSlot,
+  type ThemeAdSlotContext,
+} from "../theme-ad-slot.js";
 import { ThemeArticleList } from "../theme-links.js";
 import { FriendlyArticle } from "./article.js";
 import { FriendlyRouteIntro } from "./shell.js";
 
 export function renderFriendlyContentRoute(
   route: ContentRouteViewModel,
+  context: ThemeAdSlotContext = {},
 ): ReactNode {
   switch (route.kind) {
     case "home":
@@ -32,6 +37,7 @@ export function renderFriendlyContentRoute(
           <section aria-labelledby="fmu-home-latest" className="fmu-list">
             <h2 id="fmu-home-latest">{route.articleSectionHeading}</h2>
             <ThemeArticleList articles={route.articles} headingLevel={3} />
+            {getThemeAdSlot(context, "home-feed")}
           </section>
         </div>
       );
@@ -52,7 +58,7 @@ export function renderFriendlyContentRoute(
         </div>
       );
     case "article":
-      return <FriendlyArticle route={route} />;
+      return <FriendlyArticle context={context} route={route} />;
     case "static-page":
       return <article className="fmu-stack"><FriendlyRouteIntro route={route} /><div className="fmu-panel fmu-body">{route.body}</div></article>;
     case "archive":

@@ -10,14 +10,17 @@ import { renderFriendlyContentRoute } from "./content.js";
 import { FriendlyMobileShell } from "./shell.js";
 import { renderFriendlyStateRoute } from "./state.js";
 
-function renderRouteContent(model: ThemePageViewModel): ReactNode {
+function renderRouteContent(
+  model: ThemePageViewModel,
+  context: ThemeRenderContext,
+): ReactNode {
   switch (model.route.kind) {
     case "home":
     case "category":
     case "article":
     case "static-page":
     case "archive":
-      return renderFriendlyContentRoute(model.route);
+      return renderFriendlyContentRoute(model.route, context);
     case "search":
     case "not-found":
     case "retired":
@@ -39,7 +42,7 @@ function renderRoute(
       routeKind={model.route.kind}
       shell={model.shell}
     >
-      {renderRouteContent(model)}
+      {renderRouteContent(model, context)}
     </FriendlyMobileShell>
   );
 }
