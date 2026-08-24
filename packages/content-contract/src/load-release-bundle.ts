@@ -24,6 +24,10 @@ import {
   type LoadedReleaseBundleV4,
   validateV4PresentationStructure,
 } from "./validate-v4-presentation-structure.js";
+import {
+  type V4ReleaseConsumerContext,
+  validateV4ReleaseConsumerContext,
+} from "./validate-v4-release-consumer-context.js";
 
 export type LoadedReleaseBundle = ReleaseBundleDocuments;
 
@@ -43,6 +47,9 @@ export interface LoadSupportedReleaseBundleOptions
   readonly resolveV3ConsumerContext: (
     bundle: LoadedReleaseBundleV3,
   ) => V3ReleaseConsumerContext;
+  readonly resolveV4ConsumerContext: (
+    bundle: LoadedReleaseBundleV4,
+  ) => V4ReleaseConsumerContext;
 }
 
 export type LoadedSupportedReleaseBundle =
@@ -177,7 +184,11 @@ export function loadSupportedReleaseBundle(
   root: string,
   options: LoadSupportedReleaseBundleOptions,
 ): LoadedSupportedReleaseBundle {
-  const { resolveV3ConsumerContext, ...identityOptions } = options;
+  const {
+    resolveV3ConsumerContext,
+    resolveV4ConsumerContext,
+    ...identityOptions
+  } = options;
   const bundle = readSupportedReleaseBundleDocuments(root);
   const version = bundle.release.contractVersion;
   if (version === "2.0.0") {
@@ -195,6 +206,16 @@ export function loadSupportedReleaseBundle(
       validated,
       resolveV3ConsumerContext(validated),
     ) as unknown as LoadedSupportedReleaseBundle;
+  }
+  if (version === "4.0.0") {
+    const validated = validateV4ReleaseBundle(
+      bundle as LoadedReleaseBundleV4,
+      identityOptions,
+    );
+    return validateV4ReleaseConsumerContext(
+      validated,
+      resolveV4ConsumerContext(validated),
+    ) as LoadedSupportedReleaseBundle;
   }
 
   const unhandledVersion: never = version;

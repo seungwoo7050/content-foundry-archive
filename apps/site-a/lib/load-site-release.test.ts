@@ -18,10 +18,13 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import {
   bindValidatedSiteReleaseV3,
+  bindValidatedSiteReleaseV4,
   loadSiteRelease,
   loadSiteReleaseV3,
+  loadSiteReleaseV4,
   loadValidatedSiteRelease,
   loadValidatedSiteReleaseV3,
+  loadValidatedSiteReleaseV4,
 } from "./load-site-release";
 
 const fixture = resolve(
@@ -32,11 +35,15 @@ const v3Fixture = resolve(
   process.cwd(),
   "../../packages/content-contract/vendor/3.0.0/fixtures/bundles/valid/site-a-minimal",
 );
+const v4Fixture = resolve(
+  process.cwd(),
+  "../../packages/content-contract/vendor/4.0.0/fixtures/bundles/valid/site-a-minimal",
+);
 const temporaryRoots: string[] = [];
 
-function mediaAssets(): ResponsiveImageAsset[] {
+function mediaAssets(releaseDirectory = v3Fixture): ResponsiveImageAsset[] {
   const manifest = JSON.parse(
-    readFileSync(join(v3Fixture, "media/media-manifest.json"), "utf8"),
+    readFileSync(join(releaseDirectory, "media/media-manifest.json"), "utf8"),
   ) as MediaManifestV3;
   return manifest.items.map((media, index) =>
     projectResponsiveImageAsset(
@@ -93,6 +100,44 @@ describe("loadSiteRelease", () => {
     expect([...context.mediaAssets.keys()]).toEqual(["MED-000045", "MED-000046"]);
     expect([...context.nicheComponents.get("site-a")!.keys()]).toEqual([]);
     expect(context.canonicalOrigin).toBe("https://example.com");
+  });
+
+  it("assembles an exact v4 context with the validated presentation", () => {
+    const config = templateConfig(v4Fixture);
+    const validated = loadValidatedSiteReleaseV4(config);
+    const versioned = loadValidatedSiteRelease(config);
+    const bound = bindValidatedSiteReleaseV4(validated, mediaAssets(v4Fixture));
+    const context = loadSiteReleaseV4(config, {
+      mediaAssets: mediaAssets(v4Fixture),
+    });
+
+    expect(versioned).toEqual(validated);
+    expect(bound).toEqual(context);
+    expect(context.contractVersion).toBe("4.0.0");
+    expect(context.bundle.release.releaseId).toBe("REL-2026-000044");
+    expect(context.bundle.presentation.home.featuredArticleIds).toEqual([
+      "ART-000123",
+    ]);
+    expect(context.bundle.presentation.brand.faviconMediaId).toBeNull();
+    expect([...context.mediaAssets.keys()]).toEqual(["MED-000045", "MED-000046"]);
+  });
+
+  it("rejects a v4 template when site-wide noindex is disabled", () => {
+    expect(() =>
+      loadValidatedSiteReleaseV4({
+        ...templateConfig(v4Fixture),
+        noindex: false,
+      }),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "CONTRACT_INVALID",
+        issues: [
+          expect.objectContaining({
+            path: "/validationContext/siteWideNoindex",
+          }),
+        ],
+      }),
+    );
   });
 
   it("verifies integrity after selecting a supported declaration", () => {

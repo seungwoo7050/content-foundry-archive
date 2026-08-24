@@ -365,7 +365,8 @@ export function readSupportedReleaseBundleDocuments(
 ): SupportedReleaseBundleDocuments {
   const release = verifySupportedReleaseIntegrity(root) as
     | PublicSiteReleaseManifest
-    | ContractDocumentV3<"release">;
+    | ContractDocumentV3<"release">
+    | ContractDocumentV4<"release">;
   if (release.contractVersion === "2.0.0") {
     return assembleReleaseBundleDocumentsV2(
       root,
@@ -375,6 +376,12 @@ export function readSupportedReleaseBundleDocuments(
   if (release.contractVersion === "3.0.0") {
     // The runtime support gate above opens this branch only when the tuple does.
     return assembleReleaseBundleDocumentsV3(
+      root,
+      release,
+    ) as unknown as SupportedReleaseBundleDocuments;
+  }
+  if (release.contractVersion === "4.0.0") {
+    return assembleReleaseBundleDocumentsV4(
       root,
       release,
     ) as unknown as SupportedReleaseBundleDocuments;

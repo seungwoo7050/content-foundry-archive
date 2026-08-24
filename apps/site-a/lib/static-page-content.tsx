@@ -6,9 +6,9 @@ export function renderStaticPageContent(
   context: PreparedVersionedSiteReleaseContext,
   pagePath: readonly string[],
 ) {
-  if (context.contractVersion === "3.0.0") {
+  if (context.contractVersion !== "2.0.0") {
     const page = findPageByPathSegments(context.bundle, pagePath);
-    if (!page) throw new Error("Missing prepared v3 static page");
+    if (!page) throw new Error("Missing prepared structured static page");
     return (
       <VersionedContentBlocks
         blocks={page.content}
@@ -17,7 +17,7 @@ export function renderStaticPageContent(
           nicheComponents: context.nicheComponents,
           siteId: context.bundle.release.siteId,
         }}
-        contractVersion="3.0.0"
+        contractVersion={context.contractVersion}
       />
     );
   }

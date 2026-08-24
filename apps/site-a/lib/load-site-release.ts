@@ -1,6 +1,7 @@
 import type {
   LoadedReleaseBundle,
   LoadedReleaseBundleV3,
+  LoadedReleaseBundleV4,
 } from "@content-foundry/content-contract";
 import {
   loadSupportedReleaseBundle,
@@ -42,6 +43,18 @@ export interface SiteReleaseContextV3 extends ValidatedSiteReleaseV3 {
   readonly mediaAssets: ResponsiveImageAssetRegistry;
 }
 
+export interface ValidatedSiteReleaseV4 {
+  readonly contractVersion: "4.0.0";
+  readonly config: BuildTargetConfig;
+  readonly bundle: LoadedReleaseBundleV4;
+  readonly canonicalOrigin: string;
+  readonly nicheComponents: NicheComponentRegistry;
+}
+
+export interface SiteReleaseContextV4 extends ValidatedSiteReleaseV4 {
+  readonly mediaAssets: ResponsiveImageAssetRegistry;
+}
+
 export interface PreparedSiteReleaseContextV2 extends SiteReleaseContext {
   readonly mediaAssets: ResponsiveImageAssetRegistry;
 }
@@ -49,6 +62,7 @@ export interface PreparedSiteReleaseContextV2 extends SiteReleaseContext {
 export interface SiteReleaseContextByVersion {
   readonly "2.0.0": SiteReleaseContext;
   readonly "3.0.0": SiteReleaseContextV3;
+  readonly "4.0.0": SiteReleaseContextV4;
 }
 
 export type VersionedSiteReleaseContext =
@@ -57,6 +71,7 @@ export type VersionedSiteReleaseContext =
 export interface PreparedSiteReleaseContextByVersion {
   readonly "2.0.0": PreparedSiteReleaseContextV2;
   readonly "3.0.0": SiteReleaseContextV3;
+  readonly "4.0.0": SiteReleaseContextV4;
 }
 
 export type PreparedVersionedSiteReleaseContext =
@@ -64,11 +79,14 @@ export type PreparedVersionedSiteReleaseContext =
 
 export type ValidatedVersionedSiteRelease =
   | SiteReleaseContext
-  | ValidatedSiteReleaseV3;
+  | ValidatedSiteReleaseV3
+  | ValidatedSiteReleaseV4;
 
 export interface LoadSiteReleaseV3Options {
   readonly mediaAssets: Iterable<ResponsiveImageAsset>;
 }
+
+export type LoadSiteReleaseV4Options = LoadSiteReleaseV3Options;
 
 function validateCanonicalOrigin(config: BuildTargetConfig, origin: string) {
   const canonicalUrl = new URL(origin);
@@ -106,6 +124,17 @@ export function loadValidatedSiteRelease(
         nicheComponentRegistry: projectNicheComponentIds(nicheComponents),
       };
     },
+    resolveV4ConsumerContext: (candidate) => {
+      validateSiteRouteGraph(candidate);
+      return {
+        generatedRoutes: getGeneratedRoutes(candidate),
+        nicheComponentRegistry: projectNicheComponentIds(nicheComponents),
+        presentationReadiness: {
+          releaseMode: config.mode,
+          siteWideNoindex: config.noindex,
+        },
+      };
+    },
   });
 
   if (bundle.release.contractVersion === "2.0.0") {
@@ -118,10 +147,19 @@ export function loadValidatedSiteRelease(
     };
   }
 
+  if (bundle.release.contractVersion === "3.0.0") {
+    return {
+      contractVersion: "3.0.0",
+      config,
+      bundle: bundle as LoadedReleaseBundleV3,
+      canonicalOrigin: validateCanonicalOrigin(config, bundle.site.origin),
+      nicheComponents,
+    };
+  }
   return {
-    contractVersion: "3.0.0",
+    contractVersion: "4.0.0",
     config,
-    bundle: bundle as LoadedReleaseBundleV3,
+    bundle: bundle as LoadedReleaseBundleV4,
     canonicalOrigin: validateCanonicalOrigin(config, bundle.site.origin),
     nicheComponents,
   };
@@ -143,10 +181,35 @@ export function loadSiteReleaseV3(
   return bindValidatedSiteReleaseV3(validated, options.mediaAssets);
 }
 
+export function loadValidatedSiteReleaseV4(
+  config: BuildTargetConfig,
+): ValidatedSiteReleaseV4 {
+  const context = loadValidatedSiteRelease(config);
+  if (context.contractVersion === "4.0.0") return context;
+  throw new BuildTargetConfigError("Expected a contract 4.0.0 site release");
+}
+
+export function loadSiteReleaseV4(
+  config: BuildTargetConfig,
+  options: LoadSiteReleaseV4Options,
+): SiteReleaseContextV4 {
+  return bindValidatedSiteReleaseV4(
+    loadValidatedSiteReleaseV4(config),
+    options.mediaAssets,
+  );
+}
+
 export function bindValidatedSiteReleaseV3(
   validated: ValidatedSiteReleaseV3,
   mediaAssets: Iterable<ResponsiveImageAsset>,
 ): SiteReleaseContextV3 {
+  return bindValidatedSiteRelease(validated, mediaAssets);
+}
+
+export function bindValidatedSiteReleaseV4(
+  validated: ValidatedSiteReleaseV4,
+  mediaAssets: Iterable<ResponsiveImageAsset>,
+): SiteReleaseContextV4 {
   return bindValidatedSiteRelease(validated, mediaAssets);
 }
 

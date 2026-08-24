@@ -77,7 +77,7 @@ function createArticleSlots(
   context: PreparedVersionedSiteReleaseContext,
   slug: string,
 ) {
-  if (context.contractVersion === "3.0.0") {
+  if (context.contractVersion !== "2.0.0") {
     const article = findArticleBySlug(context.bundle, slug);
     if (!article) notFound();
     return {
@@ -90,7 +90,7 @@ function createArticleSlots(
           nicheComponents: context.nicheComponents,
           siteId: context.bundle.release.siteId,
         }}
-        contractVersion="3.0.0"
+        contractVersion={context.contractVersion}
       />,
     };
   }

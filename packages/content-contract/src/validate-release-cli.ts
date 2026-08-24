@@ -46,6 +46,11 @@ export function validateReleaseFromEnvironment(
           path.resolve(baseDirectory, contextFile),
         );
       },
+      resolveV4ConsumerContext: () => {
+        throw new ReleaseValidationUsageError(
+          "Contract 4.0.0 requires a Public Sites release-mode consumer context",
+        );
+      },
     },
   );
 

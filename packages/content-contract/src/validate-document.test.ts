@@ -192,7 +192,7 @@ describe("contract document validation", () => {
   it("rejects an unsupported explicit version before schema validation", () => {
     expect(() =>
       validateContractDocument(
-        "4.0.0" as "2.0.0",
+        "5.0.0" as "2.0.0",
         "release",
         readFixture("invalid/release-unsupported-version.json"),
       ),

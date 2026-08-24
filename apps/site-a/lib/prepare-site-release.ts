@@ -16,7 +16,7 @@ export interface PrepareSiteReleaseOptions extends SiteBuildArtifactPaths {
 export async function prepareSiteRelease(
   config: BuildTargetConfig,
   options: PrepareSiteReleaseOptions,
-): Promise<"2.0.0" | "3.0.0"> {
+): Promise<"2.0.0" | "3.0.0" | "4.0.0"> {
   const context = loadValidatedSiteRelease(config);
   resolveSiteLaunchConfig(context, options.environment ?? {});
   const immutableObjectDirectory = options.immutableObjectDirectory?.trim();
