@@ -1,9 +1,16 @@
-import type { PublishedArticleProjection } from "@content-foundry/content-contract";
+import {
+  getArticleCardDate,
+  type ArticleCardDateSource,
+} from "../lib/article-card-date";
 
-import { getArticleCardDate } from "../lib/article-card-date";
+export interface ArticleCardSource extends ArticleCardDateSource {
+  readonly summary: string;
+  readonly title: string;
+  readonly seo: { readonly canonicalPath: string };
+}
 
 interface ArticleCardProps {
-  readonly article: PublishedArticleProjection;
+  readonly article: ArticleCardSource;
   readonly locale: string;
   readonly timeZone: string;
 }

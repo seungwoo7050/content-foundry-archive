@@ -1,11 +1,14 @@
 import { resolve } from "node:path";
 
-import { loadReleaseBundle } from "@content-foundry/content-contract";
+import {
+  loadReleaseBundle,
+  type LoadedReleaseBundleV3,
+} from "@content-foundry/content-contract";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { ArticleCard } from "./article-card";
+import { ArticleCard, type ArticleCardSource } from "./article-card";
 
 const fixture = resolve(
   process.cwd(),
@@ -14,6 +17,12 @@ const fixture = resolve(
 const bundle = loadReleaseBundle(fixture);
 
 describe("ArticleCard", () => {
+  it("accepts the v3 article card structure", () => {
+    expectTypeOf<
+      LoadedReleaseBundleV3["articles"][number]
+    >().toExtend<ArticleCardSource>();
+  });
+
   it("renders an honest date and complete native article link", () => {
     const article = bundle.articles[0];
     if (!article) {
