@@ -140,6 +140,19 @@ describe("Editorial Utility", () => {
     expect(html).toContain('href="/search">사이트 검색</a>');
   });
 
+  it("marks only the exact current masthead navigation link", () => {
+    const category = render(routes[1]!);
+    const article = render(routes[2]!);
+
+    expect(category).toContain(
+      '<a aria-current="page" href="/category/life">생활</a>',
+    );
+    expect(article).toContain('<a href="/category/life">생활</a>');
+    expect(article).not.toContain(
+      '<a aria-current="page" href="/category/life">생활</a>',
+    );
+  });
+
   it("shows ordered article topics as plain facts", () => {
     const html = render(routes[2]!);
     expect(html).toContain(

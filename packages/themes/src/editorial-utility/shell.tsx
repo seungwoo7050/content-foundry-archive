@@ -71,6 +71,7 @@ export function EditorialShell({
           <ThemeNavigation
             items={shell.primaryNavigation}
             ariaLabel="카테고리 및 주요 메뉴"
+            currentPath={path}
           />
         </div>
       </header>
