@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import { createElement } from "react";
 
 import {
   loadReleaseBundle,
@@ -95,6 +96,7 @@ describe("article theme view model", () => {
       relatedSectionHeading: null,
       relatedArticles: [],
       advertisingEligible: false,
+      readerActions: null,
       hero,
       body,
     });
@@ -113,11 +115,12 @@ describe("article theme view model", () => {
       updateTriggers: ["공식 절차 변경"],
       faq: [{ question: "질문?", answerMarkdown: "답변" }],
     };
+    const readerActions = createElement("button", null, "독자 도구");
     const model = createArticleThemeViewModel(
       { config: { adsEnabled: false }, bundle: { ...v3Bundle, articles: [changed, related] } },
       changed,
       categoryFor(v3Bundle, article.categoryId),
-      { hero: "hero", body: "body" },
+      { readerActions, hero: "hero", body: "body" },
     );
 
     expect(model).toMatchObject({
@@ -136,6 +139,19 @@ describe("article theme view model", () => {
     expect(model).not.toHaveProperty("lastVerified");
     expect(model).not.toHaveProperty("reviewer");
     expect(model).not.toHaveProperty("readingTime");
+    expect(model.readerActions).toBe(readerActions);
     expect(JSON.stringify(model.sources)).not.toContain("mailto:");
+  });
+
+  it.each([null, undefined])("normalizes empty reader actions from %s", (readerActions) => {
+    const article = firstArticle(bundle);
+    const model = createArticleThemeViewModel(
+      { config: { adsEnabled: false }, bundle },
+      article,
+      categoryFor(bundle, article.categoryId),
+      { readerActions, hero: null, body: "body" },
+    );
+
+    expect(model.readerActions).toBeNull();
   });
 });

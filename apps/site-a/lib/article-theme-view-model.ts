@@ -46,6 +46,7 @@ export interface ArticleThemeRecord
 }
 
 export interface ArticleThemeSlots {
+  readonly readerActions?: ReactNode | null;
   readonly hero: ReactNode;
   readonly body: ReactNode;
 }
@@ -107,6 +108,7 @@ export function createArticleThemeViewModel(
       { config: context.config, site: context.bundle.site },
       article,
     ),
+    readerActions: slots.readerActions ?? null,
     hero: slots.hero,
     body: slots.body,
   };
