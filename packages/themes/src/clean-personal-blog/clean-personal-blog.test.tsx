@@ -5,6 +5,7 @@ import { HTML_ROUTE_KINDS, type HtmlRouteViewModel } from "../html-route-view-mo
 import type { ArticleListItemViewModel, SiteShellViewModel } from "../presentation-view-model.js";
 import { SKIN_IDS, SKIN_TOKENS, type SkinId } from "../skin.js";
 import type { ThemeModule } from "../theme-module.js";
+import type { ThemeAdSlots } from "../theme-ad-slot.js";
 import { cleanPersonalBlogTheme } from "./module.js";
 
 const shell: SiteShellViewModel = {
@@ -42,9 +43,13 @@ const markers: Readonly<Record<HtmlRouteViewModel["kind"], string>> = {
   "static-page": "소개 본문", archive: "안내 글", search: "검색 폼",
   "not-found": ">404<", retired: ">410<",
 };
-function render(route: HtmlRouteViewModel, skinId: SkinId) {
+function render(route: HtmlRouteViewModel, skinId: SkinId, adSlots?: ThemeAdSlots) {
   return renderToStaticMarkup(cleanPersonalBlogTheme.renderRoute(
-    { shell, route }, { skinId, colors: SKIN_TOKENS[skinId] },
+    { shell, route }, {
+      skinId,
+      colors: SKIN_TOKENS[skinId],
+      ...(adSlots ? { adSlots } : {}),
+    },
   ));
 }
 const matrix = SKIN_IDS.flatMap((skinId) => routes.map((route) => ({ route, skinId })));
@@ -54,7 +59,9 @@ describe("Clean Personal Blog", () => {
     expectTypeOf(cleanPersonalBlogTheme).toExtend<ThemeModule>();
     expect(cleanPersonalBlogTheme.id).toBe("clean-personal-blog");
     expect(cleanPersonalBlogTheme.qualityExpectations).toEqual({ routeKinds: HTML_ROUTE_KINDS, density: "spacious", articleMeasure: "narrow" });
-    expect(cleanPersonalBlogTheme.supportedSlots).toEqual([]);
+    expect(cleanPersonalBlogTheme.supportedSlots).toEqual([
+      "home-feed", "article-after-summary", "article-end",
+    ]);
     expect(routes.map(({ kind }) => kind)).toEqual(HTML_ROUTE_KINDS);
   });
 
@@ -88,6 +95,38 @@ describe("Clean Personal Blog", () => {
     expect(html.indexOf("자주 묻는 질문")).toBeLessThan(html.indexOf("글 읽기 도구"));
     expect(html.indexOf("글 읽기 도구")).toBeLessThan(html.indexOf("관련 글"));
     expect(html).not.toMatch(/data-ad|ad-slot|광고 영역/);
+  });
+
+  it("places only its three manual slots at eligible reading boundaries", () => {
+    const adSlots: ThemeAdSlots = {
+      "home-feed": <i data-test-slot="home-feed">홈</i>,
+      "article-after-summary": <i data-test-slot="article-after-summary">요약 뒤</i>,
+      "article-mid-1": <i data-test-slot="article-mid-1">본문 중간</i>,
+      "article-mid-2": <i data-test-slot="article-mid-2">본문 중간 둘</i>,
+      "article-end": <i data-test-slot="article-end">글 끝</i>,
+      "desktop-sidebar": <i data-test-slot="desktop-sidebar">보조 칸</i>,
+    };
+    const homeHtml = render(routes[0]!, "warm-neutral", adSlots);
+    expect(homeHtml.match(/data-test-slot=/g)).toHaveLength(1);
+    expect(homeHtml.indexOf("안내 요약")).toBeLessThan(
+      homeHtml.indexOf('data-test-slot="home-feed"'),
+    );
+
+    const article = routes[2]!;
+    if (article.kind !== "article") throw new Error("article fixture is missing");
+    const articleHtml = render(article, "warm-neutral", adSlots);
+    const order = [
+      "안내 글 설명", 'data-test-slot="article-after-summary"',
+      "이 글의 정보", "관련 글", 'data-test-slot="article-end"',
+    ].map((marker) => articleHtml.indexOf(marker));
+    expect(order.every((position) => position >= 0)).toBe(true);
+    expect(order).toEqual([...order].sort((left, right) => left - right));
+    expect(articleHtml.match(/data-test-slot=/g)).toHaveLength(2);
+    expect(render({ ...article, advertisingEligible: false }, "warm-neutral", adSlots))
+      .not.toContain("data-test-slot");
+    for (const route of routes.slice(1).filter(({ kind }) => kind !== "article")) {
+      expect(render(route, "warm-neutral", adSlots)).not.toContain("data-test-slot");
+    }
   });
 
   it.each([null, undefined])("omits reader actions for %s", (readerActions) => {

@@ -1,4 +1,8 @@
 import type { ArticleRouteViewModel } from "../content-route-view-model.js";
+import {
+  getThemeAdSlot,
+  type ThemeAdSlotContext,
+} from "../theme-ad-slot.js";
 import { ThemeArticleList } from "../theme-links.js";
 
 function ArticleTrust({ route }: { readonly route: ArticleRouteViewModel }) {
@@ -47,7 +51,13 @@ function ArticleEvidence({ route }: { readonly route: ArticleRouteViewModel }) {
   );
 }
 
-export function CleanPersonalArticle({ route }: { readonly route: ArticleRouteViewModel }) {
+export function CleanPersonalArticle({
+  context = {},
+  route,
+}: {
+  readonly context?: ThemeAdSlotContext;
+  readonly route: ArticleRouteViewModel;
+}) {
   return (
     <article className="personal-article">
       <header className="personal-article-header">
@@ -55,6 +65,9 @@ export function CleanPersonalArticle({ route }: { readonly route: ArticleRouteVi
         <h1>{route.heading}</h1>
         <p className="personal-article-summary">{route.description}</p>
       </header>
+      {route.advertisingEligible
+        ? getThemeAdSlot(context, "article-after-summary")
+        : null}
       <ArticleTrust route={route} />
       {route.hero ? <div className="personal-hero">{route.hero}</div> : null}
       {route.toc.length > 0 ? (
@@ -77,6 +90,9 @@ export function CleanPersonalArticle({ route }: { readonly route: ArticleRouteVi
           <ThemeArticleList articles={route.relatedArticles} headingLevel={3} />
         </section>
       ) : null}
+      {route.advertisingEligible
+        ? getThemeAdSlot(context, "article-end")
+        : null}
     </article>
   );
 }

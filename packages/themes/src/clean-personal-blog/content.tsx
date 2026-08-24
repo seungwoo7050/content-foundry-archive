@@ -1,4 +1,8 @@
 import type { ContentRouteViewModel } from "../content-route-view-model.js";
+import {
+  getThemeAdSlot,
+  type ThemeAdSlotContext,
+} from "../theme-ad-slot.js";
 import { ThemeArticleList } from "../theme-links.js";
 import { CleanPersonalArticle } from "./article.js";
 
@@ -16,7 +20,13 @@ function unreachable(value: never): never {
   throw new Error(`Unsupported personal content route: ${JSON.stringify(value)}`);
 }
 
-export function CleanPersonalContent({ route }: { readonly route: ContentRouteViewModel }) {
+export function CleanPersonalContent({
+  context = {},
+  route,
+}: {
+  readonly context?: ThemeAdSlotContext;
+  readonly route: ContentRouteViewModel;
+}) {
   switch (route.kind) {
     case "home":
       return (
@@ -34,6 +44,7 @@ export function CleanPersonalContent({ route }: { readonly route: ContentRouteVi
           <section aria-labelledby="personal-latest-title" className="personal-article-list personal-section">
             <h2 id="personal-latest-title">{route.articleSectionHeading}</h2>
             <ThemeArticleList articles={route.articles} headingLevel={3} />
+            {getThemeAdSlot(context, "home-feed")}
           </section>
         </div>
       );
@@ -53,7 +64,7 @@ export function CleanPersonalContent({ route }: { readonly route: ContentRouteVi
           ) : null}
         </div>
       );
-    case "article": return <CleanPersonalArticle route={route} />;
+    case "article": return <CleanPersonalArticle context={context} route={route} />;
     case "static-page":
       return <article className="personal-static"><RouteHeader heading={route.heading} description={route.description} /><div className="personal-body">{route.body}</div></article>;
     case "archive":
