@@ -202,6 +202,8 @@ const expectedIdentities = {
     contractVersion: "2.0.0",
     bundleChecksum:
       "sha256:0a8f03190b0a5d63fefc52e3efab08080a08263a6c8d716f0e4936382eee6f27",
+    buildConfigChecksum:
+      "sha256:b045e9d32e8625362973269eb4927858fee61dfa13672d5a9a85a635894446d6",
     supportedContractVersions: ["2.0.0", "3.0.0"],
     routeCount: 7,
   },
@@ -211,6 +213,8 @@ const expectedIdentities = {
     contractVersion: "3.0.0",
     bundleChecksum:
       "sha256:45a1c3f057fb59b3a7fd28e5e87a8c41eb299d0446c71949e5d4e32d2a92d745",
+    buildConfigChecksum:
+      "sha256:b045e9d32e8625362973269eb4927858fee61dfa13672d5a9a85a635894446d6",
     supportedContractVersions: ["2.0.0", "3.0.0"],
     routeCount: 7,
   },

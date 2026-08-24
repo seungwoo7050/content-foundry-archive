@@ -3,6 +3,7 @@ import {
   type SupportedContractVersion,
 } from "@content-foundry/content-contract";
 
+import type { BuildConfigChecksum } from "./build-config-checksum";
 import {
   createReleaseIdentity,
   type ReleaseIdentity,
@@ -12,12 +13,14 @@ import { getGoneRoutes, type GoneRouteSource } from "./gone-route";
 import { getRouteClaims, type GeneratedRouteSource } from "./route-claims";
 
 export interface ReleaseBuildMetadata extends ReleaseIdentity {
+  readonly buildConfigChecksum: BuildConfigChecksum;
   readonly supportedContractVersions: readonly SupportedContractVersion[];
   readonly routeCount: number;
 }
 
 export function createReleaseBuildMetadata(
   bundle: ReleaseIdentitySource & GeneratedRouteSource & GoneRouteSource,
+  buildConfigChecksum: BuildConfigChecksum,
 ): ReleaseBuildMetadata {
   const generatedHtmlCount = [...getRouteClaims(bundle).values()].filter(
     ({ outputKind }) => outputKind === "html",
@@ -25,6 +28,7 @@ export function createReleaseBuildMetadata(
 
   return {
     ...createReleaseIdentity(bundle),
+    buildConfigChecksum,
     supportedContractVersions: [...SUPPORTED_CONTRACT_VERSIONS],
     routeCount: generatedHtmlCount + getGoneRoutes(bundle).length,
   };
