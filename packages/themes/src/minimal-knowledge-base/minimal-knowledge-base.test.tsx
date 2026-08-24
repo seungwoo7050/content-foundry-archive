@@ -1,0 +1,134 @@
+import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, expectTypeOf, it } from "vitest";
+
+import type { HtmlRouteViewModel, ThemePageViewModel } from "../html-route-view-model.js";
+import { HTML_ROUTE_KINDS } from "../html-route-view-model.js";
+import type { ArticleListItemViewModel, SiteShellViewModel } from "../presentation-view-model.js";
+import { SKIN_TOKENS } from "../skin.js";
+import type { ThemeModule } from "../theme-module.js";
+import { minimalKnowledgeBaseTheme } from "./index.js";
+
+const shell: SiteShellViewModel = {
+  locale: "ko-KR",
+  skipLink: { href: "#main-content", label: "본문으로 바로가기" },
+  brand: { href: "/", label: "생활메모" },
+  description: "실생활 안내를 정리합니다.",
+  primaryNavigation: [{ link: { href: "/guide", label: "안내" }, children: [
+    { link: { href: "/guide/start", label: "시작" }, children: [] },
+  ] }],
+  footerText: "© 2026 생활메모",
+};
+
+const articleItem: ArticleListItemViewModel = {
+  link: { href: "/article/start", label: "시작 안내" },
+  summary: "글 요약",
+  date: { dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
+  category: { href: "/category/life", label: "생활" },
+  topics: ["신청"],
+};
+
+function base(path: string, heading: string) {
+  return {
+    path,
+    heading,
+    description: `${heading} 설명`,
+    breadcrumbs: path === "/" ? [] : [
+      { href: "/", label: "홈" }, { href: path, label: heading },
+    ],
+  };
+}
+
+const routes = [
+  { ...base("/", "홈"), kind: "home", articleSectionHeading: "최근 안내", articles: [articleItem], categories: [{ href: "/category/life", label: "생활", description: "생활 안내 모음" }], searchLink: { href: "/search", label: "검색" } },
+  { ...base("/category/life", "생활"), kind: "category", articleSectionHeading: "최근 안내", articles: [articleItem], topicSectionHeading: "관련 주제", topics: ["신청"] },
+  { ...base("/article/start", "시작 안내"), kind: "article", category: articleItem.category, authorLabel: "작성자", operatorLabel: "운영자", published: articleItem.date, updated: { dateTime: "2026-08-25T00:00:00Z", label: "2026년 8월 25일" }, trustLinks: [{ href: "/about", label: "운영 방식" }], toc: [{ id: "steps", label: "신청 단계", level: 2 }], sources: [{ label: "공식 출처", href: "https://example.org/source" }], updateTriggers: ["정책 변경"], faq: [{ question: "질문?", answer: "답변" }], relatedSectionHeading: "관련 안내", relatedArticles: [articleItem], advertisingEligible: false, hero: <figure>대표 이미지</figure>, body: <p>본문 슬롯</p> },
+  { ...base("/about", "소개"), kind: "static-page", body: <p>정적 본문</p> },
+  { ...base("/archive", "전체 글"), kind: "archive", articles: [articleItem] },
+  { ...base("/search", "검색"), kind: "search", client: <form>검색 클라이언트</form> },
+  { ...base("/404", "찾을 수 없음"), kind: "not-found", statusCode: 404, action: { href: "/", label: "홈" } },
+  { ...base("/old", "제공 종료"), kind: "retired", statusCode: 410, action: { href: "/archive", label: "전체 글" } },
+] satisfies readonly HtmlRouteViewModel[];
+
+function render(route: HtmlRouteViewModel) {
+  return renderToStaticMarkup(minimalKnowledgeBaseTheme.renderRoute(
+    { shell, route }, { skinId: "calm-blue", colors: SKIN_TOKENS["calm-blue"] },
+  ));
+}
+
+function routeAt(index: number): HtmlRouteViewModel {
+  const route = routes[index];
+  if (!route) throw new Error(`Missing route fixture at index ${index}`);
+  return route;
+}
+
+describe("Minimal Knowledge Base", () => {
+  it("implements the exact module identity and complete route matrix", () => {
+    expectTypeOf(minimalKnowledgeBaseTheme).toExtend<ThemeModule>();
+    expectTypeOf<ThemePageViewModel>().toHaveProperty("route");
+    expect(minimalKnowledgeBaseTheme.id).toBe("minimal-knowledge-base");
+    expect(minimalKnowledgeBaseTheme.qualityExpectations.routeKinds).toBe(HTML_ROUTE_KINDS);
+    expect(routes.map(({ kind }) => kind)).toEqual(HTML_ROUTE_KINDS);
+    expect(minimalKnowledgeBaseTheme.supportedSlots).toEqual([]);
+  });
+
+  it.each(routes)("renders $kind through the complete KB shell", (route) => {
+    const html = render(route);
+    expect(html).toContain(`data-route="${route.kind}"`);
+    expect(html).toContain(route.heading);
+    expect(html).toContain('data-theme="minimal-knowledge-base"');
+    expect(html).toContain('data-skin="calm-blue"');
+    expect(html).toContain('<main id="main-content">');
+  });
+
+  it("orders the skip link, knowledge rail, main content, and footer", () => {
+    const html = render(routeAt(0));
+    const order = ["kb-skip-link", "kb-knowledge-rail", '<main id="main-content">', "kb-footer"];
+    const positions = order.map((value) => html.indexOf(value));
+    expect(positions.every((position) => position >= 0)).toBe(true);
+    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    expect(html).toContain('<nav aria-label="생활메모"><ul><li><a href="/guide">안내</a><ul>');
+    expect(html).toContain("--color-canvas:#F6F8FC");
+    expect(html).toContain("--color-surface:#FFFFFF");
+    expect(html).toContain("--color-surface-muted:#EAF3FF");
+    expect(html).toContain("--color-text:#13213A");
+    expect(html).toContain("--color-text-muted:#65738B");
+    expect(html).toContain("--color-primary:#245BCC");
+    expect(html).toContain("--color-on-primary:#FFFFFF");
+    expect(html).toContain("--color-border:#CBD8EB");
+    expect(html).toContain("--color-success:#177245");
+    expect(html).toContain("--color-warning:#8A4B08");
+    expect(html).toContain("--color-danger:#B42318");
+    expect(html).toContain("--focus-ring:#174AAD");
+  });
+
+  it("keeps home and category knowledge sections in their intended order", () => {
+    const home = render(routeAt(0));
+    expect(home.indexOf("kb-home-search")).toBeLessThan(home.indexOf("kb-category-grid"));
+    expect(home.indexOf("kb-category-grid")).toBeLessThan(home.indexOf("kb-latest-articles"));
+    expect(home).toContain("생활 안내 모음");
+    const category = render(routeAt(1));
+    expect(category.indexOf("kb-category-scope")).toBeLessThan(category.indexOf("kb-category-articles"));
+    expect(category.indexOf("kb-category-articles")).toBeLessThan(category.indexOf("kb-category-topics"));
+  });
+
+  it("renders the complete answer-first article truth in order", () => {
+    const html = render(routeAt(2));
+    const facts = ["시작 안내 설명", "이 안내의 정보", "신청 단계", "대표 이미지", "본문 슬롯", "공개 출처", "다시 확인하는 기준", "자주 묻는 질문", "관련 안내"];
+    const positions = facts.map((fact) => html.indexOf(fact));
+    expect(positions.every((position) => position >= 0)).toBe(true);
+    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    expect(html).toContain('<span aria-current="page">시작 안내</span>');
+    expect(html).toContain('<li data-level="2"><a href="#steps">신청 단계</a></li>');
+    expect(html).not.toMatch(/data-ad|ad-slot/);
+  });
+
+  it("renders static, archive, search, missing, and retired facts without invented claims", () => {
+    const html = routes.slice(3).map(render).join("\n");
+    expect(html).toContain("정적 본문");
+    expect(html).toContain("시작 안내");
+    expect(html).toContain("검색 클라이언트");
+    expect(html).toContain(">404<");
+    expect(html).toContain(">410<");
+    expect(html).not.toMatch(/검증일|evergreen|popularity|ranking|저장|save/i);
+  });
+});
