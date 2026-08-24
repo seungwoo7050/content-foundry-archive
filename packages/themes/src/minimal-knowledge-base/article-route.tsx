@@ -90,6 +90,11 @@ export function MinimalKnowledgeBaseArticle({
             <ThemeArticleList articles={route.relatedArticles} headingLevel={3} />
           </section>
         ) : null}
+        {route.readerActions ? (
+          <section aria-label="독자 기능" className="kb-reader-actions">
+            {route.readerActions}
+          </section>
+        ) : null}
       </article>
     </div>
   );
