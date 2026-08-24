@@ -3,7 +3,7 @@ import {
   getThemeAdSlot,
   type ThemeAdSlotContext,
 } from "../theme-ad-slot.js";
-import { ThemeArticleList } from "../theme-links.js";
+import { ThemeArticleList, ThemeArticleTopics } from "../theme-links.js";
 import { FriendlyRouteIntro } from "./shell.js";
 
 function ArticleTrust({ route }: { readonly route: ArticleRouteViewModel }) {
@@ -59,6 +59,7 @@ export function FriendlyArticle({
     <article className="fmu-stack">
       <FriendlyRouteIntro route={route} showDescription={false} />
       {route.category ? <p className="fmu-eyebrow"><a href={route.category.href}>{route.category.label}</a></p> : null}
+      <ThemeArticleTopics topics={route.topics} />
       {route.hero ? <div className="fmu-panel fmu-body">{route.hero}</div> : null}
       <section aria-labelledby="fmu-summary" className="fmu-panel fmu-summary">
         <h2 id="fmu-summary">이 글에서 확인할 내용</h2>
