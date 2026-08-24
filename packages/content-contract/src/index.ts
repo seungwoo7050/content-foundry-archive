@@ -64,6 +64,55 @@ export type {
   PublicSiteTaxonomy as PublicSiteTaxonomyV3,
   Taxon as TaxonV3,
 } from "./generated/3.0.0/taxonomy.js";
+export type {
+  PublishedActionLinkBlock as PublishedActionLinkBlockV4,
+} from "./generated/4.0.0/action-link-block.js";
+export type {
+  PublishedArticleProjection as PublishedArticleProjectionV4,
+} from "./generated/4.0.0/article.js";
+export type {
+  PublishedCodeOrCommandBlock as PublishedCodeOrCommandBlockV4,
+} from "./generated/4.0.0/code-command-block.js";
+export type {
+  PublishedContentBlock as PublishedContentBlockV4,
+} from "./generated/4.0.0/content-block.js";
+export type {
+  PublishedStructuredContent as PublishedStructuredContentV4,
+} from "./generated/4.0.0/content.js";
+export type {
+  PublishedGalleryBlock as PublishedGalleryBlockV4,
+} from "./generated/4.0.0/gallery-block.js";
+export type {
+  MediaManifest as MediaManifestV4,
+} from "./generated/4.0.0/media-manifest.js";
+export type {
+  Item as NavigationItemV4,
+  PublicSiteNavigation as PublicSiteNavigationV4,
+} from "./generated/4.0.0/navigation.js";
+export type {
+  PublishedNicheComponentBlock as PublishedNicheComponentBlockV4,
+} from "./generated/4.0.0/niche-component-block.js";
+export type {
+  PublishedStaticPageProjection as PublishedStaticPageProjectionV4,
+} from "./generated/4.0.0/page.js";
+export type {
+  PublicSitePresentationProjection,
+} from "./generated/4.0.0/presentation.js";
+export type {
+  Gone as GoneRouteV4,
+  PublicRouteDispositions as PublicRouteDispositionsV4,
+  Redirect as RedirectRouteV4,
+} from "./generated/4.0.0/redirects.js";
+export type {
+  PublicSiteReleaseManifest as PublicSiteReleaseManifestV4,
+} from "./generated/4.0.0/release.js";
+export type {
+  PublicSiteConfiguration as PublicSiteConfigurationV4,
+} from "./generated/4.0.0/site.js";
+export type {
+  PublicSiteTaxonomy as PublicSiteTaxonomyV4,
+  Taxon as TaxonV4,
+} from "./generated/4.0.0/taxonomy.js";
 export {
   ContractError,
   type ContractErrorCode,

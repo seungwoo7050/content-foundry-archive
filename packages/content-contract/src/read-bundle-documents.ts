@@ -13,8 +13,8 @@ import type { PublicSiteReleaseManifest } from "./generated/release.js";
 import type { PublicSiteConfiguration } from "./generated/site.js";
 import type { PublicSiteTaxonomy } from "./generated/taxonomy.js";
 import {
-  type ContractDocumentKind,
-  type RegisteredContractSchemaVersion,
+  type ContractDocumentFor,
+  type ContractDocumentKindFor,
   validateContractDocumentForVersion,
 } from "./validate-document.js";
 import {
@@ -23,9 +23,8 @@ import {
   verifySupportedReleaseIntegrity,
 } from "./verify-integrity.js";
 
-type ContractDocumentV3<K extends ContractDocumentKind> = ReturnType<
-  typeof validateContractDocumentForVersion<"3.0.0", K>
->;
+type ContractDocumentV3<K extends ContractDocumentKindFor<"3.0.0">> =
+  ContractDocumentFor<"3.0.0", K>;
 
 const JSON_DECODER = new TextDecoder("utf-8", {
   fatal: true,
@@ -90,7 +89,7 @@ function readJson(root: string, path: string): unknown {
   }
 }
 
-function readDocumentV2<K extends ContractDocumentKind>(
+function readDocumentV2<K extends ContractDocumentKindFor<"2.0.0">>(
   root: string,
   path: string,
   kind: K,
@@ -98,7 +97,7 @@ function readDocumentV2<K extends ContractDocumentKind>(
   return validateContractDocumentForVersion("2.0.0", kind, readJson(root, path));
 }
 
-function readDocumentV3<K extends ContractDocumentKind>(
+function readDocumentV3<K extends ContractDocumentKindFor<"3.0.0">>(
   root: string,
   path: string,
   kind: K,
@@ -271,7 +270,7 @@ export function readReleaseBundleDocumentsForVersion(
   root: string,
 ): ReleaseBundleDocumentsByVersion["3.0.0"];
 export function readReleaseBundleDocumentsForVersion(
-  version: RegisteredContractSchemaVersion,
+  version: keyof ReleaseBundleDocumentsByVersion,
   root: string,
 ): ReleaseBundleDocuments | ReleaseBundleDocumentsV3 {
   if (version === "2.0.0") {

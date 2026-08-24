@@ -45,6 +45,27 @@ const contracts = [
       "taxonomy",
     ],
   },
+  {
+    version: "4.0.0",
+    outputRoot: join(generatedRoot, "4.0.0"),
+    schemas: [
+      "action-link-block",
+      "article",
+      "code-command-block",
+      "content-block",
+      "content",
+      "gallery-block",
+      "media-manifest",
+      "navigation",
+      "niche-component-block",
+      "page",
+      "presentation",
+      "redirects",
+      "release",
+      "site",
+      "taxonomy",
+    ],
+  },
 ];
 
 for (const contract of contracts) {

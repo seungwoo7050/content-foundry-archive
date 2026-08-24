@@ -18,7 +18,6 @@ import type { PublicSiteReleaseManifest as PublicSiteReleaseManifestV3 } from ".
 import type { PublicSiteReleaseManifest } from "./generated/release.js";
 import { validateBundleLayout } from "./validate-bundle-layout.js";
 import {
-  type RegisteredContractSchemaVersion,
   validateContractDocumentForVersion,
 } from "./validate-document.js";
 
@@ -248,7 +247,7 @@ export function verifyReleaseIntegrityForVersion(
   root: string,
 ): PublicSiteReleaseManifestV3;
 export function verifyReleaseIntegrityForVersion(
-  version: RegisteredContractSchemaVersion,
+  version: keyof ReleaseManifestByVersion,
   root: string,
 ): PublicSiteReleaseManifest | PublicSiteReleaseManifestV3 {
   const { release, source } = readReleaseManifest(root);
@@ -256,7 +255,7 @@ export function verifyReleaseIntegrityForVersion(
 }
 
 function verifyReleaseIntegrityForParsedVersion(
-  version: RegisteredContractSchemaVersion,
+  version: keyof ReleaseManifestByVersion,
   root: string,
   release: Record<string, unknown>,
   source: string,
@@ -287,7 +286,7 @@ export function verifySupportedReleaseIntegrity(
   const { release, source } = readReleaseManifest(root);
   const version = resolveSupportedContractVersion(
     release.contractVersion,
-  ) as RegisteredContractSchemaVersion;
+  ) as keyof ReleaseManifestByVersion;
   return verifyReleaseIntegrityForParsedVersion(
     version,
     root,
