@@ -66,4 +66,20 @@ describe("verifyImageSource", () => {
       issues: [expect.objectContaining({ path: recordPath })],
     });
   });
+
+  it("rejects identity-valid bytes with a corrupt pixel payload", async () => {
+    const corrupt = Buffer.from(bytes);
+    corrupt[52] = corrupt[52]! ^ 0xff;
+    const invalid = {
+      ...media,
+      sha256: createHash("sha256").update(corrupt).digest("hex"),
+    };
+
+    await expect(
+      verifyImageSource(invalid, corrupt, recordPath),
+    ).rejects.toMatchObject({
+      code: "INTEGRITY_FAILED",
+      issues: [expect.objectContaining({ path: recordPath })],
+    });
+  });
 });

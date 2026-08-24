@@ -29,7 +29,9 @@ export async function verifyImageSource(
   const verified = verifyMediaByteIdentity(media, bytes, recordPath);
   let metadata: Awaited<ReturnType<ReturnType<typeof sharp>["metadata"]>>;
   try {
-    metadata = await sharp(verified.bytes, { failOn: "error" }).metadata();
+    const image = sharp(verified.bytes, { failOn: "error" });
+    metadata = await image.metadata();
+    await image.clone().raw().toBuffer();
   } catch {
     throw failure(media.id, [
       { path: recordPath, message: "source bytes are not a decodable image" },
