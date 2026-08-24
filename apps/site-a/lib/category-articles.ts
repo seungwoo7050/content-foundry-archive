@@ -1,11 +1,29 @@
-import type {
-  LoadedReleaseBundle,
-  PublishedArticleProjection,
-} from "@content-foundry/content-contract";
+export interface CategoryArticleRecord {
+  readonly id: string;
+  readonly categoryId: string;
+  readonly tagIds: readonly string[];
+  readonly updatedAt: string;
+}
+
+export interface CategoryTagRecord {
+  readonly id: string;
+}
+
+export interface CategoryArticleSource<
+  TArticle extends CategoryArticleRecord = CategoryArticleRecord,
+> {
+  readonly articles: readonly TArticle[];
+}
+
+export interface CategoryTagSource<
+  TTag extends CategoryTagRecord = CategoryTagRecord,
+> {
+  readonly taxonomy: { readonly tags: readonly TTag[] };
+}
 
 function compareByRecentUpdate(
-  left: PublishedArticleProjection,
-  right: PublishedArticleProjection,
+  left: CategoryArticleRecord,
+  right: CategoryArticleRecord,
 ) {
   const updatedDifference =
     Date.parse(right.updatedAt) - Date.parse(left.updatedAt);
@@ -21,19 +39,19 @@ function compareByRecentUpdate(
   return 0;
 }
 
-export function getCategoryArticles(
-  bundle: LoadedReleaseBundle,
+export function getCategoryArticles<TArticle extends CategoryArticleRecord>(
+  bundle: CategoryArticleSource<TArticle>,
   categoryId: string,
-) {
+): TArticle[] {
   return bundle.articles
     .filter((article) => article.categoryId === categoryId)
     .sort(compareByRecentUpdate);
 }
 
-export function getCategoryTags(
-  bundle: LoadedReleaseBundle,
-  articles: readonly PublishedArticleProjection[],
-) {
+export function getCategoryTags<TTag extends CategoryTagRecord>(
+  bundle: CategoryTagSource<TTag>,
+  articles: readonly CategoryArticleRecord[],
+): TTag[] {
   const tagIds = new Set(articles.flatMap((article) => article.tagIds));
   return bundle.taxonomy.tags.filter((tag) => tagIds.has(tag.id));
 }

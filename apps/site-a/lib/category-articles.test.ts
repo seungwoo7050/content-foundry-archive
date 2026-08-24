@@ -2,11 +2,17 @@ import { resolve } from "node:path";
 
 import {
   loadReleaseBundle,
+  type LoadedReleaseBundleV3,
   type PublishedArticleProjection,
 } from "@content-foundry/content-contract";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { getCategoryArticles, getCategoryTags } from "./category-articles";
+import {
+  getCategoryArticles,
+  getCategoryTags,
+  type CategoryArticleSource,
+  type CategoryTagSource,
+} from "./category-articles";
 
 const fixture = resolve(
   process.cwd(),
@@ -36,6 +42,25 @@ function createArticle(
 }
 
 describe("category article selection", () => {
+  it("accepts and preserves v3 article and tag records", () => {
+    expectTypeOf<LoadedReleaseBundleV3>().toExtend<CategoryArticleSource>();
+    expectTypeOf<LoadedReleaseBundleV3>().toExtend<CategoryTagSource>();
+    const articles = getCategoryArticles(
+      { articles: [] as LoadedReleaseBundleV3["articles"] },
+      "category",
+    );
+    const tags = getCategoryTags(
+      { taxonomy: { tags: [] as LoadedReleaseBundleV3["taxonomy"]["tags"] } },
+      articles,
+    );
+    expectTypeOf(articles).toEqualTypeOf<
+      Array<LoadedReleaseBundleV3["articles"][number]>
+    >();
+    expectTypeOf(tags).toEqualTypeOf<
+      Array<LoadedReleaseBundleV3["taxonomy"]["tags"][number]>
+    >();
+  });
+
   it("filters by exact category ID and returns a deterministic recent-first copy", () => {
     const input = [
       createArticle("ART-000101", "category-id", "2026-08-23T01:00:00Z"),
