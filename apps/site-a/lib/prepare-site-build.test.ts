@@ -5,13 +5,29 @@ import {
   readFileSync,
   readdirSync,
   rmSync,
+  symlinkSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
 import { loadV3ReleaseBundle } from "@content-foundry/content-contract";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+const restoreFailure = vi.hoisted(() => ({ enabled: false }));
+
+vi.mock("node:fs/promises", async (importOriginal) => {
+  const filesystem = await importOriginal<typeof import("node:fs/promises")>();
+  return {
+    ...filesystem,
+    rename: async (source: string, destination: string) => {
+      if (restoreFailure.enabled && source.endsWith("previous-media")) {
+        throw new Error("simulated restore failure");
+      }
+      return filesystem.rename(source, destination);
+    },
+  };
+});
 
 import { getGeneratedRoutes } from "./generated-routes";
 import {
@@ -67,6 +83,7 @@ function prepareOptions(
 }
 
 afterEach(() => {
+  restoreFailure.enabled = false;
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 
@@ -126,6 +143,27 @@ describe("prepare site build artifacts", () => {
     expect(readFileSync(oldMedia, "utf8")).toBe("old media");
   });
 
+  it("preserves prior media in staging when restoration fails", async () => {
+    const { root, paths, objects } = workspace();
+    writeObjects(objects);
+    const oldMedia = join(paths.publicDirectory, "_media/old.txt");
+    mkdirSync(dirname(oldMedia), { recursive: true });
+    writeFileSync(oldMedia, "old media");
+    mkdirSync(paths.projectionPath, { recursive: true });
+    restoreFailure.enabled = true;
+
+    await expect(
+      prepareV3SiteBuildArtifacts(bundle, prepareOptions(paths, objects)),
+    ).rejects.toThrow("previous media remains at");
+    const stage = readdirSync(join(root, ".site-build")).find((entry) =>
+      entry.startsWith("media-stage-"),
+    );
+    expect(stage).toBeDefined();
+    expect(
+      readFileSync(join(root, ".site-build", stage!, "previous-media/old.txt"), "utf8"),
+    ).toBe("old media");
+  });
+
   it("clears only generated v2 media and projection artifacts", async () => {
     const { root, paths } = workspace();
     const generated = join(paths.publicDirectory, "_media/generated.webp");
@@ -142,5 +180,34 @@ describe("prepare site build artifacts", () => {
     expect(existsSync(paths.projectionPath)).toBe(false);
     expect(readFileSync(join(paths.publicDirectory, "og.png"), "utf8")).toBe("owned");
     expect(readFileSync(join(root, ".site-build/keep.txt"), "utf8")).toBe("owned");
+  });
+
+  it("rejects a linked public output before clearing external media", async () => {
+    const { root, paths } = workspace();
+    const outside = join(root, "outside-public");
+    const outsideMedia = join(outside, "_media/keep.txt");
+    mkdirSync(dirname(outsideMedia), { recursive: true });
+    writeFileSync(outsideMedia, "external media");
+    symlinkSync(outside, paths.publicDirectory, "dir");
+
+    await expect(clearGeneratedSiteBuildArtifacts(paths)).rejects.toMatchObject({
+      code: "BUILD_FAILED",
+    });
+    expect(readFileSync(outsideMedia, "utf8")).toBe("external media");
+  });
+
+  it("rejects a linked build path before clearing an external projection", async () => {
+    const { root, paths } = workspace();
+    const outside = join(root, "outside-build");
+    const outsideProjection = join(outside, "media-projection.json");
+    mkdirSync(outside, { recursive: true });
+    mkdirSync(paths.publicDirectory, { recursive: true });
+    writeFileSync(outsideProjection, "external projection");
+    symlinkSync(outside, dirname(paths.projectionPath), "dir");
+
+    await expect(clearGeneratedSiteBuildArtifacts(paths)).rejects.toMatchObject({
+      code: "BUILD_FAILED",
+    });
+    expect(readFileSync(outsideProjection, "utf8")).toBe("external projection");
   });
 });

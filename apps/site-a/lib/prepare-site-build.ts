@@ -47,6 +47,18 @@ async function existingDirectory(path: string): Promise<boolean> {
   }
 }
 
+async function ensureOwnedDirectory(path: string, label: string): Promise<void> {
+  try {
+    await mkdir(path, { recursive: true });
+    if (!(await lstat(path)).isDirectory()) {
+      throw failure(`${label} is not an owned directory`);
+    }
+  } catch (error) {
+    if (error instanceof ContractError) throw error;
+    throw failure(`${label} is unavailable`);
+  }
+}
+
 function normalizeFailure(error: unknown): never {
   if (error instanceof ContractError) throw error;
   throw failure("Site build artifacts cannot be prepared");
@@ -57,13 +69,15 @@ export async function prepareV3SiteBuildArtifacts(
   options: PrepareV3SiteBuildOptions,
 ): Promise<readonly ResponsiveImageAsset[]> {
   const buildDirectory = dirname(options.projectionPath);
-  await mkdir(buildDirectory, { recursive: true });
+  await ensureOwnedDirectory(buildDirectory, "Generated build path");
+  await ensureOwnedDirectory(options.publicDirectory, "Public output path");
   const stagingRoot = await mkdtemp(join(buildDirectory, "media-stage-"));
   const stagedMedia = join(stagingRoot, "_media");
   const previousMedia = join(stagingRoot, "previous-media");
   const publicMedia = join(options.publicDirectory, "_media");
   let previousExists = false;
   let replacementPublished = false;
+  let preserveStaging = false;
 
   try {
     const registry = await prepareSiteMedia(bundle, {
@@ -74,7 +88,6 @@ export async function prepareV3SiteBuildArtifacts(
       releaseDirectory: options.releaseDirectory,
     });
     await mkdir(stagedMedia, { recursive: true });
-    await mkdir(options.publicDirectory, { recursive: true });
     previousExists = await existingDirectory(publicMedia);
     if (previousExists) await rename(publicMedia, previousMedia);
 
@@ -91,14 +104,21 @@ export async function prepareV3SiteBuildArtifacts(
         }
         if (previousExists) await rename(previousMedia, publicMedia);
       } catch {
-        throw failure("Site build artifacts cannot be restored");
+        preserveStaging = previousExists;
+        throw failure(
+          previousExists
+            ? `Site build artifacts cannot be restored; previous media remains at ${previousMedia}`
+            : "Site build artifacts cannot be restored",
+        );
       }
       return normalizeFailure(error);
     }
   } catch (error) {
     return normalizeFailure(error);
   } finally {
-    await rm(stagingRoot, { recursive: true, force: true });
+    if (!preserveStaging) {
+      await rm(stagingRoot, { recursive: true, force: true });
+    }
   }
 }
 
@@ -106,6 +126,9 @@ export async function clearGeneratedSiteBuildArtifacts(
   paths: SiteBuildArtifactPaths,
 ): Promise<void> {
   try {
+    await ensureOwnedDirectory(dirname(paths.projectionPath), "Generated build path");
+    await ensureOwnedDirectory(paths.publicDirectory, "Public output path");
+    await existingDirectory(join(paths.publicDirectory, "_media"));
     await rm(paths.projectionPath, { force: true });
     await rm(join(paths.publicDirectory, "_media"), {
       recursive: true,
