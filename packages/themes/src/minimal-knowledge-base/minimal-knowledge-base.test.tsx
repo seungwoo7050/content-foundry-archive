@@ -91,12 +91,12 @@ describe("Minimal Knowledge Base", () => {
     expect(html).toContain(route.heading);
     expect(html).toContain('data-theme="minimal-knowledge-base"');
     expect(html).toContain('data-skin="calm-blue"');
-    expect(html).toContain('<main id="main-content">');
+    expect(html).toContain('<main id="main-content" tabindex="-1">');
   });
 
   it("orders the skip link, knowledge rail, main content, and footer", () => {
     const html = render(routeAt(0));
-    const order = ["kb-skip-link", "kb-knowledge-rail", '<main id="main-content">', "kb-footer"];
+    const order = ["kb-skip-link", "kb-knowledge-rail", '<main id="main-content" tabindex="-1">', "kb-footer"];
     const positions = order.map((value) => html.indexOf(value));
     expect(positions.every((position) => position >= 0)).toBe(true);
     expect(positions).toEqual([...positions].sort((a, b) => a - b));

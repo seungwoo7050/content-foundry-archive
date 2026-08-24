@@ -55,7 +55,7 @@ export function MinimalKnowledgeBaseShell({
           items={shell.primaryNavigation}
         />
       </aside>
-      <main id="main-content">{children}</main>
+      <main id="main-content" tabIndex={-1}>{children}</main>
       <footer className="kb-footer">
         <small>{shell.footerText}</small>
         <ThemeFooterNavigation items={shell.footerNavigation ?? []} />
