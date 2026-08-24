@@ -15,7 +15,7 @@ import { createArticleBreadcrumbs } from "../../../lib/article-breadcrumbs";
 import { createArticleStructuredData } from "../../../lib/article-structured-data";
 import { createBreadcrumbStructuredData } from "../../../lib/breadcrumb-structured-data";
 import { findGoneRoute } from "../../../lib/gone-route";
-import type { VersionedSiteReleaseContext } from "../../../lib/load-site-release";
+import type { PreparedVersionedSiteReleaseContext } from "../../../lib/load-site-release";
 import { createRetiredRouteMetadata } from "../../../lib/retired-route-metadata";
 import { resolveSiteAdSlots } from "../../../lib/resolve-site-ad-slots";
 import { getVersionedSiteReleaseContext } from "../../../lib/site-release";
@@ -38,7 +38,7 @@ export function generateStaticParams() {
 }
 
 function createReaderActions(
-  context: VersionedSiteReleaseContext,
+  context: PreparedVersionedSiteReleaseContext,
   article: ReaderActionArticle,
 ) {
   return (
@@ -73,7 +73,10 @@ export async function generateMetadata({
   return createArticleMetadata(context, article);
 }
 
-function createArticleSlots(context: VersionedSiteReleaseContext, slug: string) {
+function createArticleSlots(
+  context: PreparedVersionedSiteReleaseContext,
+  slug: string,
+) {
   if (context.contractVersion === "3.0.0") {
     const article = findArticleBySlug(context.bundle, slug);
     if (!article) notFound();
@@ -106,6 +109,7 @@ function createArticleSlots(context: VersionedSiteReleaseContext, slug: string) 
       <VersionedContentBlocks
         blocks={article.content}
         contractVersion="2.0.0"
+        mediaAssets={context.mediaAssets}
       />
     ),
   };

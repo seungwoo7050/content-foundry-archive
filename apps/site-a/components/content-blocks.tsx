@@ -1,5 +1,6 @@
 import type { PublishedContentBlock } from "@content-foundry/content-contract";
 
+import { ImageBlock, type ResponsiveImageAssetRegistry } from "./image-block";
 import { LegacyContentBlock } from "./legacy-content-block";
 
 export type TextContentBlock = Exclude<
@@ -9,6 +10,7 @@ export type TextContentBlock = Exclude<
 
 interface ContentBlocksProps {
   blocks: readonly PublishedContentBlock[];
+  mediaAssets?: ResponsiveImageAssetRegistry;
 }
 
 export class UnsupportedContentBlockError extends Error {
@@ -20,12 +22,13 @@ export class UnsupportedContentBlockError extends Error {
   }
 }
 
-export function ContentBlocks({ blocks }: ContentBlocksProps) {
+export function ContentBlocks({ blocks, mediaAssets }: ContentBlocksProps) {
   return blocks.map((block, index) => {
-    if (block.type === "image") {
-      throw new UnsupportedContentBlockError(block.type);
-    }
     const key = block.type === "heading" ? block.id : `${block.type}-${index}`;
+    if (block.type === "image") {
+      if (!mediaAssets) throw new UnsupportedContentBlockError(block.type);
+      return <ImageBlock assets={mediaAssets} block={block} key={key} />;
+    }
     return <LegacyContentBlock block={block} key={key} />;
   });
 }

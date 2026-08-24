@@ -4,6 +4,7 @@ import type {
 } from "@content-foundry/content-contract";
 
 import { ContentBlocks } from "./content-blocks";
+import type { ResponsiveImageAssetRegistry } from "./image-block";
 import {
   PublishedContentBlocks,
   type ContentBlockRenderContext,
@@ -13,6 +14,7 @@ export type VersionedContentBlocksProps =
   | {
       readonly contractVersion: "2.0.0";
       readonly blocks: readonly PublishedContentBlock[];
+      readonly mediaAssets?: ResponsiveImageAssetRegistry;
     }
   | {
       readonly contractVersion: "3.0.0";
@@ -22,7 +24,12 @@ export type VersionedContentBlocksProps =
 
 export function VersionedContentBlocks(props: VersionedContentBlocksProps) {
   if (props.contractVersion === "2.0.0") {
-    return <ContentBlocks blocks={props.blocks} />;
+    return (
+      <ContentBlocks
+        blocks={props.blocks}
+        {...(props.mediaAssets ? { mediaAssets: props.mediaAssets } : {})}
+      />
+    );
   }
   return <PublishedContentBlocks blocks={props.blocks} context={props.context} />;
 }
