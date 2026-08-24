@@ -1,8 +1,8 @@
 import {
   projectStaticImageAsset,
+  type ImageProjectionSource,
   type StaticImageAsset,
 } from "./project-static-image-asset.js";
-import { type VerifiedImageSource } from "./verify-image-source.js";
 
 export const RESPONSIVE_WEBP_QUALITY = 82;
 const TARGET_WIDTHS = [480, 960, 1440] as const;
@@ -21,7 +21,7 @@ export interface ResponsiveImageAsset {
 }
 
 export function projectResponsiveImageAsset(
-  source: VerifiedImageSource,
+  source: ImageProjectionSource,
   recordPath: string,
 ): ResponsiveImageAsset {
   const fallback = projectStaticImageAsset(source, recordPath);

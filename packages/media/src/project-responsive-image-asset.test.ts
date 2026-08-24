@@ -4,6 +4,7 @@ import {
   projectResponsiveImageAsset,
   RESPONSIVE_WEBP_QUALITY,
 } from "./project-responsive-image-asset.js";
+import { type ImageProjectionSource } from "./project-static-image-asset.js";
 import { type VerifiedImageSource } from "./verify-image-source.js";
 
 const sha256 = "216154d9fcffafb56f3bd8d846eebdb9ae1b5dc8aaeeea88ce621d1ceb5798e7";
@@ -30,6 +31,19 @@ const source: VerifiedImageSource = {
 const recordPath = "/media/items/0";
 
 describe("projectResponsiveImageAsset", () => {
+  it("projects deterministic assets from verified metadata without source bytes", () => {
+    const metadata: ImageProjectionSource = {
+      media: source.media,
+      mimeType: source.mimeType,
+      width: source.width,
+      height: source.height,
+    };
+
+    expect(projectResponsiveImageAsset(metadata, recordPath)).toEqual(
+      projectResponsiveImageAsset(source, recordPath),
+    );
+  });
+
   it("keeps a small image intrinsic and adds one modern derivative", () => {
     const asset = projectResponsiveImageAsset(source, recordPath);
 

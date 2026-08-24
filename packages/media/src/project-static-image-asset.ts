@@ -1,6 +1,13 @@
 import { ContractError } from "@content-foundry/content-contract";
 
-import { type VerifiedImageSource } from "./verify-image-source.js";
+import { type ImageMediaRecord } from "./verify-media-byte-identity.js";
+
+export interface ImageProjectionSource {
+  readonly media: ImageMediaRecord;
+  readonly mimeType: string;
+  readonly width: number;
+  readonly height: number;
+}
 
 const EXTENSIONS: Readonly<Record<string, string>> = {
   "image/avif": "avif",
@@ -24,7 +31,7 @@ export interface StaticImageAsset {
 }
 
 export function projectStaticImageAsset(
-  source: VerifiedImageSource,
+  source: ImageProjectionSource,
   recordPath: string,
 ): StaticImageAsset {
   const extension = EXTENSIONS[source.mimeType];
