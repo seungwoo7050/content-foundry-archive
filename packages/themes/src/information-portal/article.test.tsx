@@ -18,6 +18,7 @@ const route: ArticleRouteViewModel = {
   category: { href: "/category/life", label: "생활" }, topics: ["신청", "생활 행정"], authorLabel: "작성자", operatorLabel: "운영자",
   published: { dateTime: "2026-08-20T00:00:00Z", label: "2026년 8월 20일" },
   updated: { dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
+  estimatedReadingTime: { minutes: 2, label: "예상 읽기 시간 약 2분" },
   trustLinks: [{ href: "/about", label: "운영 방식" }],
   toc: [{ id: "step", label: "신청 단계", level: 2 }],
   sources: [{ label: "공식 안내", href: "https://official.example/guide" }],
@@ -37,6 +38,15 @@ describe("Information Portal article", () => {
     );
 
     expect(html).toContain("신청 핵심 절차");
+    expect(html).toContain(
+      '<p class="ip-article-reading-time">예상 읽기 시간 약 2분</p>',
+    );
+    expect(html.indexOf("신청 안내</h1>")).toBeLessThan(
+      html.indexOf("예상 읽기 시간 약 2분"),
+    );
+    expect(html.indexOf("예상 읽기 시간 약 2분")).toBeLessThan(
+      html.indexOf('id="ip-summary"'),
+    );
     expect(html).toContain(
       '<ul aria-label="관련 주제" class="theme-article-topics"><li>신청</li><li>생활 행정</li></ul>',
     );
@@ -65,6 +75,19 @@ describe("Information Portal article", () => {
     expect(renderToStaticMarkup(
       <InformationPortalArticle route={withoutTopics} />,
     )).not.toContain("ip-article-topics");
+  });
+
+  it("preserves the existing article header when reading time is absent", () => {
+    const { estimatedReadingTime: _readingTime, ...withoutReadingTime } = route;
+    const html = renderToStaticMarkup(
+      <InformationPortalArticle route={withoutReadingTime} />,
+    );
+
+    expect(html).not.toContain("ip-article-reading-time");
+    expect(html).toContain("<header><h1>신청 안내</h1></header>");
+    expect(html).toContain(
+      '<section aria-labelledby="ip-summary" class="ip-panel ip-summary">',
+    );
   });
 
   it.each([null, undefined])("omits reader actions for %s", (readerActions) => {

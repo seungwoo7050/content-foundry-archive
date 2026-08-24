@@ -22,6 +22,9 @@ describe("Information Portal styles", () => {
   it("defines dense responsive grids without data claims", () => {
     expect(INFORMATION_PORTAL_STYLES).toContain("repeat(3,minmax(0,1fr))");
     expect(INFORMATION_PORTAL_STYLES).toContain("min-height:44px");
+    expect(INFORMATION_PORTAL_STYLES).toContain(
+      ".ip-article-reading-time{justify-self:start;",
+    );
     expect(INFORMATION_PORTAL_STYLES).not.toMatch(/ranking|trending|popular/i);
   });
 

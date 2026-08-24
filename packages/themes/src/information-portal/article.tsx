@@ -57,6 +57,11 @@ export function InformationPortalArticle({
     <article className="ip-stack">
       <PortalRouteIntro route={route} showDescription={false} />
       {route.category ? <p><a href={route.category.href}>{route.category.label}</a></p> : null}
+      {route.estimatedReadingTime ? (
+        <p className="ip-article-reading-time">
+          {route.estimatedReadingTime.label}
+        </p>
+      ) : null}
       <section aria-labelledby="ip-summary" className="ip-panel ip-summary">
         <h2 id="ip-summary">핵심 안내</h2><p>{route.description}</p>
       </section>
