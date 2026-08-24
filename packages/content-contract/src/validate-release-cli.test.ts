@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { validateReleaseFromEnvironment } from "./validate-release-cli.js";
 
 const packageDirectory = fileURLToPath(new URL("../", import.meta.url));
-const fixture = (version: "2.0.0" | "3.0.0") =>
+const fixture = (version: "2.0.0" | "3.0.0" | "4.0.0") =>
   `vendor/${version}/fixtures/bundles/valid/site-a-minimal`;
 
 describe("validateReleaseFromEnvironment", () => {
@@ -63,6 +63,21 @@ describe("validateReleaseFromEnvironment", () => {
         contractVersion: "3.0.0",
         releaseId: "REL-2026-000043",
         siteId: "site-a",
+      }),
+    );
+  });
+
+  it("does not invent a release-mode context for generic v4 validation", () => {
+    expect(() =>
+      validateReleaseFromEnvironment(
+        { CONTENT_RELEASE_DIR: fixture("4.0.0") },
+        packageDirectory,
+      ),
+    ).toThrowError(
+      expect.objectContaining({
+        name: "ReleaseValidationUsageError",
+        message:
+          "Contract 4.0.0 requires a Public Sites release-mode consumer context",
       }),
     );
   });

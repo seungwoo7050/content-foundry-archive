@@ -86,5 +86,9 @@ describe("readReleaseBundleDocuments", () => {
       readSupportedReleaseBundleDocuments(fixture("3.0.0")).release
         .contractVersion,
     ).toBe("3.0.0");
+    expect(
+      readSupportedReleaseBundleDocuments(fixture("4.0.0")).release
+        .contractVersion,
+    ).toBe("4.0.0");
   });
 });

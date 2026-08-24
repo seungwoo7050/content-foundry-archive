@@ -135,6 +135,9 @@ describe("verifyReleaseIntegrity", () => {
     expect(
       verifySupportedReleaseIntegrity(copyFixture(v3Fixture)).contractVersion,
     ).toBe("3.0.0");
+    expect(
+      verifySupportedReleaseIntegrity(copyFixture(v4Fixture)).contractVersion,
+    ).toBe("4.0.0");
   });
 
   it("detects a modified v3 article through the internal version boundary", () => {
