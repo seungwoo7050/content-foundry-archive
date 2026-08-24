@@ -3,12 +3,22 @@ import {
   type ContractIssue,
 } from "@content-foundry/content-contract";
 
+import { getArchiveAdditionalPageStaticParams } from "./archive-page-route";
+import { getCategoryAdditionalPageStaticParams } from "./category-route";
+
 export interface GeneratedRouteSource {
   readonly articles: readonly {
+    readonly categoryId: string;
+    readonly id: string;
+    readonly publishedAt: string;
     readonly seo: { readonly canonicalPath: string };
   }[];
   readonly taxonomy: {
-    readonly categories: readonly { readonly slug: string }[];
+    readonly categories: readonly {
+      readonly id: string;
+      readonly label: string;
+      readonly slug: string;
+    }[];
   };
   readonly pages: readonly { readonly path: string }[];
 }
@@ -24,8 +34,10 @@ export type RouteClaimKind =
   | "fixed-search"
   | "fixed-search-index"
   | "fixed-sitemap"
+  | "archive-page"
   | "article"
   | "category"
+  | "category-page"
   | "page";
 
 export interface RouteClaim {
@@ -113,6 +125,27 @@ export function getRouteClaims(
       outputKind: "machine",
       source: "fixed search-index route",
     },
+    ...getArchiveAdditionalPageStaticParams(bundle).map(({ page }) => ({
+      path: `/archive/page/${page}`,
+      kind: "archive-page" as const,
+      navigable: true,
+      outputKind: "html" as const,
+      source: `generated archive page ${page}`,
+    })),
+    ...getCategoryAdditionalPageStaticParams(bundle).map(
+      ({ category, page }) => {
+        const categoryIndex = bundle.taxonomy.categories.findIndex(
+          ({ slug }) => slug === category,
+        );
+        return {
+          path: `/category/${category}/page/${page}`,
+          kind: "category-page" as const,
+          navigable: true,
+          outputKind: "html" as const,
+          source: `/taxonomy/categories/${categoryIndex}/slug page ${page}`,
+        };
+      },
+    ),
     ...bundle.articles.map((article, index) => ({
       path: article.seo.canonicalPath,
       kind: "article" as const,

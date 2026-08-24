@@ -16,12 +16,15 @@ import {
 export interface AnalyticsRouteProjectionSource
   extends GeneratedRouteSource, GoneRouteSource {
   readonly articles: readonly {
+    readonly categoryId: string;
     readonly id: string;
+    readonly publishedAt: string;
     readonly seo: { readonly canonicalPath: string };
   }[];
   readonly taxonomy: {
     readonly categories: readonly {
       readonly id: string;
+      readonly label: string;
       readonly slug: string;
     }[];
   };
@@ -57,8 +60,10 @@ const HTML_ROUTE_TYPES: Readonly<
   "fixed-archive": "archive",
   "fixed-search": "search",
   "fixed-not-found": "not-found",
+  "archive-page": "archive",
   article: "article",
   category: "category",
+  "category-page": "category",
   page: "static-page",
 });
 const analyticsSkinIds = new Set<string>(ANALYTICS_SKIN_IDS);

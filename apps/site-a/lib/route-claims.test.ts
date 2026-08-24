@@ -14,6 +14,19 @@ const fixture = resolve(
 );
 const bundle = loadReleaseBundle(fixture);
 
+function withArticleCount(count: number) {
+  const article = bundle.articles[0];
+  if (!article) throw new Error("Site A fixture article is missing");
+  return {
+    ...bundle,
+    articles: Array.from({ length: count }, (_, index) => ({
+      ...article,
+      id: `ART-${String(index + 1).padStart(6, "0")}`,
+      seo: { ...article.seo, canonicalPath: `/article/guide-${index + 1}` },
+    })),
+  };
+}
+
 describe("generated route claims", () => {
   it("accepts the v3 release route structure", () => {
     expectTypeOf<LoadedReleaseBundleV3>().toExtend<GeneratedRouteSource>();
@@ -99,6 +112,24 @@ describe("generated route claims", () => {
         outputKind: "html",
         source: "/pages/0/path",
       },
+    });
+  });
+
+  it("claims generated archive and category pagination", () => {
+    const paginatedBundle = withArticleCount(13);
+    const claims = getRouteClaims(paginatedBundle);
+
+    expect(claims.get("/archive/page/2")).toEqual({
+      kind: "archive-page",
+      navigable: true,
+      outputKind: "html",
+      source: "generated archive page 2",
+    });
+    expect(claims.get("/category/daily-admin/page/2")).toEqual({
+      kind: "category-page",
+      navigable: true,
+      outputKind: "html",
+      source: "/taxonomy/categories/0/slug page 2",
     });
   });
 
