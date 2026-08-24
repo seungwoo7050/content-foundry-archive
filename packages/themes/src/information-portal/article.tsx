@@ -3,7 +3,7 @@ import {
   getThemeAdSlot,
   type ThemeAdSlotContext,
 } from "../theme-ad-slot.js";
-import { ThemeArticleList } from "../theme-links.js";
+import { ThemeArticleList, ThemeArticleTopics } from "../theme-links.js";
 import { PortalRouteIntro } from "./shell.js";
 
 function PortalTrust({ route }: { readonly route: ArticleRouteViewModel }) {
@@ -70,6 +70,12 @@ export function InformationPortalArticle({
           <PortalEvidence route={route} />
         </div>
         <aside aria-label="글 탐색과 안내 정보" className="ip-article-rail">
+          {route.topics && route.topics.length > 0 ? (
+            <section aria-labelledby="ip-article-topics" className="ip-panel ip-article-topics">
+              <h2 id="ip-article-topics">관련 주제</h2>
+              <ThemeArticleTopics topics={route.topics} />
+            </section>
+          ) : null}
           <PortalTrust route={route} />
           {route.toc.length > 0 ? (
             <nav aria-labelledby="ip-toc" className="ip-panel ip-toc">
