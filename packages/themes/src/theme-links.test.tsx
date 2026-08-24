@@ -5,6 +5,7 @@ import {
   ThemeArticleList,
   ThemeBreadcrumbs,
   ThemeFooterNavigation,
+  ThemeHomeAboutTeaser,
   ThemeNavigation,
   ThemeRecoveryLinks,
 } from "./theme-links.js";
@@ -44,6 +45,20 @@ describe("shared theme link primitives", () => {
       + '<li data-recovery-kind="search"><a href="/search">검색</a></li>'
       + '<li data-recovery-kind="replacement"><a href="/article/current">최신 안내</a></li>'
       + "</ul></nav>",
+    );
+  });
+
+  it("renders only a supplied fact-based home about teaser", () => {
+    expect(renderToStaticMarkup(<ThemeHomeAboutTeaser />)).toBe("");
+    expect(renderToStaticMarkup(<ThemeHomeAboutTeaser teaser={{
+      href: "/about",
+      label: "소개",
+      description: "한 명의 운영자가 정보를 확인하고 정리합니다.",
+    }} />)).toBe(
+      '<section aria-labelledby="home-about-teaser-heading">'
+      + '<h2 id="home-about-teaser-heading">운영자와 사이트 소개</h2>'
+      + '<p>한 명의 운영자가 정보를 확인하고 정리합니다.</p>'
+      + '<p><a href="/about">소개</a></p></section>',
     );
   });
 

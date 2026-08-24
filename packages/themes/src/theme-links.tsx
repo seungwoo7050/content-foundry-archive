@@ -3,6 +3,7 @@ import type {
   LinkViewModel,
   NavigationItemViewModel,
 } from "./presentation-view-model.js";
+import type { HomeAboutTeaserViewModel } from "./content-route-view-model.js";
 import type { StateRecoveryLinkViewModel } from "./state-route-view-model.js";
 
 function NavigationItems({
@@ -67,6 +68,20 @@ export function ThemeRecoveryLinks({
         ))}
       </ul>
     </nav>
+  ) : null;
+}
+
+export function ThemeHomeAboutTeaser({
+  teaser,
+}: {
+  readonly teaser?: HomeAboutTeaserViewModel | null | undefined;
+}) {
+  return teaser ? (
+    <section aria-labelledby="home-about-teaser-heading">
+      <h2 id="home-about-teaser-heading">운영자와 사이트 소개</h2>
+      <p>{teaser.description}</p>
+      <p><a href={teaser.href}>{teaser.label}</a></p>
+    </section>
   ) : null;
 }
 
