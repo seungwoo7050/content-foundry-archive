@@ -64,6 +64,11 @@ export function CleanPersonalArticle({
         {route.category ? <p className="personal-category"><a href={route.category.href}>{route.category.label}</a></p> : null}
         <h1>{route.heading}</h1>
         <p className="personal-article-summary">{route.description}</p>
+        {route.estimatedReadingTime ? (
+          <p className="personal-article-reading-time">
+            {route.estimatedReadingTime.label}
+          </p>
+        ) : null}
         <ThemeArticleTopics topics={route.topics} />
       </header>
       {route.advertisingEligible

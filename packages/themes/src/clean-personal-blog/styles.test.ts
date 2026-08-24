@@ -7,6 +7,9 @@ describe("Clean Personal Blog output styles", () => {
     expect(CLEAN_PERSONAL_BLOG_STYLES).toContain("prefers-reduced-motion: reduce");
     expect(CLEAN_PERSONAL_BLOG_STYLES).toContain("@media print");
     expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(".personal-article-meta");
+    expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(
+      ".personal-article-reading-time { display: inline-block;",
+    );
     expect(CLEAN_PERSONAL_BLOG_STYLES).toContain('.personal-body a[href^="http"]::after');
     expect(CLEAN_PERSONAL_BLOG_STYLES).not.toMatch(/data-ad-|adsbygoogle/i);
   });

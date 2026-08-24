@@ -34,6 +34,7 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
 .personal-topics li { padding: .25rem .6rem; background: var(--personal-surface-muted); border-radius: 999px; }
 .personal-article-header { margin-bottom: 1.5rem; }
 .personal-article-header h1 { font-size: clamp(2.3rem, 8vw, 4rem); }
+.personal-article-reading-time { display: inline-block; margin: .25rem 0 0; padding: .25rem .65rem; background: var(--personal-surface-muted); border: 1px solid var(--personal-border); border-radius: 999px; color: var(--personal-text); font-size: .88rem; font-weight: 700; }
 .personal-article-header > .theme-article-topics { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0 0; padding: 0; list-style: none; }
 .personal-article-header > .theme-article-topics li { padding: .2rem .6rem; background: var(--personal-surface-muted); border-radius: 999px; color: var(--personal-text-muted); font-size: .86rem; }
 .personal-category { margin: 0 0 .5rem; font-size: .9rem; }
