@@ -7,6 +7,7 @@ export {
   type GeneratedResponsiveImageAsset,
   type GeneratedResponsiveImageDerivative,
 } from "./generate-responsive-image-asset.js";
+export { createFilesystemImmutableObjectLoader } from "./load-immutable-object-from-directory.js";
 export {
   createBundleMediaSourceReader,
   type MediaSourceReader,
