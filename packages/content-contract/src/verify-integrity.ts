@@ -10,8 +10,12 @@ import canonicalize from "canonicalize";
 
 import { resolveSupportedContractVersion } from "./contract-version.js";
 import { ContractError } from "./errors.js";
+import type { PublicSiteReleaseManifest as PublicSiteReleaseManifestV3 } from "./generated/3.0.0/release.js";
 import type { PublicSiteReleaseManifest } from "./generated/release.js";
-import { validateContractDocumentForVersion } from "./validate-document.js";
+import {
+  type RegisteredContractSchemaVersion,
+  validateContractDocumentForVersion,
+} from "./validate-document.js";
 
 const ZERO_CHECKSUM = `sha256:${"0".repeat(64)}`;
 const MANIFEST_LINE = /^([0-9a-f]{64})  ([^\\]+)$/;
@@ -92,9 +96,7 @@ function collectFiles(root: string, directory = root): readonly string[] {
   });
 }
 
-export function verifyReleaseIntegrity(
-  root: string,
-): PublicSiteReleaseManifest {
+function readReleaseManifest(root: string): Record<string, unknown> {
   let release: Record<string, unknown>;
   try {
     release = JSON.parse(readFileSync(join(root, "release.json"), "utf8")) as Record<
@@ -107,8 +109,13 @@ export function verifyReleaseIntegrity(
     ]);
   }
 
-  const version = resolveSupportedContractVersion(release.contractVersion);
+  return release;
+}
 
+function verifyReleaseIntegrityWithManifest(
+  root: string,
+  release: Record<string, unknown>,
+) {
   const checksums = readIntegrityFile(root, "checksums.txt");
   const entries = parseChecksums(checksums);
   const listed = entries.map((entry) => entry.path);
@@ -149,5 +156,47 @@ export function verifyReleaseIntegrity(
   if (actualBundleChecksum !== expected) fail("Bundle checksum mismatch");
 
   release.bundleChecksum = expected;
+  return release;
+}
+
+export function verifyReleaseIntegrityForVersion(
+  version: "2.0.0",
+  root: string,
+): PublicSiteReleaseManifest;
+export function verifyReleaseIntegrityForVersion(
+  version: "3.0.0",
+  root: string,
+): PublicSiteReleaseManifestV3;
+export function verifyReleaseIntegrityForVersion(
+  version: RegisteredContractSchemaVersion,
+  root: string,
+): PublicSiteReleaseManifest | PublicSiteReleaseManifestV3 {
+  const release = readReleaseManifest(root);
+  if (release.contractVersion !== version) {
+    throw new ContractError(
+      "CONTRACT_INVALID",
+      `Invalid release contract version for ${version}`,
+      [{ path: "/contractVersion", message: `expected ${version}` }],
+    );
+  }
+
+  verifyReleaseIntegrityWithManifest(root, release);
+  if (version === "2.0.0") {
+    return validateContractDocumentForVersion("2.0.0", "release", release);
+  }
+  if (version === "3.0.0") {
+    return validateContractDocumentForVersion("3.0.0", "release", release);
+  }
+
+  const unhandledVersion: never = version;
+  throw new Error(`Unhandled registered contract version: ${unhandledVersion}`);
+}
+
+export function verifyReleaseIntegrity(
+  root: string,
+): PublicSiteReleaseManifest {
+  const release = readReleaseManifest(root);
+  const version = resolveSupportedContractVersion(release.contractVersion);
+  verifyReleaseIntegrityWithManifest(root, release);
   return validateContractDocumentForVersion(version, "release", release);
 }

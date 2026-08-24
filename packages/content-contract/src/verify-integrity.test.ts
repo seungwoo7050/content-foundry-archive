@@ -10,7 +10,10 @@ import { join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
 
-import { verifyReleaseIntegrity } from "./verify-integrity.js";
+import {
+  verifyReleaseIntegrity,
+  verifyReleaseIntegrityForVersion,
+} from "./verify-integrity.js";
 
 const fixture = new URL(
   "../vendor/2.0.0/fixtures/bundles/valid/site-a-minimal/",
@@ -47,6 +50,38 @@ describe("verifyReleaseIntegrity", () => {
     writeFileSync(article, readFileSync(article, "utf8").replace("발급 방법", "변조"));
     expect(() => verifyReleaseIntegrity(root)).toThrowError(
       expect.objectContaining({ code: "INTEGRITY_FAILED" }),
+    );
+  });
+
+  it("accepts canonical v3 integrity through the internal version boundary", () => {
+    const release = verifyReleaseIntegrityForVersion(
+      "3.0.0",
+      copyFixture(v3Fixture),
+    );
+    expect(release.contractVersion).toBe("3.0.0");
+    expect(release.releaseId).toBe("REL-2026-000043");
+  });
+
+  it("detects a modified v3 article through the internal version boundary", () => {
+    const root = copyFixture(v3Fixture);
+    const article = join(root, "articles", "ART-000123.json");
+    writeFileSync(article, readFileSync(article, "utf8").replace("발급 화면", "변조"));
+    expect(() =>
+      verifyReleaseIntegrityForVersion("3.0.0", root),
+    ).toThrowError(expect.objectContaining({ code: "INTEGRITY_FAILED" }));
+  });
+
+  it("rejects an internal version mismatch before integrity validation", () => {
+    const root = copyFixture();
+    const article = join(root, "articles", "ART-000123.json");
+    writeFileSync(article, readFileSync(article, "utf8").replace("발급 방법", "변조"));
+    expect(() =>
+      verifyReleaseIntegrityForVersion("3.0.0", root),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "CONTRACT_INVALID",
+        issues: [expect.objectContaining({ path: "/contractVersion" })],
+      }),
     );
   });
 
