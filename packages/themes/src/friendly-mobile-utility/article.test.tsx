@@ -16,6 +16,7 @@ const route: ArticleRouteViewModel = {
   operatorLabel: "운영자",
   published: { dateTime: "2026-08-20T00:00:00Z", label: "2026년 8월 20일" },
   updated: null,
+  estimatedReadingTime: { minutes: 2, label: "예상 읽기 시간 약 2분" },
   trustLinks: [{ href: "/about", label: "운영 방식" }],
   toc: [{ id: "step", label: "신청 단계", level: 2 }],
   sources: [{ label: "공식 안내", href: null }],
@@ -35,6 +36,12 @@ describe("Friendly Mobile Utility article", () => {
 
     expect(html).toContain("이 글에서 확인할 내용");
     expect(html).toContain(
+      '<p class="fmu-article-reading-time">예상 읽기 시간 약 2분</p>',
+    );
+    expect(html.indexOf("신청 안내")).toBeLessThan(
+      html.indexOf("예상 읽기 시간 약 2분"),
+    );
+    expect(html).toContain(
       '<ul aria-label="관련 주제" class="theme-article-topics"><li>신청</li><li>생활 행정</li></ul>',
     );
     expect(html).not.toMatch(/href="\/tag\//);
@@ -48,6 +55,17 @@ describe("Friendly Mobile Utility article", () => {
     expect(html.match(/현재 기사 저장/g)).toHaveLength(1);
     expect(html.indexOf("신청 본문")).toBeLessThan(html.indexOf("독자 도구"));
     expect(html).not.toMatch(/adsbygoogle|data-ad-|>광고</i);
+  });
+
+  it("preserves the existing article intro when reading time is absent", () => {
+    const { estimatedReadingTime: _readingTime, ...withoutReadingTime } = route;
+    const html = renderToStaticMarkup(
+      <FriendlyArticle route={withoutReadingTime} />,
+    );
+
+    expect(html).not.toContain("fmu-article-reading-time");
+    expect(html).toContain("<h1>신청 안내</h1>");
+    expect(html).toContain('<p class="fmu-eyebrow"><a href="/category/life">생활</a></p>');
   });
 
   it("omits empty and absent article topics", () => {

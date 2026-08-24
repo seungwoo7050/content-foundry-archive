@@ -58,6 +58,11 @@ export function FriendlyArticle({
   return (
     <article className="fmu-stack">
       <FriendlyRouteIntro route={route} showDescription={false} />
+      {route.estimatedReadingTime ? (
+        <p className="fmu-article-reading-time">
+          {route.estimatedReadingTime.label}
+        </p>
+      ) : null}
       {route.category ? <p className="fmu-eyebrow"><a href={route.category.href}>{route.category.label}</a></p> : null}
       <ThemeArticleTopics topics={route.topics} />
       {route.hero ? <div className="fmu-panel fmu-body">{route.hero}</div> : null}
