@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { RetiredRoute } from "../../components/retired-route";
 import { VersionedContentBlocks } from "../../components/versioned-content-blocks";
+import { findGoneRoute } from "../../lib/gone-route";
 import type { VersionedSiteReleaseContext } from "../../lib/load-site-release";
 import { createPageMetadata } from "../../lib/page-metadata";
 import {
   findPageByPathSegments,
-  getPageStaticParams,
+  getPageRouteStaticParams,
 } from "../../lib/page-route";
+import { createRetiredRouteMetadata } from "../../lib/retired-route-metadata";
 import { getVersionedSiteReleaseContext } from "../../lib/site-release";
 
 export const dynamicParams = false;
@@ -17,7 +20,7 @@ interface StaticPageProps {
 }
 
 export function generateStaticParams() {
-  return getPageStaticParams(getVersionedSiteReleaseContext().bundle);
+  return getPageRouteStaticParams(getVersionedSiteReleaseContext().bundle);
 }
 
 export async function generateMetadata({
@@ -28,6 +31,9 @@ export async function generateMetadata({
   const page = findPageByPathSegments(context.bundle, pagePath);
 
   if (!page) {
+    if (findGoneRoute(context.bundle, `/${pagePath.join("/")}`)) {
+      return createRetiredRouteMetadata();
+    }
     notFound();
   }
 
@@ -66,6 +72,15 @@ export default async function StaticPage({ params }: StaticPageProps) {
   const page = findPageByPathSegments(bundle, pagePath);
 
   if (!page) {
+    const retiredRoute = findGoneRoute(bundle, `/${pagePath.join("/")}`);
+    if (retiredRoute) {
+      return (
+        <RetiredRoute
+          path={retiredRoute.path}
+          replacementPath={retiredRoute.replacementPath}
+        />
+      );
+    }
     notFound();
   }
 

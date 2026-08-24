@@ -8,6 +8,7 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
   findPageByPathSegments,
+  getPageRouteStaticParams,
   getPageStaticParams,
   type PageRouteSource,
 } from "./page-route";
@@ -37,6 +38,33 @@ describe("static page route selection", () => {
 
     expect(getPageStaticParams(nestedBundle)).toEqual([
       { pagePath: ["legal", "privacy-policy"] },
+    ]);
+  });
+
+  it("adds only root-owned retired paths to the catch-all page set", () => {
+    expect(
+      getPageRouteStaticParams({
+        pages: [{ path: "/about" }],
+        redirects: {
+          items: [
+            {
+              type: "gone",
+              path: "/guides/retired/deep",
+              status: 410,
+              replacementPath: "/archive",
+            },
+            {
+              type: "gone",
+              path: "/article/retired-guide",
+              status: 410,
+              replacementPath: null,
+            },
+          ],
+        },
+      }),
+    ).toEqual([
+      { pagePath: ["about"] },
+      { pagePath: ["guides", "retired", "deep"] },
     ]);
   });
 

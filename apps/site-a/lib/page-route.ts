@@ -3,6 +3,8 @@ import {
   type ContractIssue,
 } from "@content-foundry/content-contract";
 
+import { getGoneRootStaticParams, type GoneRouteSource } from "./gone-route";
+
 export interface PageRouteRecord {
   readonly path: string;
 }
@@ -51,6 +53,12 @@ export function getPageStaticParams(bundle: PageRouteSource) {
   return bundle.pages.map((page) => ({
     pagePath: page.path.slice(1).split("/"),
   }));
+}
+
+export function getPageRouteStaticParams(
+  bundle: PageRouteSource & GoneRouteSource,
+) {
+  return [...getPageStaticParams(bundle), ...getGoneRootStaticParams(bundle)];
 }
 
 export function findPageByPathSegments<TPage extends PageRouteRecord>(
