@@ -223,6 +223,20 @@ assert.deepEqual(sitemapEntries, [
 ]);
 
 assert.match(home, /<h1 id="home-title">생활메모<\/h1>/);
+assert.match(home, /<p>운영: 생활메모<\/p>/);
+const homeStructuredData = readJsonLdScripts("home", home);
+assert.deepEqual(homeStructuredData, [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "생활메모",
+    url: "https://example.com/",
+    description: "실생활에 도움이 되는 정보를 정리하는 1인 운영 블로그",
+    inLanguage: "ko-KR",
+    publisher: { "@type": "Person", name: "생활메모" },
+  },
+]);
+assert.ok(!Object.hasOwn(homeStructuredData[0], "potentialAction"));
 assert.match(home, /<h2 id="home-search">필요한 안내 찾기<\/h2>/);
 assert.match(home, /href="\/search">사이트 검색<\/a>/);
 assert.match(
@@ -275,6 +289,17 @@ assert.deepEqual(articleStructuredData, [
     ],
   },
 ]);
+for (const [label, html] of [
+  ["article", article],
+  ["category", category],
+  ["static page", staticPage],
+  ["search", search],
+]) {
+  assert.ok(
+    readJsonLdScripts(label, html).every((data) => data["@type"] !== "WebSite"),
+    `${label} includes home-only WebSite structured data`,
+  );
+}
 assert.match(article, /<h2 id="article-trust-title">이 안내의 정보<\/h2>/);
 assert.match(article, /<dt>작성<\/dt><dd>생활메모<\/dd>/);
 assert.match(article, /<dt>운영<\/dt><dd>생활메모<\/dd>/);
