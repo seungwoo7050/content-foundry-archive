@@ -67,6 +67,12 @@ function render(route: HtmlRouteViewModel, adSlots?: ThemeAdSlots) {
   ));
 }
 
+function mainMarkup(html: string): string {
+  const markup = html.match(/<main\b[\s\S]*?<\/main>/)?.[0];
+  if (!markup) throw new Error("Rendered theme is missing its main landmark");
+  return markup;
+}
+
 function routeAt(index: number): HtmlRouteViewModel {
   const route = routes[index];
   if (!route) throw new Error(`Missing route fixture at index ${index}`);
@@ -180,14 +186,14 @@ describe("Minimal Knowledge Base", () => {
   it("renders projected home groups as distinct knowledge paths", () => {
     const home = routeAt(0);
     if (home.kind !== "home") throw new Error("Expected home fixture");
-    const html = render({
+    const html = mainMarkup(render({
       ...home,
       currentArticles: [articleItem],
       featuredArticles: [articleItem],
       evergreenArticles: [articleItem],
       latestArticles: [articleItem],
       categoryHighlights: [{ category: home.categories[0]!, articles: [articleItem] }],
-    });
+    }));
     const groups = [
       "kb-home-current",
       "kb-home-featured",
@@ -207,7 +213,7 @@ describe("Minimal Knowledge Base", () => {
   });
 
   it("keeps the legacy article list when presentation groups are absent", () => {
-    const html = render(routeAt(0));
+    const html = mainMarkup(render(routeAt(0)));
 
     expect(html).toContain('class="kb-latest-articles"');
     expect(html).not.toContain("kb-home-article-group");
@@ -216,7 +222,7 @@ describe("Minimal Knowledge Base", () => {
   it("renders one factual home introduction and omits absent variants", () => {
     const home = routeAt(0);
     if (home.kind !== "home") throw new Error("Expected home fixture");
-    const html = render(home);
+    const html = mainMarkup(render(home));
     const { aboutTeaser: _omitted, ...withoutTeaser } = home;
 
     expect(html.match(/<h2 id="home-about-teaser-heading">/g)).toHaveLength(1);
@@ -225,8 +231,8 @@ describe("Minimal Knowledge Base", () => {
     expect(html.indexOf("kb-latest-articles")).toBeLessThan(
       html.indexOf("home-about-teaser-heading"),
     );
-    expect(render({ ...home, aboutTeaser: null })).not.toContain("home-about-teaser-heading");
-    expect(render(withoutTeaser)).not.toContain("home-about-teaser-heading");
+    expect(mainMarkup(render({ ...home, aboutTeaser: null }))).not.toContain("home-about-teaser-heading");
+    expect(mainMarkup(render(withoutTeaser))).not.toContain("home-about-teaser-heading");
   });
 
   it.each(["category", "archive"] as const)(
