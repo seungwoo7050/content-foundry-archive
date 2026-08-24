@@ -52,4 +52,12 @@ export const INFORMATION_PORTAL_STYLES = `
 .ip-state{max-width:46rem;margin-inline:auto;text-align:center;padding-block:2rem}.ip-code{color:var(--color-danger);font-weight:850}.ip-footer{border-top:1px solid var(--color-border);background:var(--color-surface);padding:1rem}.ip-footer p{margin:0;color:var(--color-text-muted);font-size:.9rem}
 @media (min-width:44rem){.ip-directory{grid-template-columns:repeat(3,minmax(0,1fr))}.ip-list>ul,.ip-list>ol{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (min-width:64rem){.ip-article-layout{grid-template-columns:minmax(0,1fr) minmax(15rem,20rem)}.ip-article-main{grid-column:1}.ip-article-rail{grid-column:2}.ip-list>ul,.ip-list>ol{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){.ip,.ip *{scroll-behavior:auto!important;animation-name:none!important;transition-duration:.01ms!important}}
+@media print{
+  .ip{min-height:auto;background:#fff;color:#000;font-family:ui-serif,Georgia,serif;font-size:11pt;line-height:1.55}
+  .ip-masthead,.ip-footer,.ip-skip,.ip-breadcrumbs,.ip-article-rail,.ip aside[aria-label="광고"],.ip button{display:none!important}
+  .ip-main{display:block;width:100%;padding:0}.ip-article-layout,.ip-article-main{display:block}
+  .ip-panel,.ip-list article{break-inside:avoid;border:1px solid #aaa;background:#fff}
+  .ip-body a[href^="http"]::after{content:" (" attr(href) ")";font-size:.8em;overflow-wrap:anywhere}
+}
 `;

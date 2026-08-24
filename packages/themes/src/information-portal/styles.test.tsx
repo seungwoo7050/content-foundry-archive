@@ -24,4 +24,12 @@ describe("Information Portal styles", () => {
     expect(INFORMATION_PORTAL_STYLES).toContain("min-height:44px");
     expect(INFORMATION_PORTAL_STYLES).not.toMatch(/ranking|trending|popular/i);
   });
+
+  it("supports reduced motion and a main-first print layout", () => {
+    expect(INFORMATION_PORTAL_STYLES).toContain("prefers-reduced-motion:reduce");
+    expect(INFORMATION_PORTAL_STYLES).toContain("@media print");
+    expect(INFORMATION_PORTAL_STYLES).toContain(".ip-article-rail");
+    expect(INFORMATION_PORTAL_STYLES).toContain('.ip-body a[href^="http"]::after');
+    expect(INFORMATION_PORTAL_STYLES).not.toMatch(/data-ad-|adsbygoogle/i);
+  });
 });
