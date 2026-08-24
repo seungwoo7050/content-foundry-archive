@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+import { AnalyticsEventDispatcher } from "../components/analytics-event-dispatcher";
 import { GoogleProviderHead } from "../components/google-provider-head";
 import {
   createBuildConfigChecksum,
@@ -10,6 +11,7 @@ import {
   createReleaseIdentity,
   createReleaseIdentityMetadata,
 } from "../lib/release-identity";
+import { createSiteAnalyticsRouteProjection } from "../lib/site-analytics-route-projection";
 import { resolveSiteLaunchConfig } from "../lib/site-launch-config";
 import { getVersionedSiteReleaseContext } from "../lib/site-release";
 import "./globals.css";
@@ -75,7 +77,14 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           cmp={launch.cmp}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {launch.analytics.provider === "ga4" ? (
+          <AnalyticsEventDispatcher
+            projection={createSiteAnalyticsRouteProjection(context.bundle)}
+          />
+        ) : null}
+        {children}
+      </body>
     </html>
   );
 }

@@ -115,6 +115,11 @@ function assertSafeHtml(label, html) {
     /googletagmanager|google-analytics|doubleclick|adsbygoogle|data-ad-client/i,
     `${label} includes ads or analytics`,
   );
+  assert.doesNotMatch(
+    html,
+    /routeTypesByPath/,
+    `${label} includes an analytics dispatcher payload`,
+  );
   assertSafeScripts(label, html);
 }
 
