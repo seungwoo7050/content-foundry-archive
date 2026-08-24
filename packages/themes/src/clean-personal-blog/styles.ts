@@ -32,6 +32,32 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
 .personal-article-list article, .personal-related article { padding-bottom: 1.2rem; border-bottom: 1px solid var(--personal-border); }
 .personal-article-list article > p:first-child, .personal-related article > p:first-child { color: var(--personal-text-muted); font-size: .85rem; }
 .personal-article-list h2, .personal-article-list h3, .personal-related h3 { margin-block: .25rem; font-family: ui-serif, Georgia, serif; }
+:is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) > ul { margin: 0; }
+:is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) article { min-width: 0; overflow-wrap: anywhere; }
+:is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) article > p:first-of-type { margin: 0 0 .45rem; color: var(--personal-text-muted); font-size: .8rem; }
+:is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) article > h3 + p { margin: .65rem 0 0; color: var(--personal-text-muted); }
+:is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) article > ul { display: flex; flex-wrap: wrap; gap: .35rem; margin: .85rem 0 0; padding: 0; list-style: none; }
+:is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) article > ul li { padding: .15rem .5rem; background: var(--personal-surface-muted); border: 1px solid var(--personal-border); border-radius: 999px; color: var(--personal-text-muted); font-size: .74rem; }
+:is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) .content-image { margin: 0 0 1rem; }
+:is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) .content-image picture { display: block; }
+:is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) .content-image img { display: block; width: 100%; max-width: 100%; height: auto; }
+:is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) .content-image figcaption { margin-top: .45rem; color: var(--personal-text-muted); font-size: .75rem; }
+.personal-home-featured { margin-block: clamp(3.5rem, 9vw, 5.5rem); }
+.personal-home-featured > h2 { font-size: clamp(1.6rem, 5vw, 2.15rem); }
+.personal-home-featured article { padding: clamp(1.2rem, 4vw, 2rem); background: var(--personal-surface-muted); border: 1px solid var(--personal-border); border-top: .25rem solid var(--personal-primary); }
+.personal-home-featured article > h3 { font-size: clamp(1.45rem, 5vw, 2.15rem); line-height: 1.2; }
+.personal-home-current > ul { gap: 1.5rem; }
+.personal-home-current article { padding: 1.25rem; background: var(--personal-surface); border: 1px solid var(--personal-border); border-left: .2rem solid var(--personal-primary); }
+.personal-home-current article > h3 { font-size: 1.3rem; }
+.personal-home-reference > ul { gap: .75rem; }
+.personal-home-reference article { padding: .9rem 0; font-size: .94rem; }
+.personal-home-reference article > h3 { font-size: 1.05rem; }
+.personal-home-latest article { padding-block: 1rem 1.3rem; }
+.personal-home-category-highlight { padding: clamp(1rem, 4vw, 1.5rem); background: var(--personal-surface-muted); border: 1px solid var(--personal-border); border-radius: .5rem; }
+.personal-home-category-highlight > h2 { margin-top: 0; }
+.personal-home-category-highlight > h2 a { color: var(--personal-text); }
+.personal-home-category-highlight > p { color: var(--personal-text-muted); }
+.personal-home-category-highlight article { padding: 1rem; background: var(--personal-surface); border: 1px solid var(--personal-border); }
 .personal-topics { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; list-style: none; }
 .personal-topics li { padding: .25rem .6rem; background: var(--personal-surface-muted); border-radius: 999px; }
 .personal-article-header { margin-bottom: 1.5rem; }
@@ -57,7 +83,13 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
 .personal-state__code { color: var(--personal-text-muted); font-size: .85rem; letter-spacing: .12em; }
 .personal-state__action { display: inline-block; padding: .55rem .9rem; background: var(--personal-primary); color: var(--personal-on-primary) !important; }
 .personal-footer { padding-block: 2rem; background: var(--personal-surface); border-top: 1px solid var(--personal-border); color: var(--personal-text-muted); }
-@media (min-width: 44rem) { .personal-categories { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 30rem) {
+  .personal-home-featured article, .personal-home-current article, .personal-home-category-highlight article { padding: .9rem; }
+  .personal-home-category-highlight { padding: .9rem; }
+}
+@media (min-width: 44rem) {
+  .personal-categories, .personal-home-reference > ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 @media (prefers-reduced-motion: reduce) {
   .personal-blog, .personal-blog * { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
@@ -69,5 +101,8 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
   .personal-article-meta, .personal-toc, .personal-evidence { break-inside: avoid; border: 1px solid #aaa; border-radius: 0; background: #fff; }
   .personal-body { font-size: inherit; }
   .personal-body a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; overflow-wrap: anywhere; }
+  :is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) > ul { display: block; }
+  :is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) > ul > li { margin-bottom: 1rem; break-inside: avoid; }
+  :is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) .content-image { max-width: 30rem; }
 }
 `;
