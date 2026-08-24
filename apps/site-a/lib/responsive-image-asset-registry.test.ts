@@ -1,5 +1,8 @@
 import type { MediaManifestV3 } from "@content-foundry/content-contract";
-import type { ResponsiveImageAsset } from "@content-foundry/media";
+import {
+  projectResponsiveImageAsset,
+  type ResponsiveImageAsset,
+} from "@content-foundry/media";
 import { describe, expect, it } from "vitest";
 
 import { createResponsiveImageAssetRegistry } from "./responsive-image-asset-registry";
@@ -21,21 +24,10 @@ const manifest: MediaManifestV3 = {
 
 function asset(index: number): ResponsiveImageAsset {
   const media = manifest.items[index]!;
-  return {
-    fallback: {
-      mediaId: media.id,
-      relativePath: `_media/${media.sha256}/source.png`,
-      publicPath: `/_media/${media.sha256}/source.png`,
-      sha256: media.sha256,
-      mimeType: media.mimeType,
-      width: media.width,
-      height: media.height,
-      alt: media.alt,
-      credit: media.credit,
-      license: media.license,
-    },
-    derivatives: [],
-  };
+  return projectResponsiveImageAsset(
+    { media, mimeType: media.mimeType, width: media.width, height: media.height },
+    `/media/items/${index}`,
+  );
 }
 
 describe("createResponsiveImageAssetRegistry", () => {
@@ -67,5 +59,30 @@ describe("createResponsiveImageAssetRegistry", () => {
         ],
       }),
     );
+  });
+
+  it("rejects missing and poisoned responsive derivative projections", () => {
+    const first = asset(0);
+    const derivative = first.derivatives[0]!;
+    const staleAssets = [
+      { ...first, derivatives: [] },
+      {
+        ...first,
+        derivatives: [{ ...derivative, publicPath: "/_media/stale.webp" }],
+      },
+    ];
+
+    for (const stale of staleAssets) {
+      expect(() =>
+        createResponsiveImageAssetRegistry(manifest, [stale, asset(1)]),
+      ).toThrowError(
+        expect.objectContaining({
+          code: "BUILD_FAILED",
+          issues: [
+            expect.objectContaining({ path: "/media/items/0/projection" }),
+          ],
+        }),
+      );
+    }
   });
 });

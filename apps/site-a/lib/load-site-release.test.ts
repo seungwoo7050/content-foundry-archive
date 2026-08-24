@@ -9,7 +9,10 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
 import type { MediaManifestV3 } from "@content-foundry/content-contract";
-import type { ResponsiveImageAsset } from "@content-foundry/media";
+import {
+  projectResponsiveImageAsset,
+  type ResponsiveImageAsset,
+} from "@content-foundry/media";
 import { resolveBuildTargetConfig } from "@content-foundry/site-core";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -29,21 +32,12 @@ function mediaAssets(): ResponsiveImageAsset[] {
   const manifest = JSON.parse(
     readFileSync(join(v3Fixture, "media/media-manifest.json"), "utf8"),
   ) as MediaManifestV3;
-  return manifest.items.map((media) => ({
-    fallback: {
-      mediaId: media.id,
-      relativePath: `_media/${media.sha256}/source.png`,
-      publicPath: `/_media/${media.sha256}/source.png`,
-      sha256: media.sha256,
-      mimeType: media.mimeType,
-      width: media.width,
-      height: media.height,
-      alt: media.alt,
-      credit: media.credit,
-      license: media.license,
-    },
-    derivatives: [],
-  }));
+  return manifest.items.map((media, index) =>
+    projectResponsiveImageAsset(
+      { media, mimeType: media.mimeType, width: media.width, height: media.height },
+      `/media/items/${index}`,
+    ),
+  );
 }
 
 function templateConfig(releaseDirectory = fixture) {
