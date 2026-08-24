@@ -1,11 +1,15 @@
 import { resolve } from "node:path";
 
-import { loadReleaseBundle } from "@content-foundry/content-contract";
-import { describe, expect, it } from "vitest";
+import {
+  loadReleaseBundle,
+  type LoadedReleaseBundleV3,
+} from "@content-foundry/content-contract";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
   createReleaseIdentity,
   createReleaseIdentityMetadata,
+  type ReleaseIdentitySource,
 } from "./release-identity";
 
 const fixture = resolve(
@@ -14,6 +18,10 @@ const fixture = resolve(
 );
 
 describe("release identity", () => {
+  it("accepts the v3 release identity structure", () => {
+    expectTypeOf<LoadedReleaseBundleV3>().toExtend<ReleaseIdentitySource>();
+  });
+
   it("projects the four public release fields", () => {
     const identity = createReleaseIdentity(loadReleaseBundle(fixture));
 

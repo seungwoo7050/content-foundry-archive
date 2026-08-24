@@ -1,4 +1,3 @@
-import type { LoadedReleaseBundle } from "@content-foundry/content-contract";
 import type { Metadata } from "next";
 
 export interface ReleaseIdentity {
@@ -8,8 +7,12 @@ export interface ReleaseIdentity {
   readonly bundleChecksum: string;
 }
 
+export interface ReleaseIdentitySource {
+  readonly release: ReleaseIdentity;
+}
+
 export function createReleaseIdentity(
-  bundle: LoadedReleaseBundle,
+  bundle: ReleaseIdentitySource,
 ): ReleaseIdentity {
   return {
     releaseId: bundle.release.releaseId,
