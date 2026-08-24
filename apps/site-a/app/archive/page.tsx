@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
-import { getArchiveEntries } from "../../lib/archive-view-model";
+import { createArchiveThemeViewModel } from "../../lib/archive-theme-view-model";
 import { getVersionedSiteReleaseContext } from "../../lib/site-release";
+import { renderThemePage } from "../../lib/theme-page";
 
 export function generateMetadata(): Metadata {
   const context = getVersionedSiteReleaseContext();
@@ -28,36 +29,5 @@ export function generateMetadata(): Metadata {
 
 export default function ArchivePage() {
   const { bundle } = getVersionedSiteReleaseContext();
-  const entries = getArchiveEntries(bundle);
-  const dateFormatter = new Intl.DateTimeFormat(bundle.site.locale, {
-    dateStyle: "long",
-    timeZone: bundle.site.timeZone,
-  });
-
-  return (
-    <div className="archive-page">
-      <header>
-        <h1>전체 글</h1>
-        <p>{bundle.site.name}의 안내 글을 게시일 최신순으로 모았습니다.</p>
-      </header>
-      <ol className="article-list">
-        {entries.map(({ article, category }) => (
-          <li key={article.id}>
-            <article>
-              <p>
-                <a href={`/category/${category.slug}`}>{category.label}</a>{" "}
-                <time dateTime={article.publishedAt}>
-                  {dateFormatter.format(new Date(article.publishedAt))}
-                </time>
-              </p>
-              <h2>
-                <a href={article.seo.canonicalPath}>{article.title}</a>
-              </h2>
-              <p>{article.summary}</p>
-            </article>
-          </li>
-        ))}
-      </ol>
-    </div>
-  );
+  return renderThemePage(bundle, createArchiveThemeViewModel(bundle));
 }
