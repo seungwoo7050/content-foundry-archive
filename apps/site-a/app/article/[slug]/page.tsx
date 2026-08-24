@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { RetiredRoute } from "../../../components/retired-route";
 import { VersionedContentBlocks } from "../../../components/versioned-content-blocks";
 import { createArticleMetadata } from "../../../lib/article-metadata";
 import {
   findArticleBySlug,
-  getArticleStaticParams,
+  getArticlePageStaticParams,
 } from "../../../lib/article-route";
+import { findGoneRoute } from "../../../lib/gone-route";
 import type { VersionedSiteReleaseContext } from "../../../lib/load-site-release";
+import { createRetiredRouteMetadata } from "../../../lib/retired-route-metadata";
 import { getVersionedSiteReleaseContext } from "../../../lib/site-release";
 
 export const dynamicParams = false;
@@ -17,7 +20,7 @@ interface ArticlePageProps {
 }
 
 export function generateStaticParams() {
-  return getArticleStaticParams(getVersionedSiteReleaseContext().bundle);
+  return getArticlePageStaticParams(getVersionedSiteReleaseContext().bundle);
 }
 
 export async function generateMetadata({
@@ -28,6 +31,9 @@ export async function generateMetadata({
   const article = findArticleBySlug(context.bundle, slug);
 
   if (!article) {
+    if (findGoneRoute(context.bundle, `/article/${slug}`)) {
+      return createRetiredRouteMetadata();
+    }
     notFound();
   }
 
@@ -63,6 +69,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const article = findArticleBySlug(bundle, slug);
 
   if (!article) {
+    const retiredRoute = findGoneRoute(bundle, `/article/${slug}`);
+    if (retiredRoute) {
+      return (
+        <RetiredRoute
+          path={retiredRoute.path}
+          replacementPath={retiredRoute.replacementPath}
+        />
+      );
+    }
     notFound();
   }
 

@@ -8,6 +8,7 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
   findArticleBySlug,
+  getArticlePageStaticParams,
   getArticleStaticParams,
   type ArticleRouteSource,
 } from "./article-route";
@@ -34,6 +35,24 @@ describe("article route selection", () => {
     expect(getArticleStaticParams(bundle)).toEqual([
       { slug: "government24-resident-registration-guide" },
     ]);
+  });
+
+  it("adds retired article slugs to the static page set", () => {
+    expect(
+      getArticlePageStaticParams({
+        articles: [{ slug: "current-guide" }],
+        redirects: {
+          items: [
+            {
+              type: "gone",
+              path: "/article/retired-guide",
+              status: 410,
+              replacementPath: "/article/current-guide",
+            },
+          ],
+        },
+      }),
+    ).toEqual([{ slug: "current-guide" }, { slug: "retired-guide" }]);
   });
 
   it("returns no article for a missing slug", () => {
