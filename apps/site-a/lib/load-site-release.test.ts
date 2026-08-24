@@ -20,6 +20,7 @@ import {
   bindValidatedSiteReleaseV3,
   loadSiteRelease,
   loadSiteReleaseV3,
+  loadValidatedSiteRelease,
   loadValidatedSiteReleaseV3,
 } from "./load-site-release";
 
@@ -65,7 +66,9 @@ afterEach(() => {
 describe("loadSiteRelease", () => {
   it("loads the validated Site A template release", () => {
     const context = loadSiteRelease(templateConfig());
+    const versioned = loadValidatedSiteRelease(templateConfig());
 
+    expect(versioned).toEqual(context);
     expect(context.bundle.release.releaseId).toBe("REL-2026-000042");
     expect(context.contractVersion).toBe("2.0.0");
     expect(context.canonicalOrigin).toBe("https://example.com");
@@ -75,11 +78,13 @@ describe("loadSiteRelease", () => {
   it("assembles a fully validated synchronous v3 release context", () => {
     const config = templateConfig(v3Fixture);
     const validated = loadValidatedSiteReleaseV3(config);
+    const versioned = loadValidatedSiteRelease(config);
     const bound = bindValidatedSiteReleaseV3(validated, mediaAssets());
     const context = loadSiteReleaseV3(config, {
       mediaAssets: mediaAssets(),
     });
 
+    expect(versioned).toEqual(validated);
     expect(bound).toEqual(context);
     expect(validated.bundle).toEqual(context.bundle);
     expect(validated.nicheComponents).toEqual(context.nicheComponents);
@@ -90,7 +95,7 @@ describe("loadSiteRelease", () => {
     expect(context.canonicalOrigin).toBe("https://example.com");
   });
 
-  it("rejects an unsupported contract before integrity validation", () => {
+  it("verifies integrity after selecting a supported declaration", () => {
     const root = mkdtempSync(join(tmpdir(), "site-a-release-"));
     cpSync(fixture, root, { recursive: true });
     temporaryRoots.push(root);
@@ -103,7 +108,7 @@ describe("loadSiteRelease", () => {
     writeFileSync(manifest, `${JSON.stringify(release, null, 2)}\n`);
 
     expect(() => loadSiteRelease(templateConfig(root))).toThrowError(
-      expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }),
+      expect.objectContaining({ code: "INTEGRITY_FAILED" }),
     );
   });
 

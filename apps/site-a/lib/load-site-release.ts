@@ -3,8 +3,7 @@ import type {
   LoadedReleaseBundleV3,
 } from "@content-foundry/content-contract";
 import {
-  loadReleaseBundle,
-  loadV3ReleaseBundle,
+  loadSupportedReleaseBundle,
 } from "@content-foundry/content-contract";
 import type { ResponsiveImageAsset } from "@content-foundry/media";
 import {
@@ -51,6 +50,10 @@ export interface SiteReleaseContextByVersion {
 export type VersionedSiteReleaseContext =
   SiteReleaseContextByVersion[keyof SiteReleaseContextByVersion];
 
+export type ValidatedVersionedSiteRelease =
+  | SiteReleaseContext
+  | ValidatedSiteReleaseV3;
+
 export interface LoadSiteReleaseV3Options {
   readonly mediaAssets: Iterable<ResponsiveImageAsset>;
 }
@@ -73,26 +76,18 @@ function validateCanonicalOrigin(config: BuildTargetConfig, origin: string) {
 export function loadSiteRelease(
   config: BuildTargetConfig,
 ): SiteReleaseContext {
-  const bundle = validateSiteRouteGraph(
-    loadReleaseBundle(config.releaseDirectory, {
-      expectedSiteId: config.siteId,
-    }),
-  );
-  return {
-    contractVersion: "2.0.0",
-    config,
-    bundle,
-    canonicalOrigin: validateCanonicalOrigin(config, bundle.site.origin),
-  };
+  const context = loadValidatedSiteRelease(config);
+  if (context.contractVersion === "2.0.0") return context;
+  throw new BuildTargetConfigError("Expected a contract 2.0.0 site release");
 }
 
-export function loadValidatedSiteReleaseV3(
+export function loadValidatedSiteRelease(
   config: BuildTargetConfig,
-): ValidatedSiteReleaseV3 {
+): ValidatedVersionedSiteRelease {
   const nicheComponents = createSiteNicheComponentRegistry();
-  const bundle = loadV3ReleaseBundle(config.releaseDirectory, {
+  const bundle = loadSupportedReleaseBundle(config.releaseDirectory, {
     expectedSiteId: config.siteId,
-    resolveConsumerContext: (candidate) => {
+    resolveV3ConsumerContext: (candidate) => {
       validateSiteRouteGraph(candidate);
       return {
         generatedRoutes: getGeneratedRoutes(candidate),
@@ -101,13 +96,31 @@ export function loadValidatedSiteReleaseV3(
     },
   });
 
+  if (bundle.release.contractVersion === "2.0.0") {
+    const validated = validateSiteRouteGraph(bundle as LoadedReleaseBundle);
+    return {
+      contractVersion: "2.0.0",
+      config,
+      bundle: validated,
+      canonicalOrigin: validateCanonicalOrigin(config, validated.site.origin),
+    };
+  }
+
   return {
     contractVersion: "3.0.0",
     config,
-    bundle,
+    bundle: bundle as LoadedReleaseBundleV3,
     canonicalOrigin: validateCanonicalOrigin(config, bundle.site.origin),
     nicheComponents,
   };
+}
+
+export function loadValidatedSiteReleaseV3(
+  config: BuildTargetConfig,
+): ValidatedSiteReleaseV3 {
+  const context = loadValidatedSiteRelease(config);
+  if (context.contractVersion === "3.0.0") return context;
+  throw new BuildTargetConfigError("Expected a contract 3.0.0 site release");
 }
 
 export function loadSiteReleaseV3(
