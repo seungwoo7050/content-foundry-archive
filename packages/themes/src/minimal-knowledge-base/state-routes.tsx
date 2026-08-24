@@ -4,6 +4,7 @@ import type {
   SearchRouteViewModel,
   StateRouteViewModel,
 } from "../state-route-view-model.js";
+import { ThemeRecoveryLinks } from "../theme-links.js";
 import { KnowledgeBreadcrumbs } from "./route-chrome.js";
 
 function SearchRoute({ route }: { readonly route: SearchRouteViewModel }) {
@@ -22,6 +23,7 @@ function NotFoundRoute({ route }: { readonly route: NotFoundRouteViewModel }) {
       <KnowledgeBreadcrumbs route={route} />
       <p>{route.statusCode}</p><h1>{route.heading}</h1><p>{route.description}</p>
       <p><a href={route.action.href}>{route.action.label}</a></p>
+      <ThemeRecoveryLinks items={route.recoveryLinks} />
     </section>
   );
 }
@@ -32,6 +34,7 @@ function RetiredRoute({ route }: { readonly route: RetiredRouteViewModel }) {
       <KnowledgeBreadcrumbs route={route} />
       <p>{route.statusCode}</p><h1>{route.heading}</h1><p>{route.description}</p>
       <p><a href={route.action.href}>{route.action.label}</a></p>
+      <ThemeRecoveryLinks items={route.recoveryLinks} />
     </section>
   );
 }

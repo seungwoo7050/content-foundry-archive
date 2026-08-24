@@ -27,6 +27,12 @@ const articleItem: ArticleListItemViewModel = {
   topics: ["신청"],
 };
 
+const recoveryLinks = [
+  { kind: "search", href: "/search", label: "검색" },
+  { kind: "category", href: "/category/life", label: "생활 안내" },
+  { kind: "replacement", href: "/article/current", label: "최신 안내" },
+] as const;
+
 function base(path: string, heading: string) {
   return {
     path,
@@ -45,8 +51,8 @@ const routes = [
   { ...base("/about", "소개"), kind: "static-page", body: <p>정적 본문</p> },
   { ...base("/archive", "전체 글"), kind: "archive", articles: [articleItem] },
   { ...base("/search", "검색"), kind: "search", client: <form>검색 클라이언트</form> },
-  { ...base("/404", "찾을 수 없음"), kind: "not-found", statusCode: 404, action: { href: "/", label: "홈" } },
-  { ...base("/old", "제공 종료"), kind: "retired", statusCode: 410, action: { href: "/archive", label: "전체 글" } },
+  { ...base("/404", "찾을 수 없음"), kind: "not-found", statusCode: 404, action: { href: "/", label: "홈" }, recoveryLinks },
+  { ...base("/old", "제공 종료"), kind: "retired", statusCode: 410, action: { href: "/archive", label: "전체 글" }, recoveryLinks },
 ] satisfies readonly HtmlRouteViewModel[];
 
 function render(route: HtmlRouteViewModel) {
@@ -131,5 +137,23 @@ describe("Minimal Knowledge Base", () => {
     expect(html).toContain(">404<");
     expect(html).toContain(">410<");
     expect(html).not.toMatch(/검증일|evergreen|popularity|ranking|저장|save/i);
+  });
+
+  it("renders ordered recovery paths once after each state route primary action", () => {
+    for (const html of [render(routeAt(6)), render(routeAt(7))]) {
+      const positions = [">검색</a>", ">생활 안내</a>", ">최신 안내</a>"]
+        .map((value) => html.indexOf(value));
+      const primaryAction = Math.max(html.indexOf(">홈</a>"), html.indexOf(">전체 글</a>"));
+      expect(positions).toEqual([...positions].sort((a, b) => a - b));
+      expect(primaryAction).toBeLessThan(positions[0] ?? -1);
+      expect(html.match(/aria-label="페이지 복구 경로"/g)).toHaveLength(1);
+      expect(html).not.toContain('href="/category"');
+    }
+
+    const withoutRecovery = render({
+      ...base("/empty-404", "복구 경로 없음"), kind: "not-found", statusCode: 404,
+      action: { href: "/", label: "홈" }, recoveryLinks: [],
+    });
+    expect(withoutRecovery).not.toContain("페이지 복구 경로");
   });
 });
