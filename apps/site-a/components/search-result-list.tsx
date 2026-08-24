@@ -13,6 +13,30 @@ interface SearchResultListProps {
   readonly timeZone: string;
 }
 
+export function SearchFallbackLinks({
+  categories,
+}: {
+  readonly categories: readonly SearchFallbackCategory[];
+}) {
+  return (
+    <div className="search-fallback">
+      <p>검색어를 바꾸거나 카테고리와 전체 글에서 찾아보세요.</p>
+      <ul>
+        {categories.map((category) => (
+          <li key={category.id}>
+            <a href={category.href}>{category.label}</a>
+          </li>
+        ))}
+        <li>
+          {/* Static export intentionally uses native navigation. */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a href="/archive">전체 글 보기</a>
+        </li>
+      </ul>
+    </div>
+  );
+}
+
 export function SearchResultList({
   results,
   categories,
@@ -51,21 +75,7 @@ export function SearchResultList({
           ))}
         </ol>
       ) : (
-        <div className="search-fallback">
-          <p>검색어를 바꾸거나 카테고리와 전체 글에서 찾아보세요.</p>
-          <ul>
-            {categories.map((category) => (
-              <li key={category.id}>
-                <a href={category.href}>{category.label}</a>
-              </li>
-            ))}
-            <li>
-              {/* Static export intentionally uses native navigation. */}
-              {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-              <a href="/archive">전체 글 보기</a>
-            </li>
-          </ul>
-        </div>
+        <SearchFallbackLinks categories={categories} />
       )}
     </section>
   );
