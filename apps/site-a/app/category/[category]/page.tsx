@@ -1,20 +1,17 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { CategoryListing } from "../../../components/category-listing";
-import { RetiredRoute } from "../../../components/retired-route";
-import {
-  getCategoryArticles,
-  getCategoryTags,
-} from "../../../lib/category-articles";
 import { createCategoryMetadata } from "../../../lib/category-metadata";
 import {
   findCategoryBySlug,
   getCategoryPageStaticParams,
 } from "../../../lib/category-route";
+import { createCategoryThemeViewModel } from "../../../lib/category-theme-view-model";
 import { findGoneRoute } from "../../../lib/gone-route";
 import { createRetiredRouteMetadata } from "../../../lib/retired-route-metadata";
 import { getVersionedSiteReleaseContext } from "../../../lib/site-release";
+import { createRetiredThemeViewModel } from "../../../lib/status-theme-view-model";
+import { renderThemePage } from "../../../lib/theme-page";
 
 export const dynamicParams = false;
 
@@ -51,26 +48,16 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   if (!category) {
     const retiredRoute = findGoneRoute(bundle, `/category/${slug}`);
     if (retiredRoute) {
-      return (
-        <RetiredRoute
-          path={retiredRoute.path}
-          replacementPath={retiredRoute.replacementPath}
-        />
+      return renderThemePage(
+        bundle,
+        createRetiredThemeViewModel(bundle, retiredRoute),
       );
     }
     notFound();
   }
 
-  const articles = getCategoryArticles(bundle, category.id);
-  const tags = getCategoryTags(bundle, articles);
-
-  return (
-    <CategoryListing
-      articles={articles}
-      category={category}
-      locale={bundle.site.locale}
-      tags={tags}
-      timeZone={bundle.site.timeZone}
-    />
+  return renderThemePage(
+    bundle,
+    createCategoryThemeViewModel(bundle, category),
   );
 }
