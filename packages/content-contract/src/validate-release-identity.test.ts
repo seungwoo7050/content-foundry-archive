@@ -1,8 +1,12 @@
 import { fileURLToPath } from "node:url";
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { readReleaseBundleDocuments } from "./read-bundle-documents.js";
+import {
+  type ReleaseBundleDocumentsByVersion,
+  readReleaseBundleDocuments,
+  readReleaseBundleDocumentsForVersion,
+} from "./read-bundle-documents.js";
 import { validateReleaseIdentity } from "./validate-release-identity.js";
 
 const fixture = fileURLToPath(
@@ -12,10 +16,26 @@ const fixture = fileURLToPath(
   ),
 );
 const reference = readReleaseBundleDocuments(fixture);
+const referenceV3 = readReleaseBundleDocumentsForVersion(
+  "3.0.0",
+  fileURLToPath(
+    new URL(
+      "../vendor/3.0.0/fixtures/bundles/valid/site-a-minimal/",
+      import.meta.url,
+    ),
+  ),
+);
 
 describe("validateReleaseIdentity", () => {
   it("accepts matching release identity and counts", () => {
     expect(validateReleaseIdentity(structuredClone(reference))).toBeDefined();
+  });
+
+  it("preserves a matching v3 bundle type", () => {
+    const bundle = validateReleaseIdentity(structuredClone(referenceV3));
+    expectTypeOf(bundle).toEqualTypeOf<
+      ReleaseBundleDocumentsByVersion["3.0.0"]
+    >();
   });
 
   it("rejects a site identity mismatch", () => {

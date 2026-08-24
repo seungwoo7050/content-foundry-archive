@@ -1,5 +1,8 @@
 import { ContractError, type ContractIssue } from "./errors.js";
-import type { ReleaseBundleDocuments } from "./read-bundle-documents.js";
+import type { ReleaseBundleDocumentsByVersion } from "./read-bundle-documents.js";
+
+type IdentityBundle =
+  ReleaseBundleDocumentsByVersion[keyof ReleaseBundleDocumentsByVersion];
 
 function addMismatch(
   issues: ContractIssue[],
@@ -12,9 +15,7 @@ function addMismatch(
   }
 }
 
-export function validateReleaseIdentity(
-  bundle: ReleaseBundleDocuments,
-): ReleaseBundleDocuments {
+export function validateReleaseIdentity<T extends IdentityBundle>(bundle: T): T {
   const issues: ContractIssue[] = [];
   addMismatch(issues, "/site/id", bundle.site.id, bundle.release.siteId);
   addMismatch(
