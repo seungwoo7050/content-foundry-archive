@@ -37,5 +37,29 @@ describe("Friendly Mobile Utility state routes", () => {
 
     expect(html).toContain(`<p class="fmu-eyebrow">${statusCode}</p>`);
     expect(html).toContain(`class="fmu-action fmu-primary" href="${href}">${label}</a>`);
+    expect(html).not.toContain('aria-label="페이지 복구 경로"');
+  });
+
+  it("renders ordered recovery links once after the primary action", () => {
+    const route: StateRouteViewModel = {
+      ...base("/404", "찾을 수 없음"),
+      kind: "not-found",
+      statusCode: 404,
+      action: { href: "/", label: "홈으로" },
+      recoveryLinks: [
+        { href: "/search", label: "검색", kind: "search" },
+        { href: "/category/guides", label: "가이드", kind: "category" },
+        { href: "/article/current", label: "최신 안내", kind: "replacement" },
+      ],
+    };
+
+    const html = renderToStaticMarkup(renderFriendlyStateRoute(route));
+    const orderedHrefs = ["/", "/search", "/category/guides", "/article/current"];
+    const hrefPositions = orderedHrefs.map((href) => html.indexOf(`href="${href}"`));
+
+    expect(html.match(/aria-label="페이지 복구 경로"/g)).toHaveLength(1);
+    expect(hrefPositions.every((position) => position >= 0)).toBe(true);
+    expect(hrefPositions).toEqual([...hrefPositions].sort((a, b) => a - b));
+    expect(html).not.toContain('href="/category"');
   });
 });

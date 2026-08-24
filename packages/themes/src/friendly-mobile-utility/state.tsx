@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import type { StateRouteViewModel } from "../state-route-view-model.js";
+import { ThemeRecoveryLinks } from "../theme-links.js";
 import { FriendlyRouteIntro } from "./shell.js";
 
 export function renderFriendlyStateRoute(
@@ -21,6 +22,7 @@ export function renderFriendlyStateRoute(
         <section className="fmu-panel fmu-stack fmu-status">
           <FriendlyRouteIntro eyebrow={`${route.statusCode}`} route={route} />
           <p><a className="fmu-action fmu-primary" href={route.action.href}>{route.action.label}</a></p>
+          <ThemeRecoveryLinks items={route.recoveryLinks} />
         </section>
       );
     case "retired":
@@ -28,6 +30,7 @@ export function renderFriendlyStateRoute(
         <section className="fmu-panel fmu-stack fmu-status">
           <FriendlyRouteIntro eyebrow={`${route.statusCode}`} route={route} />
           <p><a className="fmu-action fmu-primary" href={route.action.href}>{route.action.label}</a></p>
+          <ThemeRecoveryLinks items={route.recoveryLinks} />
         </section>
       );
     default: {
