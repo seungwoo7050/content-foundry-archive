@@ -39,6 +39,7 @@ export interface ArticleRouteViewModel extends RouteBaseViewModel<"article"> {
   readonly relatedSectionHeading: string | null;
   readonly relatedArticles: readonly ArticleListItemViewModel[];
   readonly advertisingEligible: boolean;
+  readonly readerActions?: ReactNode | null;
   readonly hero: ReactNode;
   readonly body: ReactNode;
 }

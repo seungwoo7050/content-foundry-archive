@@ -11,6 +11,9 @@ describe("content route view models", () => {
   it("uses explicit React slots for already-safe rendered content", () => {
     expectTypeOf<ArticleRouteViewModel["hero"]>().toEqualTypeOf<ReactNode>();
     expectTypeOf<ArticleRouteViewModel["body"]>().toEqualTypeOf<ReactNode>();
+    expectTypeOf<ArticleRouteViewModel["readerActions"]>().toEqualTypeOf<
+      ReactNode | null | undefined
+    >();
     expectTypeOf<StaticPageRouteViewModel["body"]>().toEqualTypeOf<ReactNode>();
   });
 
