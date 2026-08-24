@@ -18,6 +18,17 @@ const objectPayloads = JSON.parse(
   readFileSync(join(appRoot, "fixtures/immutable-objects.json"), "utf8"),
 );
 const objectRoot = mkdtempSync(join(tmpdir(), "site-a-paired-media-"));
+const productionOnlyKeys = Object.freeze([
+  "SITE_ALLOWED_PRODUCTION_ORIGINS",
+  "CONSENT_PROVIDER",
+  "CONSENT_CONFIG_REVISION",
+  "GOOGLE_CMP_READY",
+  "SITE_OWNED_GA4_MEASUREMENT_ID",
+  "SITE_OWNED_ADSENSE_CLIENT_ID",
+  "ADSENSE_MANUAL_UNITS",
+  "ADSENSE_AUTO_ADS_ENABLED",
+  "ADSENSE_SITE_READY",
+]);
 
 function run(command, args, environment) {
   const result = spawnSync(command, args, {
@@ -29,8 +40,10 @@ function run(command, args, environment) {
 }
 
 function releaseEnvironment(version, immutableObjectDirectory = "") {
+  const environment = { ...process.env };
+  for (const key of productionOnlyKeys) delete environment[key];
   return {
-    ...process.env,
+    ...environment,
     CI: "true",
     RELEASE_MODE: "preview",
     CONTENT_RELEASE_DIR: join(
@@ -58,10 +71,12 @@ try {
     writeFileSync(target, Buffer.from(encoded, "base64"));
   }
 
-  run("pnpm", ["run", "build"], releaseEnvironment("3.0.0", objectRoot));
-  run("pnpm", ["run", "verify:static"], process.env);
-  run("pnpm", ["run", "build"], releaseEnvironment("2.0.0"));
-  run("pnpm", ["run", "verify:static"], process.env);
+  const v3Environment = releaseEnvironment("3.0.0", objectRoot);
+  run("pnpm", ["run", "build"], v3Environment);
+  run("pnpm", ["run", "verify:static"], v3Environment);
+  const v2Environment = releaseEnvironment("2.0.0");
+  run("pnpm", ["run", "build"], v2Environment);
+  run("pnpm", ["run", "verify:static"], v2Environment);
 } finally {
   rmSync(objectRoot, { recursive: true, force: true });
 }
