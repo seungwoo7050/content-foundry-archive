@@ -1,5 +1,8 @@
 import { ContractError, type ContractIssue } from "./errors.js";
-import type { ReleaseBundleDocuments } from "./read-bundle-documents.js";
+import type { ReleaseBundleDocumentsByVersion } from "./read-bundle-documents.js";
+
+type PublicKeyBundle =
+  ReleaseBundleDocumentsByVersion[keyof ReleaseBundleDocumentsByVersion];
 
 interface PublicKey {
   readonly path: string;
@@ -36,9 +39,7 @@ function keys<T>(
   }));
 }
 
-export function validatePublicKeys(
-  bundle: ReleaseBundleDocuments,
-): ReleaseBundleDocuments {
+export function validatePublicKeys<T extends PublicKeyBundle>(bundle: T): T {
   const issues: ContractIssue[] = [];
   const collections = [
     [keys(bundle.articles, "/articles", "id"), "article ID"],

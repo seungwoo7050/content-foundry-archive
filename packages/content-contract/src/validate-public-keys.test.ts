@@ -1,8 +1,12 @@
 import { fileURLToPath } from "node:url";
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { readReleaseBundleDocuments } from "./read-bundle-documents.js";
+import {
+  type ReleaseBundleDocumentsByVersion,
+  readReleaseBundleDocuments,
+  readReleaseBundleDocumentsForVersion,
+} from "./read-bundle-documents.js";
 import { validatePublicKeys } from "./validate-public-keys.js";
 
 const fixture = fileURLToPath(
@@ -12,6 +16,15 @@ const fixture = fileURLToPath(
   ),
 );
 const reference = readReleaseBundleDocuments(fixture);
+const referenceV3 = readReleaseBundleDocumentsForVersion(
+  "3.0.0",
+  fileURLToPath(
+    new URL(
+      "../vendor/3.0.0/fixtures/bundles/valid/site-a-minimal/",
+      import.meta.url,
+    ),
+  ),
+);
 
 const expectInvalidAt = (bundle: typeof reference, path: string) => {
   expect(() => validatePublicKeys(bundle)).toThrowError(
@@ -25,6 +38,13 @@ const expectInvalidAt = (bundle: typeof reference, path: string) => {
 describe("validatePublicKeys", () => {
   it("accepts unique keys in the reference bundle", () => {
     expect(validatePublicKeys(structuredClone(reference))).toBeDefined();
+  });
+
+  it("preserves a canonical v3 bundle type", () => {
+    const bundle = validatePublicKeys(structuredClone(referenceV3));
+    expectTypeOf(bundle).toEqualTypeOf<
+      ReleaseBundleDocumentsByVersion["3.0.0"]
+    >();
   });
 
   it("rejects a duplicate article slug", () => {
