@@ -64,7 +64,7 @@ export function isAdSensePublicClientId(value: unknown): value is AdSensePublicC
 
 export function resolveAdvertisingProviderConfig(
   productionAdvertisingEnabled: boolean,
-  releaseIdentity: AdvertisingReleaseIdentity | null | undefined,
+  releaseIdentity: unknown,
   serializedManualUnits: string | null | undefined,
 ): AdvertisingProviderConfig {
   if (productionAdvertisingEnabled !== true) return disabledConfig;

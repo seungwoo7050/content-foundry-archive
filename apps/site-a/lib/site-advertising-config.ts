@@ -2,7 +2,6 @@ import {
   AdvertisingConfigError,
   resolveAdvertisingProviderConfig,
   type AdvertisingProviderConfig,
-  type AdvertisingReleaseIdentity,
 } from "@content-foundry/advertising";
 import type { ConsentBuildConfig } from "@content-foundry/site-core";
 import { getThemeModule, type ThemeId } from "@content-foundry/themes";
@@ -11,7 +10,7 @@ export interface SiteAdvertisingSource {
   readonly config: { readonly adsEnabled: boolean };
   readonly bundle: {
     readonly site: {
-      readonly ads: AdvertisingReleaseIdentity;
+      readonly ads: unknown;
       readonly defaultTheme: ThemeId;
     };
   };
