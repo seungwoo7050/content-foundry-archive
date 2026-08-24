@@ -17,13 +17,15 @@ describe("CategoryListing", () => {
   it("composes a labelled category with its complete article cards", () => {
     const category = bundle.taxonomy.categories[0];
     const article = bundle.articles[0];
-    if (!category || !article) {
+    const tag = bundle.taxonomy.tags[0];
+    if (!category || !article || !tag) {
       throw new Error("Site A fixture category data is incomplete");
     }
     const html = renderToStaticMarkup(
       createElement(CategoryListing, {
         category: { ...category, description: " " },
         articles: [article],
+        tags: [tag],
         locale: bundle.site.locale,
         timeZone: bundle.site.timeZone,
       }),
@@ -40,6 +42,9 @@ describe("CategoryListing", () => {
     );
     expect(html).toContain(
       "<p>정부24에서 주민등록등본을 발급하는 기본 절차를 정리합니다.</p>",
+    );
+    expect(html).toContain(
+      '<section aria-labelledby="category-topics"><h2 id="category-topics">관련 주제</h2><ul><li>정부24</li></ul></section>',
     );
   });
 });

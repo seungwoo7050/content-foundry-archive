@@ -5,12 +5,15 @@ import type {
 
 import { getCategoryDescription } from "../lib/category-metadata";
 import { ArticleCard } from "./article-card";
+import { CategoryTopics } from "./category-topics";
 
 type Category = PublicSiteTaxonomy["categories"][number];
+type Tag = PublicSiteTaxonomy["tags"][number];
 
 interface CategoryListingProps {
   readonly category: Category;
   readonly articles: readonly PublishedArticleProjection[];
+  readonly tags: readonly Tag[];
   readonly locale: string;
   readonly timeZone: string;
 }
@@ -18,6 +21,7 @@ interface CategoryListingProps {
 export function CategoryListing({
   category,
   articles,
+  tags,
   locale,
   timeZone,
 }: CategoryListingProps) {
@@ -41,6 +45,7 @@ export function CategoryListing({
           ))}
         </ul>
       </section>
+      <CategoryTopics tags={tags} />
     </div>
   );
 }
