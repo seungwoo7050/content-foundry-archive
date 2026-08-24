@@ -1,4 +1,13 @@
 export {
+  type ArticleListItemViewModel,
+  type ArticleSourceViewModel,
+  type DateViewModel,
+  type FaqItemViewModel,
+  type LinkViewModel,
+  type NavigationItemViewModel,
+  type SiteShellViewModel,
+} from "./presentation-view-model.js";
+export {
   SKIN_IDS,
   SKIN_TOKENS,
   type SemanticColorTokens,

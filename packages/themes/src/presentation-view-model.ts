@@ -1,0 +1,41 @@
+export interface LinkViewModel {
+  readonly href: string;
+  readonly label: string;
+}
+
+export interface DateViewModel {
+  readonly dateTime: string;
+  readonly label: string;
+}
+
+export interface NavigationItemViewModel {
+  readonly link: LinkViewModel;
+  readonly children: readonly NavigationItemViewModel[];
+}
+
+export interface SiteShellViewModel {
+  readonly locale: string;
+  readonly skipLink: LinkViewModel;
+  readonly brand: LinkViewModel;
+  readonly description: string;
+  readonly primaryNavigation: readonly NavigationItemViewModel[];
+  readonly footerText: string;
+}
+
+export interface ArticleListItemViewModel {
+  readonly link: LinkViewModel;
+  readonly summary: string;
+  readonly date: DateViewModel;
+  readonly category: LinkViewModel | null;
+  readonly topics: readonly string[];
+}
+
+export interface ArticleSourceViewModel {
+  readonly label: string;
+  readonly href: string | null;
+}
+
+export interface FaqItemViewModel {
+  readonly question: string;
+  readonly answer: string;
+}
