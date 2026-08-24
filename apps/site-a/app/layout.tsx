@@ -6,11 +6,11 @@ import {
   createReleaseIdentity,
   createReleaseIdentityMetadata,
 } from "../lib/release-identity";
-import { getSiteReleaseContext } from "../lib/site-release";
+import { getVersionedSiteReleaseContext } from "../lib/site-release";
 import "./globals.css";
 
 export function generateMetadata(): Metadata {
-  const { bundle, canonicalOrigin, config } = getSiteReleaseContext();
+  const { bundle, canonicalOrigin, config } = getVersionedSiteReleaseContext();
   const noindex = config.noindex;
   const identity = createReleaseIdentity(bundle);
   const socialImage = new URL("/og.png", canonicalOrigin).href;
@@ -53,7 +53,7 @@ export function generateMetadata(): Metadata {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
-  const { bundle } = getSiteReleaseContext();
+  const { bundle } = getVersionedSiteReleaseContext();
 
   return (
     <html lang={bundle.site.locale}>
