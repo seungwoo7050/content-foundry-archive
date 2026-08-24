@@ -17,6 +17,9 @@ importers:
 
   apps/site-a:
     dependencies:
+      '@content-foundry/advertising':
+        specifier: workspace:*
+        version: link:../../packages/advertising
       '@content-foundry/analytics':
         specifier: workspace:*
         version: link:../../packages/analytics

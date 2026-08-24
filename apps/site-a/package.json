@@ -14,6 +14,7 @@
     "verify:static:paired": "node scripts/verify-paired-static.mjs"
   },
   "dependencies": {
+    "@content-foundry/advertising": "workspace:*",
     "@content-foundry/analytics": "workspace:*",
     "@content-foundry/content-contract": "workspace:*",
     "@content-foundry/media": "workspace:*",
