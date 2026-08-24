@@ -26,7 +26,7 @@ const mediaAssets = new Map([
 ]);
 
 describe("VersionedContentBlocks", () => {
-  it("dispatches v2 and v3 blocks through their matching renderer", () => {
+  it("dispatches v2, v3, and v4 blocks through matching renderers", () => {
     const v2 = renderToStaticMarkup(
       createElement(VersionedContentBlocks, {
         contractVersion: "2.0.0",
@@ -55,11 +55,31 @@ describe("VersionedContentBlocks", () => {
         },
       }),
     );
+    const v4 = renderToStaticMarkup(
+      createElement(VersionedContentBlocks, {
+        contractVersion: "4.0.0",
+        blocks: [
+          {
+            type: "action-link",
+            kind: "internal",
+            label: "v4 소개",
+            path: "/about",
+          },
+        ],
+        context: {
+          mediaAssets: new Map(),
+          nicheComponents: new Map(),
+          siteId: "site-a",
+        },
+      }),
+    );
 
     expect(v2).toContain("v2 본문");
     expect(v2).toContain('src="/_media/MED-000045/source.png"');
     expect(v2).toContain('alt="v2 발급 화면"');
     expect(v3).toContain('href="/about"');
     expect(v3).toContain("v3 소개");
+    expect(v4).toContain('href="/about"');
+    expect(v4).toContain("v4 소개");
   });
 });
