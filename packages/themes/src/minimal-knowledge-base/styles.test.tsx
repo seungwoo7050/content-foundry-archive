@@ -31,11 +31,19 @@ describe("Minimal Knowledge Base styles", () => {
     }
     expect(html).toContain("grid-template-columns:16rem minmax(0,1fr)");
     expect(html).toContain("overflow-x:auto");
+    expect(html).toContain("min-height:44px");
   });
 
   it("keeps knowledge-base CSS structural and claim free", () => {
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain("min-height:100vh");
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain("scroll-margin-top:1rem");
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      ".kb-category-grid>ul>li:only-child",
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      "@media(prefers-reduced-motion:reduce)",
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain("@media print");
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).not.toMatch(
       /ranking|popular|reading.?time|verified|newsletter|save/i,
     );
