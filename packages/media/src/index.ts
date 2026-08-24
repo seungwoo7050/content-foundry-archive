@@ -7,6 +7,10 @@ export {
   type ImmutableObjectLoader,
 } from "./read-immutable-object-media-source.js";
 export {
+  projectStaticImageAsset,
+  type StaticImageAsset,
+} from "./project-static-image-asset.js";
+export {
   type MediaSourceReaders,
   resolveImageSource,
 } from "./resolve-image-source.js";
