@@ -21,9 +21,9 @@ vi.mock("./load-site-release", async (importOriginal) => {
   const loader = await importOriginal<typeof import("./load-site-release")>();
   return {
     ...loader,
-    loadValidatedSiteReleaseV3: (config: BuildTargetConfig) => {
-      const context = loader.loadValidatedSiteReleaseV3(config);
-      return loaderOverride.mediaManifest
+    loadValidatedSiteRelease: (config: BuildTargetConfig) => {
+      const context = loader.loadValidatedSiteRelease(config);
+      return loaderOverride.mediaManifest && context.contractVersion === "3.0.0"
         ? {
             ...context,
             bundle: { ...context.bundle, mediaManifest: loaderOverride.mediaManifest },
