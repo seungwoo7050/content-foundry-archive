@@ -1,10 +1,18 @@
 import { resolve } from "node:path";
 
+import type { LoadedReleaseBundleV3 } from "@content-foundry/content-contract";
 import { resolveBuildTargetConfig } from "@content-foundry/site-core";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { createArticleMetadata } from "./article-metadata";
-import { loadSiteRelease } from "./load-site-release";
+import {
+  createArticleMetadata,
+  type ArticleMetadataSource,
+} from "./article-metadata";
+import {
+  loadSiteRelease,
+  type SiteReleaseContextV3,
+} from "./load-site-release";
+import type { MetadataContext } from "./metadata-context";
 
 const fixture = resolve(
   process.cwd(),
@@ -19,6 +27,13 @@ const context = loadSiteRelease(
 );
 
 describe("createArticleMetadata", () => {
+  it("accepts v3 article and release context metadata structures", () => {
+    expectTypeOf<SiteReleaseContextV3>().toExtend<MetadataContext>();
+    expectTypeOf<
+      LoadedReleaseBundleV3["articles"][number]
+    >().toExtend<ArticleMetadataSource>();
+  });
+
   it("projects article SEO while preserving template noindex", () => {
     const article = context.bundle.articles[0];
     if (!article) {

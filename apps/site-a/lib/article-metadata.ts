@@ -1,11 +1,22 @@
-import type { PublishedArticleProjection } from "@content-foundry/content-contract";
 import type { Metadata } from "next";
 
-import type { SiteReleaseContext } from "./load-site-release";
+import type { MetadataContext } from "./metadata-context";
+
+export interface ArticleMetadataSource {
+  readonly publishedAt: string;
+  readonly updatedAt: string;
+  readonly seo: {
+    readonly canonicalPath: string;
+    readonly title: string;
+    readonly description: string;
+    readonly index: boolean;
+    readonly follow: boolean;
+  };
+}
 
 export function createArticleMetadata(
-  context: SiteReleaseContext,
-  article: PublishedArticleProjection,
+  context: MetadataContext,
+  article: ArticleMetadataSource,
 ): Metadata {
   const canonical = new URL(
     article.seo.canonicalPath,
