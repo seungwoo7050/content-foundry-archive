@@ -3,16 +3,20 @@ import {
   type AnalyticsEventContext,
   type AnalyticsEventPayload,
 } from "@content-foundry/analytics";
+import { act, createElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import type { SiteAnalyticsRouteProjection } from "../lib/site-analytics-route-projection";
 import { createAnalyticsEventRuntime } from "./analytics-event-runtime";
 import {
+  AnalyticsEventDispatcher,
   dispatchAnalyticsEvent,
+  emitAnalyticsEvent,
   resolveAnalyticsEventContext,
   resolveClassifiedExternalLinkEvent,
   resolveInternalLinkEvent,
 } from "./analytics-event-dispatcher";
+import { GA4_PROVIDER_READY_EVENT } from "./ga4-tag";
 
 const context: AnalyticsEventContext = {
   eventContractVersion: ANALYTICS_EVENT_CONTRACT_VERSION,
@@ -52,6 +56,49 @@ const projection: SiteAnalyticsRouteProjection = {
     },
   },
 };
+
+class MountElement extends EventTarget {
+  readonly nodeType = 1;
+  readonly tagName = "DIV";
+  readonly namespaceURI = "http://www.w3.org/1999/xhtml";
+  readonly style = {};
+  readonly childNodes: unknown[] = [];
+
+  constructor(readonly ownerDocument: EventTarget) {
+    super();
+  }
+
+  setAttribute() {}
+  removeAttribute() {}
+  appendChild(node: unknown) { this.childNodes.push(node); return node; }
+  insertBefore(node: unknown) { this.childNodes.push(node); return node; }
+  removeChild(node: unknown) {
+    this.childNodes.splice(this.childNodes.indexOf(node), 1);
+    return node;
+  }
+}
+
+function createMountDom() {
+  const documentTarget = Object.assign(new EventTarget(), {
+    nodeType: 9,
+    documentElement: { namespaceURI: "http://www.w3.org/1999/xhtml" },
+    activeElement: null,
+  });
+  const createMountElement = () => new MountElement(documentTarget);
+  Object.assign(documentTarget, { createElement: createMountElement, body: createMountElement() });
+  const windowTarget = Object.assign(new EventTarget(), {
+    document: documentTarget,
+    location: {
+      origin: "https://guides.example.kr",
+      pathname: "/article/guide",
+      protocol: "https:",
+    },
+    HTMLIFrameElement: class {},
+    getSelection: () => null,
+  });
+  Object.assign(documentTarget, { defaultView: windowTarget });
+  return { documentTarget, windowTarget, container: createMountElement() };
+}
 
 describe("Site A analytics event dispatch", () => {
   it("resolves exact known paths and defaults unknown paths to not-found", () => {
@@ -176,5 +223,51 @@ describe("Site A analytics event dispatch", () => {
     runtime.updateConsent(consent);
     runtime.providerReady();
     expect(delivered).toEqual([]);
+  });
+
+  it("mounts the consent and provider lifecycle that flushes a queued DOM event", async () => {
+    const { documentTarget, windowTarget, container } = createMountDom();
+    vi.stubGlobal("document", documentTarget);
+    vi.stubGlobal("window", windowTarget);
+    vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
+    const { createRoot } = await import("react-dom/client");
+    const root = createRoot(container as unknown as Element);
+
+    try {
+      await act(async () => {
+        root.render(createElement(AnalyticsEventDispatcher, { projection }));
+      });
+      const cmp = windowTarget as typeof windowTarget & {
+        googlefc?: {
+          callbackQueue?: Array<{ CONSENT_MODE_DATA_READY(): void }>;
+          getGoogleConsentModeValues?: () => unknown;
+        };
+        gtag?: ReturnType<typeof vi.fn>;
+      };
+      expect(cmp.googlefc?.callbackQueue).toHaveLength(1);
+      emitAnalyticsEvent({
+        eventName: "bookmark_local",
+        articleId: "ART-BEFORE-CONSENT",
+      });
+      cmp.googlefc!.getGoogleConsentModeValues = () => consent;
+      cmp.googlefc!.callbackQueue![0]!.CONSENT_MODE_DATA_READY();
+      emitAnalyticsEvent({
+        eventName: "bookmark_local",
+        articleId: "ART-QUEUED",
+      });
+
+      const gtag = vi.fn();
+      cmp.gtag = gtag;
+      expect(gtag).not.toHaveBeenCalled();
+      documentTarget.dispatchEvent(new Event(GA4_PROVIDER_READY_EVENT));
+      expect(gtag).toHaveBeenCalledTimes(1);
+      expect(gtag.mock.calls[0]?.[2]).toMatchObject({
+        article_id: "ART-QUEUED",
+        route_type: "article",
+      });
+    } finally {
+      await act(async () => root.unmount());
+      vi.unstubAllGlobals();
+    }
   });
 });
