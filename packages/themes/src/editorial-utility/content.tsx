@@ -1,0 +1,112 @@
+import type {
+  ArchiveRouteViewModel,
+  CategoryRouteViewModel,
+  ContentRouteViewModel,
+  HomeRouteViewModel,
+  StaticPageRouteViewModel,
+} from "../content-route-view-model.js";
+import { ThemeArticleList } from "../theme-links.js";
+import { EditorialArticle } from "./article.js";
+
+function RouteHeader({
+  heading,
+  description,
+}: {
+  readonly heading: string;
+  readonly description: string;
+}) {
+  return <header className="editorial-route-header"><h1>{heading}</h1><p>{description}</p></header>;
+}
+
+function Home({ route }: { readonly route: HomeRouteViewModel }) {
+  const lead = route.articles.slice(0, 1);
+  const secondary = route.articles.slice(1, 3);
+  const latest = route.articles.slice(3);
+  return (
+    <div className="editorial-home" data-route="home">
+      <RouteHeader heading={route.heading} description={route.description} />
+      {(route.categories.length > 0 || route.searchLink) ? (
+        <div className="editorial-home-tools">
+          {route.categories.length > 0 ? (
+            <ul>{route.categories.map((category) => (
+              <li key={category.href}>
+                <a href={category.href}>{category.label}</a>
+                <p>{category.description}</p>
+              </li>
+            ))}</ul>
+          ) : <span />}
+          {route.searchLink ? <a href={route.searchLink.href}>{route.searchLink.label}</a> : null}
+        </div>
+      ) : null}
+      {lead.length > 0 ? (
+        <section className="editorial-home-lead" aria-label="첫 안내">
+          <ThemeArticleList articles={lead} headingLevel={2} />
+        </section>
+      ) : null}
+      {secondary.length > 0 ? (
+        <section className="editorial-home-secondary editorial-section" aria-label="이어지는 안내">
+          <ThemeArticleList articles={secondary} headingLevel={2} />
+        </section>
+      ) : null}
+      <section className="editorial-latest editorial-section">
+        <h2>{route.articleSectionHeading}</h2>
+        <ThemeArticleList articles={latest} headingLevel={3} />
+      </section>
+    </div>
+  );
+}
+
+function Category({ route }: { readonly route: CategoryRouteViewModel }) {
+  return (
+    <div data-route="category">
+      <RouteHeader heading={route.heading} description={route.description} />
+      <section className="editorial-list-section editorial-section">
+        <h2>{route.articleSectionHeading}</h2>
+        <ThemeArticleList articles={route.articles} headingLevel={3} />
+      </section>
+      {route.topicSectionHeading && route.topics.length > 0 ? (
+        <section className="editorial-section">
+          <h2>{route.topicSectionHeading}</h2>
+          <ul className="editorial-topic-list">{route.topics.map((topic, index) => (
+            <li key={`${topic}:${index}`}>{topic}</li>
+          ))}</ul>
+        </section>
+      ) : null}
+    </div>
+  );
+}
+
+function StaticPage({ route }: { readonly route: StaticPageRouteViewModel }) {
+  return (
+    <article data-route="static-page">
+      <RouteHeader heading={route.heading} description={route.description} />
+      <div className="editorial-static-body">{route.body}</div>
+    </article>
+  );
+}
+
+function Archive({ route }: { readonly route: ArchiveRouteViewModel }) {
+  return (
+    <div data-route="archive">
+      <RouteHeader heading={route.heading} description={route.description} />
+      <section className="editorial-list-section">
+        <ThemeArticleList articles={route.articles} headingLevel={2} ordered />
+      </section>
+    </div>
+  );
+}
+
+function unreachable(value: never): never {
+  throw new Error(`Unsupported editorial content route: ${JSON.stringify(value)}`);
+}
+
+export function EditorialContent({ route }: { readonly route: ContentRouteViewModel }) {
+  switch (route.kind) {
+    case "home": return <Home route={route} />;
+    case "category": return <Category route={route} />;
+    case "article": return <EditorialArticle route={route} />;
+    case "static-page": return <StaticPage route={route} />;
+    case "archive": return <Archive route={route} />;
+    default: return unreachable(route);
+  }
+}
