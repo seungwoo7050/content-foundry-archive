@@ -27,6 +27,11 @@ describe("Information Portal discovery routes", () => {
       }],
       categories: [{ href: "/category/life", label: "생활", description: "생활 절차를 확인합니다." }],
       searchLink: { href: "/search", label: "사이트 검색" },
+      aboutTeaser: {
+        href: "/about",
+        label: "소개",
+        description: "한 명의 운영자가 정보를 확인하고 정리합니다.",
+      },
     };
 
     const html = renderToStaticMarkup(renderInformationPortalContent(route));
@@ -35,7 +40,24 @@ describe("Information Portal discovery routes", () => {
     expect(html).toContain('class="ip-search-action" href="/search"');
     expect(html).toContain("생활 절차를 확인합니다.");
     expect(html).toContain('href="/article/start">신청 안내</a>');
+    expect(html.match(/id="home-about-teaser-heading"/g)).toHaveLength(1);
+    expect(html).toContain("한 명의 운영자가 정보를 확인하고 정리합니다.");
+    expect(html).toContain('<a href="/about">소개</a>');
     expect(html).not.toMatch(/ranking|trending|popular|count|순위|인기/i);
+  });
+
+  it("omits an absent home about teaser", () => {
+    const route: HomeRouteViewModel = {
+      ...base,
+      kind: "home",
+      articleSectionHeading: "최근 안내",
+      articles: [],
+      categories: [],
+      searchLink: null,
+    };
+
+    expect(renderToStaticMarkup(renderInformationPortalContent(route)))
+      .not.toContain("home-about-teaser-heading");
   });
 
   it("keeps category topics and latest articles as distinct sections", () => {

@@ -5,7 +5,10 @@ import {
   getThemeAdSlot,
   type ThemeAdSlotContext,
 } from "../theme-ad-slot.js";
-import { ThemeArticleList } from "../theme-links.js";
+import {
+  ThemeArticleList,
+  ThemeHomeAboutTeaser,
+} from "../theme-links.js";
 import { InformationPortalArticle } from "./article.js";
 import { PortalRouteIntro } from "./shell.js";
 
@@ -36,6 +39,7 @@ export function renderInformationPortalContent(
             <ThemeArticleList articles={route.articles} headingLevel={3} />
             {getThemeAdSlot(context, "home-feed")}
           </section>
+          <ThemeHomeAboutTeaser teaser={route.aboutTeaser} />
         </div>
       );
     case "category":
