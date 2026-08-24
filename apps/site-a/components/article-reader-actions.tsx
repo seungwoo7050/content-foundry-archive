@@ -21,7 +21,7 @@ export function ArticleReaderActions({
         <ArticleBookmark siteId={siteId} articleId={articleId} />
       ) : null}
       <ArticleShareButton articleId={articleId} canonicalUrl={canonicalUrl} />
-      <ArticleFeedback />
+      <ArticleFeedback articleId={articleId} />
     </section>
   );
 }

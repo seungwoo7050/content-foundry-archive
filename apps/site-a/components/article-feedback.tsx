@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { emitAnalyticsEvent } from "./analytics-event-dispatcher";
+
 export type ArticleFeedbackValue = "helpful" | "not-helpful";
 
 export function selectArticleFeedback(
@@ -11,11 +13,28 @@ export function selectArticleFeedback(
   return current === selected ? null : selected;
 }
 
-export function ArticleFeedback() {
+export function selectArticleFeedbackWithAnalytics(
+  current: ArticleFeedbackValue | null,
+  selected: ArticleFeedbackValue,
+  articleId: string,
+  emit: typeof emitAnalyticsEvent = emitAnalyticsEvent,
+): ArticleFeedbackValue | null {
+  const next = selectArticleFeedback(current, selected);
+  if (next !== null) {
+    emit({ eventName: "article_feedback", articleId, feedback: next });
+  }
+  return next;
+}
+
+export function ArticleFeedback({ articleId }: { readonly articleId: string }) {
   const [feedback, setFeedback] = useState<ArticleFeedbackValue | null>(null);
 
   function handleSelection(selected: ArticleFeedbackValue) {
-    setFeedback((current) => selectArticleFeedback(current, selected));
+    setFeedback(selectArticleFeedbackWithAnalytics(
+      feedback,
+      selected,
+      articleId,
+    ));
   }
 
   return (

@@ -37,6 +37,9 @@ describe("ArticleReaderActions", () => {
     const share = children.find(
       (child) => isValidElement(child) && child.type === ArticleShareButton,
     );
+    const feedback = children.find(
+      (child) => isValidElement(child) && child.type === ArticleFeedback,
+    );
 
     expect(bookmark).toMatchObject({
       props: { siteId: "site-a", articleId: "ART-000123" },
@@ -46,6 +49,9 @@ describe("ArticleReaderActions", () => {
         articleId: "ART-000123",
         canonicalUrl: "https://guides.example.kr/article/one",
       },
+    });
+    expect(feedback).toMatchObject({
+      props: { articleId: "ART-000123" },
     });
   });
 
