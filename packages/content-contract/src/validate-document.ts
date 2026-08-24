@@ -12,6 +12,20 @@ import redirectsSchema from "../vendor/2.0.0/schemas/redirects.schema.json" with
 import releaseSchema from "../vendor/2.0.0/schemas/release.schema.json" with { type: "json" };
 import siteSchema from "../vendor/2.0.0/schemas/site.schema.json" with { type: "json" };
 import taxonomySchema from "../vendor/2.0.0/schemas/taxonomy.schema.json" with { type: "json" };
+import actionLinkBlockSchemaV3 from "../vendor/3.0.0/schemas/action-link-block.schema.json" with { type: "json" };
+import articleSchemaV3 from "../vendor/3.0.0/schemas/article.schema.json" with { type: "json" };
+import codeCommandBlockSchemaV3 from "../vendor/3.0.0/schemas/code-command-block.schema.json" with { type: "json" };
+import contentBlockSchemaV3 from "../vendor/3.0.0/schemas/content-block.schema.json" with { type: "json" };
+import contentSchemaV3 from "../vendor/3.0.0/schemas/content.schema.json" with { type: "json" };
+import galleryBlockSchemaV3 from "../vendor/3.0.0/schemas/gallery-block.schema.json" with { type: "json" };
+import mediaManifestSchemaV3 from "../vendor/3.0.0/schemas/media-manifest.schema.json" with { type: "json" };
+import navigationSchemaV3 from "../vendor/3.0.0/schemas/navigation.schema.json" with { type: "json" };
+import nicheComponentBlockSchemaV3 from "../vendor/3.0.0/schemas/niche-component-block.schema.json" with { type: "json" };
+import pageSchemaV3 from "../vendor/3.0.0/schemas/page.schema.json" with { type: "json" };
+import redirectsSchemaV3 from "../vendor/3.0.0/schemas/redirects.schema.json" with { type: "json" };
+import releaseSchemaV3 from "../vendor/3.0.0/schemas/release.schema.json" with { type: "json" };
+import siteSchemaV3 from "../vendor/3.0.0/schemas/site.schema.json" with { type: "json" };
+import taxonomySchemaV3 from "../vendor/3.0.0/schemas/taxonomy.schema.json" with { type: "json" };
 
 import {
   resolveSupportedContractVersion,
@@ -20,15 +34,25 @@ import {
 import { ContractError } from "./errors.js";
 import type {
   MediaManifest,
+  MediaManifestV3,
   PublicRouteDispositions,
+  PublicRouteDispositionsV3,
   PublicSiteConfiguration,
+  PublicSiteConfigurationV3,
   PublicSiteNavigation,
+  PublicSiteNavigationV3,
   PublicSiteReleaseManifest,
+  PublicSiteReleaseManifestV3,
   PublicSiteTaxonomy,
+  PublicSiteTaxonomyV3,
   PublishedArticleProjection,
+  PublishedArticleProjectionV3,
   PublishedContentBlock,
+  PublishedContentBlockV3,
   PublishedStaticPageProjection,
+  PublishedStaticPageProjectionV3,
   PublishedStructuredContent,
+  PublishedStructuredContentV3,
 } from "./index.js";
 
 export { SUPPORTED_CONTRACT_VERSION };
@@ -46,8 +70,22 @@ interface ContractDocumentsV2 {
   taxonomy: PublicSiteTaxonomy;
 }
 
+interface ContractDocumentsV3 {
+  article: PublishedArticleProjectionV3;
+  "content-block": PublishedContentBlockV3;
+  content: PublishedStructuredContentV3;
+  "media-manifest": MediaManifestV3;
+  navigation: PublicSiteNavigationV3;
+  page: PublishedStaticPageProjectionV3;
+  redirects: PublicRouteDispositionsV3;
+  release: PublicSiteReleaseManifestV3;
+  site: PublicSiteConfigurationV3;
+  taxonomy: PublicSiteTaxonomyV3;
+}
+
 interface ContractDocumentsBySchemaVersion {
   "2.0.0": ContractDocumentsV2;
+  "3.0.0": ContractDocumentsV3;
 }
 
 export type ContractDocumentKind = keyof ContractDocumentsV2;
@@ -67,7 +105,7 @@ interface ContractSchemaPack {
   readonly documents: Readonly<Record<string, object>>;
 }
 
-const schemaNames = [
+const v2SchemaNames = [
   "content-block",
   "content",
   "article",
@@ -80,7 +118,7 @@ const schemaNames = [
   "taxonomy",
 ] as const satisfies readonly ContractDocumentKind[];
 
-const schemas: Record<ContractDocumentKind, object> = {
+const v2Schemas: Record<ContractDocumentKind, object> = {
   article: articleSchema,
   "content-block": contentBlockSchema,
   content: contentSchema,
@@ -93,11 +131,37 @@ const schemas: Record<ContractDocumentKind, object> = {
   taxonomy: taxonomySchema,
 };
 
+const v3SchemaNames =
+  v2SchemaNames satisfies readonly ContractDocumentKindFor<"3.0.0">[];
+
+const v3Schemas: Record<ContractDocumentKindFor<"3.0.0">, object> = {
+  article: articleSchemaV3,
+  "content-block": contentBlockSchemaV3,
+  content: contentSchemaV3,
+  "media-manifest": mediaManifestSchemaV3,
+  navigation: navigationSchemaV3,
+  page: pageSchemaV3,
+  redirects: redirectsSchemaV3,
+  release: releaseSchemaV3,
+  site: siteSchemaV3,
+  taxonomy: taxonomySchemaV3,
+};
+
 const schemaPacks = {
   "2.0.0": {
     dependencies: [],
-    names: schemaNames,
-    documents: schemas,
+    names: v2SchemaNames,
+    documents: v2Schemas,
+  },
+  "3.0.0": {
+    dependencies: [
+      actionLinkBlockSchemaV3,
+      codeCommandBlockSchemaV3,
+      galleryBlockSchemaV3,
+      nicheComponentBlockSchemaV3,
+    ],
+    names: v3SchemaNames,
+    documents: v3Schemas,
   },
 } satisfies Record<RegisteredContractSchemaVersion, ContractSchemaPack>;
 
@@ -126,6 +190,7 @@ function compileSchemaPack(pack: ContractSchemaPack) {
 
 const validatorsByVersion = {
   "2.0.0": compileSchemaPack(schemaPacks["2.0.0"]),
+  "3.0.0": compileSchemaPack(schemaPacks["3.0.0"]),
 } satisfies Record<
   RegisteredContractSchemaVersion,
   ReadonlyMap<string, ValidateFunction>
