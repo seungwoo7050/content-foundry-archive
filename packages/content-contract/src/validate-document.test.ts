@@ -46,7 +46,7 @@ describe("contract document validation", () => {
     "accepts a valid %s fixture through public and versioned validation",
     (kind, path) => {
       const value = fixtureValue(kind, path);
-      expect(validateContractDocument(kind, value)).toBeDefined();
+      expect(validateContractDocument("2.0.0", kind, value)).toBeDefined();
       expect(
         validateContractDocumentForVersion("2.0.0", kind, value),
       ).toBeDefined();
@@ -119,6 +119,7 @@ describe("contract document validation", () => {
   it("classifies an invalid article slug", () => {
     expect(() =>
       validateContractDocument(
+        "2.0.0",
         "article",
         readFixture("invalid/article-invalid-slug.json"),
       ),
@@ -128,15 +129,17 @@ describe("contract document validation", () => {
   it("requires stable heading ids", () => {
     expect(() =>
       validateContractDocument(
+        "2.0.0",
         "content",
         readFixture("invalid/content-heading-missing-id.json"),
       ),
     ).toThrowError(ContractError);
   });
 
-  it("rejects a supported-looking but unknown version first", () => {
+  it("rejects an unsupported explicit version before schema validation", () => {
     expect(() =>
       validateContractDocument(
+        "3.0.0" as "2.0.0",
         "release",
         readFixture("invalid/release-unsupported-version.json"),
       ),
@@ -146,6 +149,7 @@ describe("contract document validation", () => {
   it("does not expose a vendored v3 block through the legacy validator", () => {
     expect(() =>
       validateContractDocument(
+        "2.0.0",
         "content-block",
         readV3Fixture("valid/gallery-block.json"),
       ),

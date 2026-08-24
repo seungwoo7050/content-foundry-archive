@@ -29,7 +29,7 @@ import taxonomySchemaV3 from "../vendor/3.0.0/schemas/taxonomy.schema.json" with
 
 import {
   resolveSupportedContractVersion,
-  SUPPORTED_CONTRACT_VERSION,
+  type SupportedContractVersion,
 } from "./contract-version.js";
 import { ContractError } from "./errors.js";
 import type {
@@ -54,8 +54,6 @@ import type {
   PublishedStructuredContent,
   PublishedStructuredContentV3,
 } from "./index.js";
-
-export { SUPPORTED_CONTRACT_VERSION };
 
 interface ContractDocumentsV2 {
   article: PublishedArticleProjection;
@@ -223,19 +221,19 @@ export function validateContractDocumentForVersion<
   return value as ContractDocumentFor<V, K>;
 }
 
-export function validateContractDocument<K extends ContractDocumentKind>(
+type PublicSupportedSchemaVersion = Extract<
+  SupportedContractVersion,
+  RegisteredContractSchemaVersion
+>;
+
+export function validateContractDocument<
+  V extends PublicSupportedSchemaVersion,
+  K extends ContractDocumentKindFor<V>,
+>(
+  version: V,
   kind: K,
   value: unknown,
-): ContractDocumentsV2[K] {
-  let version = SUPPORTED_CONTRACT_VERSION;
-  if (
-    kind === "release" &&
-    typeof value === "object" &&
-    value !== null &&
-    "contractVersion" in value
-  ) {
-    version = resolveSupportedContractVersion(value.contractVersion);
-  }
-
-  return validateContractDocumentForVersion(version, kind, value);
+): ContractDocumentFor<V, K> {
+  const supportedVersion = resolveSupportedContractVersion(version) as V;
+  return validateContractDocumentForVersion(supportedVersion, kind, value);
 }
