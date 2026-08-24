@@ -46,6 +46,7 @@ describe("route disposition source claims", () => {
   it.each([
     ["/", "fixed-home", "fixed home route"],
     ["/archive", "fixed-archive", "fixed archive route"],
+    ["/search", "fixed-search", "fixed search route"],
     ["/404", "fixed-not-found", "fixed not-found route"],
     ["/_release.json", "fixed-release-identity", "fixed release-identity route"],
     ["/sitemap.xml", "fixed-sitemap", "fixed sitemap route"],

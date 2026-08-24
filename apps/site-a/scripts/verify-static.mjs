@@ -101,6 +101,7 @@ const staticPage = readArtifact(staticPageRelativePath);
 const category = readArtifact(categoryRelativePath);
 const archive = readArtifact("archive.html");
 const notFound = readArtifact("404.html");
+const search = readArtifact("search.html");
 const robots = readArtifact("robots.txt");
 const rss = readArtifact("rss.xml");
 const searchIndex = JSON.parse(readArtifact("search-index.json"));
@@ -239,11 +240,18 @@ assert.match(
 );
 assert.match(notFound, /페이지를 찾을 수 없습니다/);
 assert.match(notFound, /href="\/">생활메모 홈으로 돌아가기<\/a>/);
+assert.match(search, /<h1>검색<\/h1>/);
+assert.match(search, /<label for="site-search-query">찾고 싶은 안내<\/label>/);
+assert.match(search, /<input id="site-search-query" type="search"/);
+assert.doesNotMatch(search, /<input[^>]+\sname=/);
+assert.match(search, /검색어는 이 기기에서만 처리합니다\./);
+assert.match(search, /href="\/category\/daily-admin">생활·행정<\/a>/);
 assert.match(home, /<meta name="robots" content="noindex, nofollow"/);
 assert.match(article, /<meta name="robots" content="noindex, nofollow"/);
 assert.match(staticPage, /<meta name="robots" content="noindex, nofollow"/);
 assert.match(category, /<meta name="robots" content="noindex, nofollow"/);
 assert.match(archive, /<meta name="robots" content="noindex, nofollow"/);
+assert.match(search, /<meta name="robots" content="noindex, nofollow"/);
 assertCanonical(home, "https://example.com");
 assertCanonical(
   article,
@@ -252,6 +260,7 @@ assertCanonical(
 assertCanonical(staticPage, "https://example.com/about");
 assertCanonical(category, `https://example.com/category/${categorySlug}`);
 assertCanonical(archive, "https://example.com/archive");
+assertCanonical(search, "https://example.com/search");
 assert.match(archive, /<title>전체 글 \| 생활메모<\/title>/);
 assert.match(category, /<title>생활·행정 \| 생활메모<\/title>/);
 assert.equal(readMeta(category, "description"), "생활과 행정 절차 안내");
@@ -278,6 +287,7 @@ for (const [field, metaName] of Object.entries(identityFields)) {
   assert.equal(readMeta(staticPage, metaName), identity[field]);
   assert.equal(readMeta(category, metaName), identity[field]);
   assert.equal(readMeta(archive, metaName), identity[field]);
+  assert.equal(readMeta(search, metaName), identity[field]);
 }
 
 const articleArtifacts = readdirSync(join(outRoot, "article"))
@@ -297,11 +307,13 @@ assert.doesNotMatch(article, /(?:og:image|twitter:image|og\.png)/);
 assert.doesNotMatch(staticPage, /(?:og:image|twitter:image|og\.png)/);
 assert.doesNotMatch(category, /(?:og:image|twitter:image|og\.png)/);
 assert.doesNotMatch(archive, /(?:og:image|twitter:image|og\.png)/);
+assert.doesNotMatch(search, /(?:og:image|twitter:image|og\.png)/);
 assertSafeHtml("home", home);
 assertSafeHtml("article", article);
 assertSafeHtml("static page", staticPage);
 assertSafeHtml("category", category);
 assertSafeHtml("archive", archive);
+assertSafeHtml("search", search);
 assertSafeHtml("404", notFound);
 
 const projectionPath = join(appRoot, ".site-build/media-projection.json");
@@ -393,5 +405,15 @@ for (const sourceRoot of ["app", "components", "lib"]) {
     );
   }
 }
+
+const searchControllerSource = readFileSync(
+  join(appRoot, "components/search-controller.tsx"),
+  "utf8",
+);
+assert.doesNotMatch(
+  searchControllerSource,
+  /\b(?:localStorage|sessionStorage|sendBeacon|URLSearchParams)\b|console\.|(?:window|document)\.location|history\./,
+  "Search controller persists, logs, or exposes raw queries",
+);
 
 console.log("Site A static export verified.");
