@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import type { SiteShellViewModel } from "../presentation-view-model.js";
 import { SKIN_TOKENS } from "../skin.js";
 import { FriendlyMobileShell, FriendlyRouteIntro } from "./shell.js";
 
@@ -9,6 +10,7 @@ const shell = {
   skipLink: { href: "#main-content", label: "본문으로 바로가기" },
   brand: { href: "/", label: "생활메모" },
   description: "실생활 정보를 정리합니다.",
+  searchLink: { href: "/search", label: "사이트 검색" },
   primaryNavigation: [
     {
       link: { href: "/guide", label: "안내" },
@@ -46,6 +48,9 @@ describe("Friendly Mobile Utility shell", () => {
 
     expect(html).toContain('data-theme="friendly-mobile-utility"');
     expect(html).toContain('href="#main-content">본문으로 바로가기</a>');
+    expect(html).toContain(
+      '<a class="fmu-header-search" href="/search">사이트 검색</a>',
+    );
     expect(html).toContain('<main class="fmu-main" data-route-kind="static-page" id="main-content" tabindex="-1">');
     expect(html).toContain(
       '<a aria-current="page" href="/guide/start">시작</a>',
@@ -54,6 +59,31 @@ describe("Friendly Mobile Utility shell", () => {
     expect(html).toContain('aria-current="page">소개</span>');
     expect(html).toContain('<p>© 2026 생활메모</p>');
     expect(html.match(/<main\b/g)).toHaveLength(1);
+  });
+
+  it("omits the masthead search anchor when release control is absent", () => {
+    const { searchLink: _searchLink, ...withoutSearchLink } = shell;
+    const render = (shellModel: SiteShellViewModel) =>
+      renderToStaticMarkup(
+        <FriendlyMobileShell
+          context={{ skinId: "calm-blue", colors: SKIN_TOKENS["calm-blue"] }}
+          routeKind="static-page"
+          routePath="/about"
+          shell={shellModel}
+        >
+          <FriendlyRouteIntro route={route} />
+        </FriendlyMobileShell>,
+      );
+    const masthead = (html: string) => html.match(
+      /<header class="fmu-header">[\s\S]*?<\/header>/,
+    )?.[0];
+
+    expect(masthead(render(withoutSearchLink))).not.toContain(
+      "fmu-header-search",
+    );
+    expect(masthead(render({ ...shell, searchLink: null }))).not.toContain(
+      "fmu-header-search",
+    );
   });
 
 });

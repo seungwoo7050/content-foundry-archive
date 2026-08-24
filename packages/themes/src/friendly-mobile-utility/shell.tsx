@@ -71,6 +71,11 @@ export function FriendlyMobileShell({
             {shell.brand.label}
           </a>
           <p className="fmu-tagline">{shell.description}</p>
+          {shell.searchLink ? (
+            <a className="fmu-header-search" href={shell.searchLink.href}>
+              {shell.searchLink.label}
+            </a>
+          ) : null}
           <div className="fmu-nav">
             <ThemeNavigation
               ariaLabel="주요 메뉴"

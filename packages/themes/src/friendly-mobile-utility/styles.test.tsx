@@ -23,6 +23,9 @@ describe("Friendly Mobile Utility styles", () => {
     expect(FRIENDLY_MOBILE_STYLES).toContain("min-height:48px");
     expect(FRIENDLY_MOBILE_STYLES).toContain("var(--color-surface-muted)");
     expect(FRIENDLY_MOBILE_STYLES).toContain(
+      ".fmu-header-search{display:inline-flex;min-height:48px;",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
       ".fmu-article-reading-time{width:max-content;max-width:100%",
     );
     expect(FRIENDLY_MOBILE_STYLES).not.toMatch(/saved|bookmark|popular|ranking/i);
