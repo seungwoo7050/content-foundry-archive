@@ -55,7 +55,7 @@ export function ThemeFooterNavigation({
 export function ThemeRecoveryLinks({
   items,
 }: {
-  readonly items?: readonly StateRecoveryLinkViewModel[];
+  readonly items?: readonly StateRecoveryLinkViewModel[] | undefined;
 }) {
   return items && items.length > 0 ? (
     <nav aria-label="페이지 복구 경로">

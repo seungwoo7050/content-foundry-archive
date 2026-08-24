@@ -34,6 +34,7 @@ describe("shared theme link primitives", () => {
 
   it("renders recovery links in order without exposing kind as content", () => {
     expect(renderToStaticMarkup(<ThemeRecoveryLinks />)).toBe("");
+    expect(renderToStaticMarkup(<ThemeRecoveryLinks items={undefined} />)).toBe("");
     expect(renderToStaticMarkup(<ThemeRecoveryLinks items={[]} />)).toBe("");
     expect(renderToStaticMarkup(<ThemeRecoveryLinks items={[
       { kind: "search", href: "/search", label: "검색" },
