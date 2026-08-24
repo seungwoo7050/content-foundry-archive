@@ -33,6 +33,17 @@ const copyFixture = (source = fixture) => {
 };
 
 const releasePath = (root: string) => join(root, "release.json");
+type ReleaseRewrite = (
+  release: Record<string, unknown>,
+  source: string,
+) => string;
+
+function rewriteRelease(root: string, rewrite: ReleaseRewrite) {
+  const path = releasePath(root);
+  const source = readFileSync(path, "utf8");
+  const release = JSON.parse(source) as Record<string, unknown>;
+  writeFileSync(path, rewrite(release, source));
+}
 
 function prependChecksumField(root: string, field: string) {
   const path = releasePath(root);
@@ -141,6 +152,57 @@ describe("verifyReleaseIntegrity", () => {
       }),
     );
   });
+
+  it("rejects a logical release change at the bundle checksum boundary", () => {
+    const root = copyFixture(v3Fixture);
+    rewriteRelease(root, (release) => {
+      release.contentRevision = 44;
+      return `${JSON.stringify(release, null, 2)}\n`;
+    });
+
+    expect(() =>
+      verifyReleaseIntegrityForVersion("3.0.0", root),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "INTEGRITY_FAILED",
+        message: "Bundle checksum mismatch",
+      }),
+    );
+  });
+
+  it.each([
+    {
+      representation: "key order",
+      rewrite: (release: Record<string, unknown>) =>
+        `${JSON.stringify(
+          Object.fromEntries(Object.entries(release).reverse()),
+          null,
+          2,
+        )}\n`,
+    },
+    {
+      representation: "whitespace",
+      rewrite: (release: Record<string, unknown>) =>
+        `${JSON.stringify(release)}\n`,
+    },
+    {
+      representation: "final LF",
+      rewrite: (_release: Record<string, unknown>, source: string) =>
+        source.endsWith("\n") ? source.slice(0, -1) : source,
+    },
+  ] satisfies readonly {
+    readonly representation: string;
+    readonly rewrite: ReleaseRewrite;
+  }[])(
+    "accepts a release representation change to $representation",
+    ({ rewrite }) => {
+      const root = copyFixture(v3Fixture);
+      rewriteRelease(root, rewrite);
+
+      const release = verifyReleaseIntegrityForVersion("3.0.0", root);
+      expect(release.releaseId).toBe("REL-2026-000043");
+    },
+  );
 
   it("rejects invalid release manifest UTF-8", () => {
     const root = copyFixture(v3Fixture);
