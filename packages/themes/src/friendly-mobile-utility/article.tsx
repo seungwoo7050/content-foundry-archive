@@ -76,6 +76,12 @@ export function FriendlyArticle({
       ) : null}
       <div className="fmu-panel fmu-body">{route.body}</div>
       <ArticleEvidence route={route} />
+      {route.readerActions !== null && route.readerActions !== undefined ? (
+        <section aria-labelledby="fmu-reader-actions" className="fmu-panel">
+          <h2 id="fmu-reader-actions">독자 도구</h2>
+          {route.readerActions}
+        </section>
+      ) : null}
       {route.relatedSectionHeading && route.relatedArticles.length > 0 ? (
         <section aria-labelledby="fmu-related" className="fmu-list">
           <h2 id="fmu-related">{route.relatedSectionHeading}</h2>

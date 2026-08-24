@@ -23,6 +23,7 @@ const route: ArticleRouteViewModel = {
   relatedSectionHeading: "관련 안내",
   relatedArticles: [],
   advertisingEligible: true,
+  readerActions: <button type="button">현재 기사 저장</button>,
   hero: <figure>대표 이미지</figure>,
   body: <section id="step">신청 본문</section>,
 };
@@ -38,6 +39,18 @@ describe("Friendly Mobile Utility article", () => {
     expect(html).toContain("공식 안내");
     expect(html).toContain("공식 절차 변경");
     expect(html).toContain("신분증입니다.");
+    expect(html).toContain('<section aria-labelledby="fmu-reader-actions"');
+    expect(html.match(/현재 기사 저장/g)).toHaveLength(1);
+    expect(html.indexOf("신청 본문")).toBeLessThan(html.indexOf("독자 도구"));
     expect(html).not.toMatch(/adsbygoogle|data-ad-|>광고</i);
+  });
+
+  it.each([null, undefined])("omits reader actions for %s", (readerActions) => {
+    const html = renderToStaticMarkup(
+      <FriendlyArticle route={{ ...route, readerActions }} />,
+    );
+
+    expect(html).not.toContain("fmu-reader-actions");
+    expect(html).not.toContain("현재 기사 저장");
   });
 });
