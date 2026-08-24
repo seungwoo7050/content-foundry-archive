@@ -139,6 +139,24 @@ describe("Editorial Utility", () => {
     expect(html).toContain('href="/search">사이트 검색</a>');
   });
 
+  it("renders a supplied about teaser once and omits absent data", () => {
+    const home = routes[0]!;
+    if (home.kind !== "home") throw new Error("Expected home fixture");
+    const html = render({
+      ...home,
+      aboutTeaser: {
+        href: "/about",
+        label: "소개",
+        description: "한 명의 운영자가 확인한 생활 정보를 정리합니다.",
+      },
+    });
+
+    expect(html.match(/id="home-about-teaser-heading"/g)).toHaveLength(1);
+    expect(html).toContain("한 명의 운영자가 확인한 생활 정보를 정리합니다.");
+    expect(html).toContain('href="/about">소개</a>');
+    expect(render(home)).not.toContain("home-about-teaser-heading");
+  });
+
   it("renders the generous article truth, evidence rail, TOC, and narrow body", () => {
     const html = render(routes[2]!);
     const facts = ["기사 제목", "기사 제목 설명", "대표 이미지", "이 안내의 정보", "목차", "기관 원문", "정책 변경", "본문 슬롯", "자주 묻는 질문", "함께 읽을 안내"];

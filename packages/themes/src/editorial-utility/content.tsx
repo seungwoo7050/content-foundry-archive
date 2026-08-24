@@ -9,7 +9,10 @@ import {
   getThemeAdSlot,
   type ThemeAdSlotContext,
 } from "../theme-ad-slot.js";
-import { ThemeArticleList } from "../theme-links.js";
+import {
+  ThemeArticleList,
+  ThemeHomeAboutTeaser,
+} from "../theme-links.js";
 import { EditorialArticle } from "./article.js";
 
 function RouteHeader({
@@ -63,6 +66,7 @@ function Home({
         <ThemeArticleList articles={latest} headingLevel={3} />
         {getThemeAdSlot(context, "home-feed")}
       </section>
+      <ThemeHomeAboutTeaser teaser={route.aboutTeaser} />
     </div>
   );
 }
