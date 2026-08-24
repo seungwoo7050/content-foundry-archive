@@ -1,40 +1,62 @@
+import type { AnalyticsProviderConfig } from "@content-foundry/analytics";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, it, vi } from "vitest";
 
-import type { AnalyticsProviderConfig } from "@content-foundry/analytics";
-import { describe, expect, it } from "vitest";
+import { Ga4Tag, loadGa4 } from "./ga4-tag";
 
-import { Ga4Tag } from "./ga4-tag";
-
-describe("Ga4Tag", () => {
-  it("renders nothing for disabled analytics", () => {
+describe("GA4 Basic consent-mode tag", () => {
+  it("renders no provider markup before the CMP callback", () => {
     expect(renderToStaticMarkup(createElement(Ga4Tag, {
       config: { provider: "disabled", publicMeasurementId: null },
     }))).toBe("");
+    expect(renderToStaticMarkup(createElement(Ga4Tag, {
+      config: { provider: "ga4", publicMeasurementId: "G-ABC123" },
+    }))).toBe("");
   });
 
-  it("renders the official loader before one exact config command", () => {
-    const html = renderToStaticMarkup(createElement(Ga4Tag, {
-      config: { provider: "ga4", publicMeasurementId: "G-PSW1MY7HB4" },
-    }));
+  it("loads and configures one validated GA4 script", () => {
+    const appended: Array<Record<string, unknown>> = [];
+    const script = {
+      async: false,
+      src: "",
+      setAttribute: vi.fn(),
+    };
+    const documentTarget = {
+      querySelector: vi.fn(() => null),
+      createElement: vi.fn(() => script),
+      head: { append: (value: Record<string, unknown>) => appended.push(value) },
+    } as unknown as Document;
+    const dataLayer: unknown[] = [];
 
-    expect(html).toBe(
-      '<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PSW1MY7HB4"></script>' +
-      "<script>gtag('js', new Date());\ngtag('config', 'G-PSW1MY7HB4');</script>",
+    expect(loadGa4(documentTarget, { dataLayer }, "G-ABC123")).toBe(true);
+    expect(script).toMatchObject({
+      async: true,
+      src: "https://www.googletagmanager.com/gtag/js?id=G-ABC123",
+    });
+    expect(script.setAttribute).toHaveBeenCalledWith(
+      "data-content-foundry-provider",
+      "ga4",
     );
-    expect(html.match(/<script/g)).toHaveLength(2);
-    expect(html.indexOf("gtag/js")).toBeLessThan(html.indexOf("gtag('config'"));
-    expect(html).not.toMatch(/article|release|title|user|email|query/i);
+    expect(appended).toEqual([script]);
+    expect(dataLayer[0]).toEqual(["js", expect.any(Date)]);
+    expect(dataLayer[1]).toEqual(["config", "G-ABC123"]);
   });
 
-  it("fails closed if a typed boundary is forged", () => {
+  it("deduplicates the loader and rejects forged identifiers", () => {
+    const existingDocument = {
+      querySelector: () => ({}),
+    } as unknown as Document;
+    expect(loadGa4(existingDocument, {}, "G-ABC123")).toBe(false);
+    expect(() => loadGa4(existingDocument, {}, "G-forged")).toThrow(
+      "valid measurement ID",
+    );
+
     const forged = {
       provider: "ga4",
-      publicMeasurementId: "G-unsafe'</script>",
-    } as AnalyticsProviderConfig;
-
-    expect(() => renderToStaticMarkup(
-      createElement(Ga4Tag, { config: forged }),
-    )).toThrow("valid measurement ID");
+      publicMeasurementId: "G-forged",
+    } as unknown as AnalyticsProviderConfig;
+    expect(() => renderToStaticMarkup(createElement(Ga4Tag, { config: forged })))
+      .toThrow("valid measurement ID");
   });
 });
