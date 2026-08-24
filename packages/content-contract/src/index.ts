@@ -80,9 +80,12 @@ export {
 export { verifyReleaseIntegrity } from "./verify-integrity.js";
 export {
   loadReleaseBundle,
+  loadSupportedReleaseBundle,
   loadV3ReleaseBundle,
   type LoadedReleaseBundle,
+  type LoadedSupportedReleaseBundle,
   type LoadReleaseBundleOptions,
+  type LoadSupportedReleaseBundleOptions,
   type LoadV3ReleaseBundleOptions,
 } from "./load-release-bundle.js";
 export {

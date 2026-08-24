@@ -2,9 +2,11 @@ import { ContractError, type ContractIssue } from "./errors.js";
 import {
   readReleaseBundleDocuments,
   readReleaseBundleDocumentsForVersion,
+  readSupportedReleaseBundleDocuments,
   type ReleaseBundleDocuments,
   type ReleaseBundleDocumentsByVersion,
 } from "./read-bundle-documents.js";
+import type { SupportedContractVersion } from "./contract-version.js";
 import { validateContentReferences } from "./validate-content-references.js";
 import { validateContentSemantics } from "./validate-content-semantics.js";
 import { validateExternalActionUrls } from "./validate-external-action-urls.js";
@@ -30,6 +32,16 @@ export interface LoadV3ReleaseBundleOptions extends LoadReleaseBundleOptions {
     bundle: LoadedReleaseBundleV3,
   ) => V3ReleaseConsumerContext;
 }
+
+export interface LoadSupportedReleaseBundleOptions
+  extends LoadReleaseBundleOptions {
+  readonly resolveV3ConsumerContext: (
+    bundle: LoadedReleaseBundleV3,
+  ) => V3ReleaseConsumerContext;
+}
+
+export type LoadedSupportedReleaseBundle =
+  ReleaseBundleDocumentsByVersion[SupportedContractVersion];
 
 type VersionedReleaseBundle =
   ReleaseBundleDocumentsByVersion[keyof ReleaseBundleDocumentsByVersion];
@@ -125,4 +137,34 @@ export function loadV3ReleaseBundle(
     bundle,
     resolveConsumerContext(bundle),
   );
+}
+
+export function loadSupportedReleaseBundle(
+  root: string,
+  options: LoadSupportedReleaseBundleOptions,
+): LoadedSupportedReleaseBundle {
+  const { resolveV3ConsumerContext, ...identityOptions } = options;
+  const bundle = readSupportedReleaseBundleDocuments(
+    root,
+  ) as VersionedReleaseBundle;
+  const version = bundle.release.contractVersion;
+  if (version === "2.0.0") {
+    return validateLoadedReleaseBundle(
+      bundle as ReleaseBundleDocumentsByVersion["2.0.0"],
+      identityOptions,
+    );
+  }
+  if (version === "3.0.0") {
+    const validated = validateV3ReleaseBundle(
+      bundle as ReleaseBundleDocumentsByVersion["3.0.0"],
+      identityOptions,
+    );
+    return validateV3ReleaseConsumerContext(
+      validated,
+      resolveV3ConsumerContext(validated),
+    ) as unknown as LoadedSupportedReleaseBundle;
+  }
+
+  const unhandledVersion: never = version;
+  throw new Error(`Unhandled supported release version: ${unhandledVersion}`);
 }
