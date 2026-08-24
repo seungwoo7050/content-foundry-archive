@@ -50,7 +50,7 @@ const routes: readonly HtmlRouteViewModel[] = [
     advertisingEligible: true, hero: null, body: <section id="step">신청 본문</section>,
   },
   { ...base("/about", "소개"), kind: "static-page", body: <p>운영 원칙</p> },
-  { ...base("/archive", "전체 글"), kind: "archive", articles: [item] },
+  { ...base("/archive", "전체 글"), kind: "archive", articles: [item], pagination: { currentPage: 1, pageCount: 1, previous: null, next: null } },
   { ...base("/search", "검색"), kind: "search", client: <form>검색 폼</form> },
   { ...base("/404", "찾을 수 없음"), kind: "not-found", statusCode: 404, action: { href: "/", label: "홈으로" } },
   { ...base("/retired", "종료된 안내"), kind: "retired", statusCode: 410, action: { href: "/archive", label: "전체 글" } },

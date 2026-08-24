@@ -7,6 +7,7 @@ import type {
   DateViewModel,
   FaqItemViewModel,
   LinkViewModel,
+  PaginationViewModel,
   TocItemViewModel,
 } from "./presentation-view-model.js";
 import type { RouteBaseViewModel } from "./route-base-view-model.js";
@@ -57,6 +58,7 @@ export interface StaticPageRouteViewModel
 
 export interface ArchiveRouteViewModel extends RouteBaseViewModel<"archive"> {
   readonly articles: readonly ArticleListItemViewModel[];
+  readonly pagination: PaginationViewModel;
 }
 
 export type ContentRouteViewModel =

@@ -60,6 +60,12 @@ describe("archive theme view model", () => {
           topics: ["정부24"],
         },
       ],
+      pagination: {
+        currentPage: 1,
+        pageCount: 1,
+        previous: null,
+        next: null,
+      },
     });
     expect(model).not.toHaveProperty("count");
     expect(JSON.stringify(model)).not.toMatch(/ART-|popularity|ranking/);
@@ -97,6 +103,42 @@ describe("archive theme view model", () => {
       dateTime: "2026-08-20T00:00:00Z",
       label: "2026년 8월 20일",
     });
+  });
+
+  it("projects a page-two path, breadcrumb, slice, and navigation", () => {
+    const articles = Array.from({ length: 13 }, (_, index) => ({
+      ...article,
+      id: `ART-${String(index + 1).padStart(6, "0")}`,
+      title: `안내 ${index + 1}`,
+      seo: {
+        ...article.seo,
+        canonicalPath: `/article/guide-${index + 1}`,
+      },
+    }));
+
+    const model = createArchiveThemeViewModel({ ...bundle, articles }, 2);
+
+    expect(model).toMatchObject({
+      path: "/archive/page/2",
+      heading: "전체 글 2페이지",
+      description: "생활메모의 안내 글을 게시일 최신순으로 모았습니다. 2페이지입니다.",
+      breadcrumbs: [
+        { href: "/", label: "생활메모" },
+        { href: "/archive", label: "전체 글" },
+        { href: "/archive/page/2", label: "2페이지" },
+      ],
+      pagination: {
+        currentPage: 2,
+        pageCount: 2,
+        previous: { href: "/archive", label: "이전 페이지" },
+        next: null,
+      },
+    });
+    expect(model.articles.map(({ link }) => link.href)).toEqual([
+      "/article/guide-13",
+    ]);
+    expect(() => createArchiveThemeViewModel({ ...bundle, articles }, 3))
+      .toThrow(RangeError);
   });
 
   it("preserves fail-closed taxonomy validation", () => {

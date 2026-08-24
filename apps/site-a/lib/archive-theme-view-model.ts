@@ -10,6 +10,10 @@ import {
   type ThemeArticleListRecord,
   type ThemeArticleListSource,
 } from "./theme-article-list-item";
+import {
+  getStaticListPagePath,
+  paginateStaticList,
+} from "./static-list-pagination";
 
 interface ArchiveThemeArticleRecord
   extends ArchiveArticleRecord,
@@ -29,20 +33,36 @@ export interface ArchiveThemeSource extends ThemeArticleListSource {
 
 export function createArchiveThemeViewModel(
   bundle: ArchiveThemeSource,
+  currentPage = 1,
 ): ArchiveRouteViewModel {
-  const articles = getArchiveEntries(bundle).map(({ article }) =>
+  const basePath = "/archive";
+  const page = paginateStaticList(
+    getArchiveEntries(bundle),
+    currentPage,
+    basePath,
+  );
+  const articles = page.records.map(({ article }) =>
     createThemeArticleListItem(bundle, article, "published"),
   );
+  const path = getStaticListPagePath(basePath, currentPage);
+  const heading = currentPage === 1 ? "전체 글" : `전체 글 ${currentPage}페이지`;
+  const description = `${bundle.site.name}의 안내 글을 게시일 최신순으로 모았습니다.`;
 
   return {
     kind: "archive",
-    path: "/archive",
-    heading: "전체 글",
-    description: `${bundle.site.name}의 안내 글을 게시일 최신순으로 모았습니다.`,
+    path,
+    heading,
+    description: currentPage === 1
+      ? description
+      : `${description} ${currentPage}페이지입니다.`,
     breadcrumbs: [
       { href: "/", label: bundle.site.name },
-      { href: "/archive", label: "전체 글" },
+      { href: basePath, label: "전체 글" },
+      ...(currentPage === 1
+        ? []
+        : [{ href: path, label: `${currentPage}페이지` }]),
     ],
     articles,
+    pagination: page.pagination,
   };
 }
