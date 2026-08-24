@@ -17,6 +17,9 @@ importers:
 
   apps/site-a:
     dependencies:
+      '@content-foundry/analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@content-foundry/content-contract':
         specifier: workspace:*
         version: link:../../packages/content-contract
