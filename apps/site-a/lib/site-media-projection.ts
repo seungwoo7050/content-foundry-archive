@@ -6,7 +6,7 @@ import { basename, dirname, join } from "node:path";
 import {
   ContractError,
   type ContractIssue,
-  type LoadedReleaseBundleV3,
+  type LoadedSupportedReleaseBundle,
 } from "@content-foundry/content-contract";
 import type { ResponsiveImageAsset } from "@content-foundry/media";
 
@@ -22,6 +22,11 @@ const documentKeys = [
   "releaseId",
   "siteId",
 ] as const;
+
+type SiteMediaProjectionInput = Pick<
+  LoadedSupportedReleaseBundle,
+  "mediaManifest" | "release"
+>;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -39,7 +44,7 @@ function exactDocument(value: unknown): value is Record<string, unknown> {
 }
 
 function projectionDocument(
-  bundle: LoadedReleaseBundleV3,
+  bundle: SiteMediaProjectionInput,
   assets: Iterable<ResponsiveImageAsset>,
 ) {
   const registry = createResponsiveImageAssetRegistry(bundle.mediaManifest, assets);
@@ -55,7 +60,7 @@ function projectionDocument(
 
 function parseProjectionDocument(
   source: string,
-  bundle: LoadedReleaseBundleV3,
+  bundle: SiteMediaProjectionInput,
 ): readonly ResponsiveImageAsset[] {
   let value: unknown;
   try {
@@ -116,7 +121,7 @@ function parseProjectionDocument(
 
 export async function writeSiteMediaProjection(
   path: string,
-  bundle: LoadedReleaseBundleV3,
+  bundle: SiteMediaProjectionInput,
   assets: Iterable<ResponsiveImageAsset>,
 ): Promise<void> {
   const source = `${JSON.stringify(projectionDocument(bundle, assets), null, 2)}\n`;
@@ -136,7 +141,7 @@ export async function writeSiteMediaProjection(
 
 export function readSiteMediaProjection(
   path: string,
-  bundle: LoadedReleaseBundleV3,
+  bundle: SiteMediaProjectionInput,
 ): readonly ResponsiveImageAsset[] {
   let source: string;
   try {

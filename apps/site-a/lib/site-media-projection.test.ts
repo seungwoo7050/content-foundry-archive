@@ -8,7 +8,10 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
-import { loadV3ReleaseBundle } from "@content-foundry/content-contract";
+import {
+  loadReleaseBundle,
+  loadV3ReleaseBundle,
+} from "@content-foundry/content-contract";
 import { projectResponsiveImageAsset } from "@content-foundry/media";
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -22,6 +25,11 @@ const fixture = join(
   process.cwd(),
   "../../packages/content-contract/vendor/3.0.0/fixtures/bundles/valid/site-a-minimal",
 );
+const v2Fixture = join(
+  process.cwd(),
+  "../../packages/content-contract/vendor/2.0.0/fixtures/bundles/valid/site-a-minimal",
+);
+const v2Bundle = loadReleaseBundle(v2Fixture);
 const bundle = loadV3ReleaseBundle(fixture, {
   resolveConsumerContext: (candidate) => ({
     generatedRoutes: getGeneratedRoutes(candidate),
@@ -44,6 +52,7 @@ function projectionPath() {
 
 function document(path: string) {
   return JSON.parse(readFileSync(path, "utf8")) as {
+    contractVersion: string;
     releaseId: string;
     assets: Array<{ derivatives: Array<{ publicPath: string }> }>;
   };
@@ -54,6 +63,19 @@ afterEach(() => {
 });
 
 describe("site media projection persistence", () => {
+  it("accepts v2 media and release identity inputs", async () => {
+    const path = projectionPath();
+
+    await writeSiteMediaProjection(path, v2Bundle, []);
+
+    expect(document(path)).toMatchObject({
+      contractVersion: "2.0.0",
+      releaseId: v2Bundle.release.releaseId,
+      assets: [],
+    });
+    expect(readSiteMediaProjection(path, v2Bundle)).toEqual([]);
+  });
+
   it("writes deterministic version-bound JSON and reads verified assets", async () => {
     const path = projectionPath();
 

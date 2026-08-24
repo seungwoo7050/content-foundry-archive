@@ -3,7 +3,7 @@ import { isDeepStrictEqual } from "node:util";
 import {
   ContractError,
   type ContractIssue,
-  type MediaManifestV3,
+  type LoadedSupportedReleaseBundle,
 } from "@content-foundry/content-contract";
 import {
   projectResponsiveImageAsset,
@@ -15,8 +15,10 @@ export type ResponsiveImageAssetRegistry = ReadonlyMap<
   ResponsiveImageAsset
 >;
 
+type SupportedMediaManifest = LoadedSupportedReleaseBundle["mediaManifest"];
+
 export function createResponsiveImageAssetRegistry(
-  manifest: MediaManifestV3,
+  manifest: SupportedMediaManifest,
   assets: Iterable<ResponsiveImageAsset>,
 ): ResponsiveImageAssetRegistry {
   const candidates = [...assets];
