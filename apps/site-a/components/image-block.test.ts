@@ -33,12 +33,13 @@ const asset: ResponsiveImageAsset = {
   ],
 };
 
-function render(value = asset, priority = false) {
+function render(value = asset, priority = false, sizes?: string) {
   return renderToStaticMarkup(
     createElement(ImageBlock, {
       block: { type: "image", mediaId, caption: "신청 <화면>" },
       assets: new Map([[mediaId, value]]),
       priority,
+      ...(sizes === undefined ? {} : { sizes }),
     }),
   );
 }
@@ -65,6 +66,12 @@ describe("ImageBlock", () => {
 
     expect(html).toContain('loading="eager"');
     expect(html).toContain('fetchPriority="high"');
+  });
+
+  it("allows a list card to declare its responsive display width", () => {
+    expect(render(asset, false, "(min-width: 64rem) 24rem, 100vw")).toContain(
+      'sizes="(min-width: 64rem) 24rem, 100vw"',
+    );
   });
 
   it("preserves an explicit empty alt attribute", () => {

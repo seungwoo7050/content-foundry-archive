@@ -12,6 +12,7 @@ interface ImageBlockProps {
   readonly block: PublishedImageBlockV3;
   readonly assets: ResponsiveImageAssetRegistry;
   readonly priority?: boolean;
+  readonly sizes?: string;
 }
 
 export class MissingResponsiveImageAssetError extends Error {
@@ -23,7 +24,12 @@ export class MissingResponsiveImageAssetError extends Error {
   }
 }
 
-export function ImageBlock({ block, assets, priority = false }: ImageBlockProps) {
+export function ImageBlock({
+  block,
+  assets,
+  priority = false,
+  sizes = "(min-width: 48rem) 42rem, 100vw",
+}: ImageBlockProps) {
   const asset = assets.get(block.mediaId);
   if (asset === undefined) throw new MissingResponsiveImageAssetError(block.mediaId);
   const srcSet = asset.derivatives
@@ -39,7 +45,7 @@ export function ImageBlock({ block, assets, priority = false }: ImageBlockProps)
     <figure className="content-image">
       <picture>
         <source
-          sizes="(min-width: 48rem) 42rem, 100vw"
+          sizes={sizes}
           srcSet={srcSet}
           type="image/webp"
         />
