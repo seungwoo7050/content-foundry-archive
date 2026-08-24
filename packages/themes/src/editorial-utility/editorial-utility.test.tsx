@@ -95,6 +95,14 @@ function render(
   );
 }
 
+function getListRoute(kind: "archive" | "category") {
+  const route = routes.find((candidate) => candidate.kind === kind);
+  if (!route || (route.kind !== "archive" && route.kind !== "category")) {
+    throw new Error(`Missing ${kind} fixture.`);
+  }
+  return route;
+}
+
 const matrix = SKIN_IDS.flatMap((skinId) =>
   routes.map((route) => ({ route, skinId })),
 );
@@ -230,6 +238,45 @@ describe("Editorial Utility", () => {
     expect(html).toContain('href="/about">소개</a>');
     expect(render(home)).not.toContain("home-about-teaser-heading");
   });
+
+  it.each(["category", "archive"] as const)(
+    "omits pagination markup from a one-page %s list",
+    (kind) => {
+      expect(render(getListRoute(kind)))
+        .not.toContain('aria-label="목록 페이지 이동"');
+    },
+  );
+
+  it.each([
+    ["category", "/category/life/page/2", "/category/life", "/category/life/page/3"],
+    ["archive", "/archive/page/2", "/archive", "/archive/page/3"],
+  ] as const)(
+    "renders real pagination anchors after the %s article list",
+    (kind, path, previousHref, nextHref) => {
+      const route = getListRoute(kind);
+      const html = render({
+        ...route,
+        path,
+        breadcrumbs: [{ href: path, label: route.heading }],
+        pagination: {
+          currentPage: 2,
+          pageCount: 3,
+          previous: { href: previousHref, label: "이전 페이지" },
+          next: { href: nextHref, label: "다음 페이지" },
+        },
+      });
+
+      expect(html.indexOf('href="/article/1"')).toBeLessThan(
+        html.indexOf('aria-label="목록 페이지 이동"'),
+      );
+      expect(html).toContain(
+        `<a href="${previousHref}" rel="prev">이전 페이지</a>`,
+      );
+      expect(html).toContain(
+        `<a href="${nextHref}" rel="next">다음 페이지</a>`,
+      );
+    },
+  );
 
   it("renders the generous article truth, evidence rail, TOC, and narrow body", () => {
     const html = render(routes[2]!);

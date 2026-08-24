@@ -12,6 +12,7 @@ import {
 import {
   ThemeArticleList,
   ThemeHomeAboutTeaser,
+  ThemePagination,
 } from "../theme-links.js";
 import { EditorialArticle } from "./article.js";
 
@@ -115,6 +116,7 @@ function Category({ route }: { readonly route: CategoryRouteViewModel }) {
       <section className="editorial-list-section editorial-section">
         <h2>{route.articleSectionHeading}</h2>
         <ThemeArticleList articles={route.articles} headingLevel={3} />
+        <ThemePagination pagination={route.pagination} />
       </section>
       {route.topicSectionHeading && route.topics.length > 0 ? (
         <section className="editorial-section">
@@ -143,6 +145,7 @@ function Archive({ route }: { readonly route: ArchiveRouteViewModel }) {
       <RouteHeader heading={route.heading} description={route.description} />
       <section className="editorial-list-section">
         <ThemeArticleList articles={route.articles} headingLevel={2} ordered />
+        <ThemePagination pagination={route.pagination} />
       </section>
     </div>
   );
