@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { TextDecoder } from "node:util";
 
 import { ContractError, type ContractIssue } from "./errors.js";
 import type { PublishedArticleProjection } from "./generated/article.js";
@@ -23,6 +24,11 @@ import {
 type ContractDocumentV3<K extends ContractDocumentKind> = ReturnType<
   typeof validateContractDocumentForVersion<"3.0.0", K>
 >;
+
+const JSON_DECODER = new TextDecoder("utf-8", {
+  fatal: true,
+  ignoreBOM: true,
+});
 
 export interface ReleaseBundleDocuments {
   readonly release: PublicSiteReleaseManifest;
@@ -52,8 +58,26 @@ export interface ReleaseBundleDocumentsByVersion {
 }
 
 function readJson(root: string, path: string): unknown {
+  let bytes: Buffer;
   try {
-    return JSON.parse(readFileSync(join(root, path), "utf8")) as unknown;
+    bytes = readFileSync(join(root, path));
+  } catch (error) {
+    throw new ContractError("CONTRACT_INVALID", `Cannot parse ${path}`, [
+      { path: `/${path}`, message: String(error) },
+    ]);
+  }
+
+  let source: string;
+  try {
+    source = JSON_DECODER.decode(bytes);
+  } catch {
+    throw new ContractError("CONTRACT_INVALID", `Cannot parse ${path}`, [
+      { path: `/${path}`, message: "JSON document must be valid UTF-8" },
+    ]);
+  }
+
+  try {
+    return JSON.parse(source) as unknown;
   } catch (error) {
     throw new ContractError("CONTRACT_INVALID", `Cannot parse ${path}`, [
       { path: `/${path}`, message: String(error) },
