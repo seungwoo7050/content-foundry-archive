@@ -216,6 +216,7 @@ assert.ok(
 );
 const expectedBuildConfigChecksum =
   providerFreeBuildConfigChecksums[verifierMode];
+const supportedContractVersions = ["2.0.0", "3.0.0", "4.0.0"];
 const expectedIdentities = {
   "2.0.0": {
     releaseId: "REL-2026-000042",
@@ -224,7 +225,7 @@ const expectedIdentities = {
     bundleChecksum:
       "sha256:0a8f03190b0a5d63fefc52e3efab08080a08263a6c8d716f0e4936382eee6f27",
     buildConfigChecksum: expectedBuildConfigChecksum,
-    supportedContractVersions: ["2.0.0", "3.0.0"],
+    supportedContractVersions,
     routeCount: 7,
   },
   "3.0.0": {
@@ -234,7 +235,17 @@ const expectedIdentities = {
     bundleChecksum:
       "sha256:45a1c3f057fb59b3a7fd28e5e87a8c41eb299d0446c71949e5d4e32d2a92d745",
     buildConfigChecksum: expectedBuildConfigChecksum,
-    supportedContractVersions: ["2.0.0", "3.0.0"],
+    supportedContractVersions,
+    routeCount: 7,
+  },
+  "4.0.0": {
+    releaseId: "REL-2026-000044",
+    siteId: "site-a",
+    contractVersion: "4.0.0",
+    bundleChecksum:
+      "sha256:b4b05f24b333618344362580bc96991876394f50da4f5532291467f60954d1c4",
+    buildConfigChecksum: expectedBuildConfigChecksum,
+    supportedContractVersions,
     routeCount: 7,
   },
 };
@@ -264,9 +275,10 @@ const sitemapEntries = [...sitemap.matchAll(
   ...(match[2] ? { lastModified: match[2] } : {}),
 }));
 const expectedArticleLastModified =
-  identity.contractVersion === "3.0.0"
+  identity.contractVersion !== "2.0.0"
     ? "2026-08-24T02:30:00Z"
     : "2026-08-20T01:00:00Z";
+const hasIndexedFixtureArticle = identity.contractVersion !== "4.0.0";
 assert.deepEqual(searchIndex.release, {
   releaseId: identity.releaseId,
   siteId: identity.siteId,
@@ -275,47 +287,60 @@ assert.deepEqual(searchIndex.release, {
 });
 assert.equal(searchIndex.schemaVersion, "1.0.0");
 assert.equal(searchIndex.locale, "ko-KR");
-assert.equal(searchIndex.entries.length, 1);
-assert.deepEqual(
-  {
-    id: searchIndex.entries[0].id,
-    path: searchIndex.entries[0].path,
-    updatedAt: searchIndex.entries[0].updatedAt,
-    categoryKeys: Object.keys(searchIndex.entries[0].category).sort(),
-    tagKeys: Object.keys(searchIndex.entries[0].tags[0]).sort(),
-    headingKeys: Object.keys(searchIndex.entries[0].headings[0]).sort(),
-  },
-  {
-    id: "ART-000123",
-    path: `/article/${articleSlug}`,
-    updatedAt: expectedArticleLastModified,
-    categoryKeys: ["id", "label", "slug"],
-    tagKeys: ["id", "label", "slug"],
-    headingKeys: ["id", "text"],
-  },
-);
+assert.equal(searchIndex.entries.length, hasIndexedFixtureArticle ? 1 : 0);
+if (hasIndexedFixtureArticle) {
+  assert.deepEqual(
+    {
+      id: searchIndex.entries[0].id,
+      path: searchIndex.entries[0].path,
+      updatedAt: searchIndex.entries[0].updatedAt,
+      categoryKeys: Object.keys(searchIndex.entries[0].category).sort(),
+      tagKeys: Object.keys(searchIndex.entries[0].tags[0]).sort(),
+      headingKeys: Object.keys(searchIndex.entries[0].headings[0]).sort(),
+    },
+    {
+      id: "ART-000123",
+      path: `/article/${articleSlug}`,
+      updatedAt: expectedArticleLastModified,
+      categoryKeys: ["id", "label", "slug"],
+      tagKeys: ["id", "label", "slug"],
+      headingKeys: ["id", "text"],
+    },
+  );
+}
 assert.match(rss, /^<\?xml version="1\.0" encoding="UTF-8"\?>\n<rss version="2\.0">/);
 assert.match(rss, /<title>생활메모<\/title>/);
-assert.match(
-  rss,
-  new RegExp(`<link>https://example\\.com/article/${articleSlug}</link>`),
+assert.equal([...rss.matchAll(/<item>/g)].length, hasIndexedFixtureArticle ? 1 : 0);
+if (hasIndexedFixtureArticle) {
+  assert.match(
+    rss,
+    new RegExp(`<link>https://example\\.com/article/${articleSlug}</link>`),
+  );
+  assert.match(
+    rss,
+    /<pubDate>Thu, 20 Aug 2026 01:00:00 GMT<\/pubDate>/,
+  );
+  assert.match(rss, /<category>생활·행정<\/category>/);
+}
+assert.deepEqual(
+  sitemapEntries,
+  hasIndexedFixtureArticle
+    ? [
+        { url: "https://example.com/" },
+        { url: "https://example.com/archive" },
+        {
+          url: `https://example.com/article/${articleSlug}`,
+          lastModified: expectedArticleLastModified,
+        },
+        { url: `https://example.com/category/${categorySlug}` },
+        { url: "https://example.com/about" },
+      ]
+    : [
+        { url: "https://example.com/" },
+        { url: "https://example.com/archive" },
+        { url: `https://example.com/category/${categorySlug}` },
+      ],
 );
-assert.match(
-  rss,
-  /<pubDate>Thu, 20 Aug 2026 01:00:00 GMT<\/pubDate>/,
-);
-assert.match(rss, /<category>생활·행정<\/category>/);
-assert.equal([...rss.matchAll(/<item>/g)].length, 1);
-assert.deepEqual(sitemapEntries, [
-  { url: "https://example.com/" },
-  { url: "https://example.com/archive" },
-  {
-    url: `https://example.com/article/${articleSlug}`,
-    lastModified: expectedArticleLastModified,
-  },
-  { url: `https://example.com/category/${categorySlug}` },
-  { url: "https://example.com/about" },
-]);
 
 assert.match(home, /<h1>생활메모<\/h1>/);
 const homeStructuredData = readJsonLdScripts("home", home);
@@ -351,7 +376,7 @@ assert.deepEqual(articleStructuredData, [
     url: `https://example.com/article/${articleSlug}`,
     inLanguage: "ko-KR",
     datePublished: "2026-08-20T01:00:00Z",
-    ...(identity.contractVersion === "3.0.0"
+    ...(identity.contractVersion !== "2.0.0"
       ? { dateModified: "2026-08-24T02:30:00Z" }
       : {}),
     author: { "@type": "Person", name: "생활메모" },
@@ -400,7 +425,7 @@ assert.match(
   article,
   /<dt>게시<\/dt><dd><time dateTime="2026-08-20T01:00:00Z">2026년 8월 20일<\/time>/,
 );
-if (identity.contractVersion === "3.0.0") {
+if (identity.contractVersion !== "2.0.0") {
   assert.match(
     article,
     /<dt>수정<\/dt><dd><time dateTime="2026-08-24T02:30:00Z">2026년 8월 24일<\/time>/,
@@ -424,7 +449,7 @@ assert.match(
 );
 assert.match(category, /<h2>최근 안내<\/h2>/);
 const expectedCategoryDate =
-  identity.contractVersion === "3.0.0"
+  identity.contractVersion !== "2.0.0"
     ? ["2026-08-24T02:30:00Z", "2026년 8월 24일"]
     : ["2026-08-20T01:00:00Z", "2026년 8월 20일"];
 assert.match(
@@ -445,9 +470,7 @@ assert.match(archive, /게시일 최신순으로 모았습니다\./);
 assert.match(archive, /href="\/category\/daily-admin">생활·행정<\/a>/);
 assert.match(
   archive,
-  new RegExp(
-    `<time dateTime="${expectedCategoryDate[0]}">${expectedCategoryDate[1]}<\\/time>`,
-  ),
+  /<time dateTime="2026-08-20T01:00:00Z">2026년 8월 20일<\/time>/,
 );
 assert.match(
   archive,
@@ -529,11 +552,7 @@ const categoryArtifacts = readdirSync(join(outRoot, "category"))
 assert.deepEqual(categoryArtifacts, [`${categorySlug}.html`]);
 assert.ok(!existsSync(join(outRoot, "category", "missing-category.html")));
 
-assert.match(home, /property="og:image" content="https:\/\/example\.com\/og\.png"/);
-assert.match(
-  home,
-  /property="og:image:alt" content="생활메모 — 실생활에 도움이 되는 정보를 정리하는 1인 운영 블로그"/,
-);
+assert.doesNotMatch(home, /(?:og:image|twitter:image|og\.png)/);
 assert.doesNotMatch(article, /(?:og:image|twitter:image|og\.png)/);
 assert.doesNotMatch(staticPage, /(?:og:image|twitter:image|og\.png)/);
 assert.doesNotMatch(category, /(?:og:image|twitter:image|og\.png)/);
