@@ -153,6 +153,33 @@ describe("Editorial Utility", () => {
     );
   });
 
+  it("renders only a release-provided masthead search entry", () => {
+    const renderShell = (shellModel: SiteShellViewModel) =>
+      renderToStaticMarkup(
+        editorialUtilityTheme.renderRoute(
+          { shell: shellModel, route: routes[3]! },
+          { skinId: "calm-blue", colors: SKIN_TOKENS["calm-blue"] },
+        ),
+      );
+    const masthead = (html: string) => html.match(
+      /<header class="editorial-masthead">[\s\S]*?<\/header>/,
+    )?.[0];
+    const withSearch = masthead(renderShell({
+      ...shell,
+      searchLink: { href: "/search", label: "사이트 검색" },
+    }));
+
+    expect(withSearch).toContain(
+      '<a class="editorial-masthead-search" href="/search">사이트 검색</a>',
+    );
+    expect(masthead(renderShell(shell))).not.toContain(
+      "editorial-masthead-search",
+    );
+    expect(masthead(renderShell({ ...shell, searchLink: null }))).not.toContain(
+      "editorial-masthead-search",
+    );
+  });
+
   it("shows ordered article topics as plain facts", () => {
     const html = render(routes[2]!);
     expect(html).toContain(

@@ -73,6 +73,14 @@ export function EditorialShell({
             ariaLabel="카테고리 및 주요 메뉴"
             currentPath={path}
           />
+          {shell.searchLink ? (
+            <a
+              className="editorial-masthead-search"
+              href={shell.searchLink.href}
+            >
+              {shell.searchLink.label}
+            </a>
+          ) : null}
         </div>
       </header>
       <main className="editorial-main" id="main-content" tabIndex={-1}>
