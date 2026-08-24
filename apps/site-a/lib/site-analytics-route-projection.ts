@@ -15,6 +15,16 @@ import {
 
 export interface AnalyticsRouteProjectionSource
   extends GeneratedRouteSource, GoneRouteSource {
+  readonly articles: readonly {
+    readonly id: string;
+    readonly seo: { readonly canonicalPath: string };
+  }[];
+  readonly taxonomy: {
+    readonly categories: readonly {
+      readonly id: string;
+      readonly slug: string;
+    }[];
+  };
   readonly release: {
     readonly releaseId: string;
     readonly siteId: string;
@@ -31,7 +41,14 @@ export type SiteAnalyticsBaseContext = Omit<
 export interface SiteAnalyticsRouteProjection {
   readonly baseContext: SiteAnalyticsBaseContext;
   readonly routeTypesByPath: Readonly<Record<string, AnalyticsRouteType>>;
+  readonly routeDestinationsByPath: Readonly<
+    Record<string, AnalyticsRouteDestination>
+  >;
 }
+
+export type AnalyticsRouteDestination =
+  | { readonly destinationType: "article"; readonly destinationId: string }
+  | { readonly destinationType: "category"; readonly destinationId: string };
 
 const HTML_ROUTE_TYPES: Readonly<
   Partial<Record<RouteClaimKind, AnalyticsRouteType>>
@@ -73,6 +90,22 @@ export function createSiteAnalyticsRouteProjection(
   for (const gone of getGoneRoutes(bundle)) {
     addRoute(routeTypesByPath, gone.path, "retired");
   }
+  const routeDestinationsByPath = Object.fromEntries([
+    ...bundle.articles.map((article) => [
+      article.seo.canonicalPath,
+      Object.freeze({
+        destinationType: "article" as const,
+        destinationId: article.id,
+      }),
+    ] as const),
+    ...bundle.taxonomy.categories.map((category) => [
+      `/category/${category.slug}`,
+      Object.freeze({
+        destinationType: "category" as const,
+        destinationId: category.id,
+      }),
+    ] as const),
+  ]);
 
   return Object.freeze({
     baseContext: Object.freeze({
@@ -83,6 +116,7 @@ export function createSiteAnalyticsRouteProjection(
       skinId: bundle.release.defaultSkin as SiteAnalyticsBaseContext["skinId"],
     }),
     routeTypesByPath: Object.freeze(routeTypesByPath),
+    routeDestinationsByPath: Object.freeze(routeDestinationsByPath),
   });
 }
 

@@ -52,6 +52,16 @@ describe("Site A analytics route projection", () => {
       "/about": "static-page",
       "/retired-help": "retired",
     });
+    expect(projection.routeDestinationsByPath).toEqual({
+      "/article/government24-resident-registration-guide": {
+        destinationType: "article",
+        destinationId: "ART-000123",
+      },
+      "/category/daily-admin": {
+        destinationType: "category",
+        destinationId: "daily-admin",
+      },
+    });
     expect(resolveAnalyticsRouteType(projection, "/legacy")).toBe("not-found");
     expect(resolveAnalyticsRouteType(projection, "/ads.txt")).toBe("not-found");
   });

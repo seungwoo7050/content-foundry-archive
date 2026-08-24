@@ -37,6 +37,7 @@ const projection: SiteAnalyticsRouteProjection = {
     "/article/guide": "article",
     "/retired-guide": "retired",
   },
+  routeDestinationsByPath: {},
 };
 
 describe("Site A analytics event dispatch", () => {
