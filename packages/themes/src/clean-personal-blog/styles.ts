@@ -55,4 +55,16 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
 .personal-state__action { display: inline-block; padding: .55rem .9rem; background: var(--personal-primary); color: var(--personal-on-primary) !important; }
 .personal-footer { padding-block: 2rem; background: var(--personal-surface); border-top: 1px solid var(--personal-border); color: var(--personal-text-muted); }
 @media (min-width: 44rem) { .personal-categories { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (prefers-reduced-motion: reduce) {
+  .personal-blog, .personal-blog * { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+@media print {
+  .personal-blog { min-height: auto; background: #fff; color: #000; font-family: ui-serif, Georgia, serif; font-size: 11pt; line-height: 1.55; }
+  .personal-masthead, .personal-footer, .personal-skip, .personal-nav, .personal-breadcrumbs, .personal-search-link, .personal-blog aside[aria-label="광고"], .personal-blog button { display: none !important; }
+  .personal-main { padding: 0; }
+  .personal-reading-column { width: 100%; }
+  .personal-article-meta, .personal-toc, .personal-evidence { break-inside: avoid; border: 1px solid #aaa; border-radius: 0; background: #fff; }
+  .personal-body { font-size: inherit; }
+  .personal-body a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; overflow-wrap: anywhere; }
+}
 `;
