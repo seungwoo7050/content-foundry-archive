@@ -3,7 +3,7 @@ import {
   getThemeAdSlot,
   type ThemeAdSlotContext,
 } from "../theme-ad-slot.js";
-import { ThemeArticleList } from "../theme-links.js";
+import { ThemeArticleList, ThemeArticleTopics } from "../theme-links.js";
 import { KnowledgeBreadcrumbs } from "./route-chrome.js";
 
 function ArticleTrust({ route }: { readonly route: ArticleRouteViewModel }) {
@@ -85,6 +85,7 @@ export function MinimalKnowledgeBaseArticle({
           <h1>{route.heading}</h1>
           <p>{route.description}</p>
         </header>
+        <ThemeArticleTopics topics={route.topics} />
         {route.advertisingEligible
           ? getThemeAdSlot(context, "article-after-summary")
           : null}
