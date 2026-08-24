@@ -1,3 +1,4 @@
+export { exportImageSources } from "./export-image-sources.js";
 export { exportStaticImageSource } from "./export-static-image-source.js";
 export {
   createBundleMediaSourceReader,
