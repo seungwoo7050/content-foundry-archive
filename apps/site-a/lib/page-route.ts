@@ -1,8 +1,17 @@
 import {
   ContractError,
   type ContractIssue,
-  type LoadedReleaseBundle,
 } from "@content-foundry/content-contract";
+
+export interface PageRouteRecord {
+  readonly path: string;
+}
+
+export interface PageRouteSource<
+  TPage extends PageRouteRecord = PageRouteRecord,
+> {
+  readonly pages: readonly TPage[];
+}
 
 const reservedNamespaces = [
   ["/article", "article route namespace"],
@@ -10,7 +19,7 @@ const reservedNamespaces = [
   ["/index", "Next static export namespace"],
 ] as const;
 
-function validatePageRouteOwnership(bundle: LoadedReleaseBundle) {
+function validatePageRouteOwnership(bundle: PageRouteSource) {
   const issues: ContractIssue[] = [];
   bundle.pages.forEach((page, index) => {
     let owner = page.path === "/404" ? "fixed not-found route" : undefined;
@@ -37,17 +46,17 @@ function validatePageRouteOwnership(bundle: LoadedReleaseBundle) {
   }
 }
 
-export function getPageStaticParams(bundle: LoadedReleaseBundle) {
+export function getPageStaticParams(bundle: PageRouteSource) {
   validatePageRouteOwnership(bundle);
   return bundle.pages.map((page) => ({
     pagePath: page.path.slice(1).split("/"),
   }));
 }
 
-export function findPageByPathSegments(
-  bundle: LoadedReleaseBundle,
+export function findPageByPathSegments<TPage extends PageRouteRecord>(
+  bundle: PageRouteSource<TPage>,
   pagePath: readonly string[],
-) {
+): TPage | undefined {
   const path = `/${pagePath.join("/")}`;
   return bundle.pages.find((page) => page.path === path);
 }

@@ -1,9 +1,16 @@
 import { resolve } from "node:path";
 
-import { loadReleaseBundle } from "@content-foundry/content-contract";
-import { describe, expect, it } from "vitest";
+import {
+  loadReleaseBundle,
+  type LoadedReleaseBundleV3,
+} from "@content-foundry/content-contract";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { findPageByPathSegments, getPageStaticParams } from "./page-route";
+import {
+  findPageByPathSegments,
+  getPageStaticParams,
+  type PageRouteSource,
+} from "./page-route";
 
 const fixture = resolve(
   process.cwd(),
@@ -12,6 +19,17 @@ const fixture = resolve(
 const bundle = loadReleaseBundle(fixture);
 
 describe("static page route selection", () => {
+  it("accepts and preserves v3 static-page route records", () => {
+    expectTypeOf<LoadedReleaseBundleV3>().toExtend<PageRouteSource>();
+    const page = findPageByPathSegments(
+      { pages: [] as LoadedReleaseBundleV3["pages"] },
+      ["missing"],
+    );
+    expectTypeOf(page).toEqualTypeOf<
+      LoadedReleaseBundleV3["pages"][number] | undefined
+    >();
+  });
+
   it("enumerates canonical paths as catch-all segment arrays", () => {
     const nestedBundle = structuredClone(bundle);
     nestedBundle.pages[0]!.path = "/legal/privacy-policy";
