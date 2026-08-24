@@ -2,10 +2,12 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 
 import type {
   ArticleListItemViewModel,
+  CategoryLinkViewModel,
   DateViewModel,
   LinkViewModel,
   NavigationItemViewModel,
   SiteShellViewModel,
+  TocItemViewModel,
 } from "./presentation-view-model.js";
 
 describe("shared presentation facts", () => {
@@ -38,5 +40,15 @@ describe("shared presentation facts", () => {
     expectTypeOf<ArticleListItemViewModel["topics"]>().toEqualTypeOf<
       readonly string[]
     >();
+  });
+
+  it("retains category scope and table-of-contents hierarchy", () => {
+    expectTypeOf<CategoryLinkViewModel>().toExtend<LinkViewModel>();
+    expectTypeOf<CategoryLinkViewModel["description"]>().toEqualTypeOf<string>();
+    expectTypeOf<TocItemViewModel>().toEqualTypeOf<{
+      readonly id: string;
+      readonly label: string;
+      readonly level: number;
+    }>();
   });
 });

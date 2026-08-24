@@ -1,11 +1,13 @@
 export {
   type ArticleListItemViewModel,
   type ArticleSourceViewModel,
+  type CategoryLinkViewModel,
   type DateViewModel,
   type FaqItemViewModel,
   type LinkViewModel,
   type NavigationItemViewModel,
   type SiteShellViewModel,
+  type TocItemViewModel,
 } from "./presentation-view-model.js";
 export { type RouteBaseViewModel } from "./route-base-view-model.js";
 export {

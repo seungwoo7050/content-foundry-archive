@@ -3,6 +3,10 @@ export interface LinkViewModel {
   readonly label: string;
 }
 
+export interface CategoryLinkViewModel extends LinkViewModel {
+  readonly description: string;
+}
+
 export interface DateViewModel {
   readonly dateTime: string;
   readonly label: string;
@@ -38,4 +42,10 @@ export interface ArticleSourceViewModel {
 export interface FaqItemViewModel {
   readonly question: string;
   readonly answer: string;
+}
+
+export interface TocItemViewModel {
+  readonly id: string;
+  readonly label: string;
+  readonly level: number;
 }
