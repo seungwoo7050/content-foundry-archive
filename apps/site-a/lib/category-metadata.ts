@@ -1,11 +1,14 @@
-import type { PublicSiteTaxonomy } from "@content-foundry/content-contract";
 import type { Metadata } from "next";
 
-import type { SiteReleaseContext } from "./load-site-release";
+import type { MetadataContext } from "./metadata-context";
 
-type Category = PublicSiteTaxonomy["categories"][number];
+export interface CategoryMetadataSource {
+  readonly description: string;
+  readonly label: string;
+  readonly slug: string;
+}
 
-export function getCategoryDescription(category: Category) {
+export function getCategoryDescription(category: CategoryMetadataSource) {
   return (
     category.description.trim() ||
     `${category.label} 카테고리의 안내 글을 모았습니다.`
@@ -13,8 +16,8 @@ export function getCategoryDescription(category: Category) {
 }
 
 export function createCategoryMetadata(
-  context: SiteReleaseContext,
-  category: Category,
+  context: MetadataContext,
+  category: CategoryMetadataSource,
 ): Metadata {
   const canonical = new URL(
     `/category/${category.slug}`,

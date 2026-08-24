@@ -1,10 +1,15 @@
 import { resolve } from "node:path";
 
+import type { LoadedReleaseBundleV3 } from "@content-foundry/content-contract";
 import { resolveBuildTargetConfig } from "@content-foundry/site-core";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { createCategoryMetadata } from "./category-metadata";
-import { loadSiteRelease } from "./load-site-release";
+import {
+  createCategoryMetadata,
+  type CategoryMetadataSource,
+} from "./category-metadata";
+import { loadSiteRelease, type SiteReleaseContextV3 } from "./load-site-release";
+import type { MetadataContext } from "./metadata-context";
 
 const fixture = resolve(
   process.cwd(),
@@ -27,6 +32,13 @@ function getFixtureCategory() {
 }
 
 describe("createCategoryMetadata", () => {
+  it("accepts v3 category and release context metadata structures", () => {
+    expectTypeOf<SiteReleaseContextV3>().toExtend<MetadataContext>();
+    expectTypeOf<
+      LoadedReleaseBundleV3["taxonomy"]["categories"][number]
+    >().toExtend<CategoryMetadataSource>();
+  });
+
   it("projects category metadata while preserving template noindex", () => {
     expect(createCategoryMetadata(context, getFixtureCategory())).toEqual({
       title: "생활·행정",
