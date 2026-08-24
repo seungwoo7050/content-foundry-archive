@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ArticleReaderActions } from "../../../components/article-reader-actions";
-import { ImageBlock } from "../../../components/image-block";
 import { StructuredData } from "../../../components/structured-data";
 import { VersionedContentBlocks } from "../../../components/versioned-content-blocks";
+import { renderArticleHero } from "../../../lib/article-hero";
 import { createArticleMetadata } from "../../../lib/article-metadata";
 import { createArticleThemeViewModel } from "../../../lib/article-theme-view-model";
 import {
@@ -82,12 +82,7 @@ function createArticleSlots(
     if (!article) notFound();
     return {
       readerActions: createReaderActions(context, article),
-      hero: article.heroMediaId === null ? null : (
-        <ImageBlock
-          assets={context.mediaAssets}
-          block={{ type: "image", mediaId: article.heroMediaId }}
-        />
-      ),
+      hero: renderArticleHero(article.heroMediaId, context.mediaAssets),
       body: <VersionedContentBlocks
         blocks={article.content}
         context={{
@@ -104,7 +99,7 @@ function createArticleSlots(
   if (!article) notFound();
   return {
     readerActions: createReaderActions(context, article),
-    hero: null,
+    hero: renderArticleHero(article.heroMediaId, context.mediaAssets),
     body: (
       <VersionedContentBlocks
         blocks={article.content}
