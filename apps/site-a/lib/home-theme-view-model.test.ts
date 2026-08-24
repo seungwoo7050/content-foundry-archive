@@ -15,6 +15,17 @@ import {
 } from "./home-theme-view-model";
 import { loadValidatedSiteReleaseV4 } from "./load-site-release";
 
+type RequiredHomePresentation = Required<
+  Pick<
+    HomeRouteViewModel,
+    | "featuredArticles"
+    | "currentArticles"
+    | "evergreenArticles"
+    | "latestArticles"
+    | "categoryHighlights"
+  >
+>;
+
 const fixture = resolve(
   process.cwd(),
   "../../packages/content-contract/vendor/2.0.0/fixtures/bundles/valid/site-a-minimal",
@@ -32,6 +43,7 @@ describe("home theme view model", () => {
       ReturnType<typeof createHomeThemeViewModel>
     >().toEqualTypeOf<HomeThemeViewModel>();
     expectTypeOf<HomeThemeViewModel>().toExtend<HomeRouteViewModel>();
+    expectTypeOf<HomeThemeViewModel>().toExtend<RequiredHomePresentation>();
   });
 
   it("projects only actual home discovery facts", () => {

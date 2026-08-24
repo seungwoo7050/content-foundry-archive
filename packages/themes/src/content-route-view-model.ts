@@ -20,6 +20,14 @@ export interface HomeAboutTeaserViewModel extends LinkViewModel {
 export interface HomeRouteViewModel extends RouteBaseViewModel<"home"> {
   readonly articleSectionHeading: string;
   readonly articles: readonly ArticleListItemViewModel[];
+  readonly featuredArticles?: readonly ArticleListItemViewModel[];
+  readonly currentArticles?: readonly ArticleListItemViewModel[];
+  readonly evergreenArticles?: readonly ArticleListItemViewModel[];
+  readonly latestArticles?: readonly ArticleListItemViewModel[];
+  readonly categoryHighlights?: readonly {
+    readonly category: CategoryLinkViewModel;
+    readonly articles: readonly ArticleListItemViewModel[];
+  }[];
   readonly categories: readonly CategoryLinkViewModel[];
   readonly searchLink: LinkViewModel | null;
   readonly aboutTeaser?: HomeAboutTeaserViewModel | null;
