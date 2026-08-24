@@ -9,6 +9,10 @@ import {
   isArticleAdvertisingEligible,
 } from "./article-ad-eligibility";
 import {
+  getEstimatedReadingTimeMinutes,
+  type ArticleReadingTimeSource,
+} from "./article-reading-time";
+import {
   createArticleBreadcrumbs,
   type ArticleBreadcrumbArticle,
   type ArticleBreadcrumbCategory,
@@ -35,6 +39,7 @@ export interface ArticleThemeContext {
 
 export interface ArticleThemeRecord
   extends ArticleTrustRecord,
+    ArticleReadingTimeSource,
     ArticleBreadcrumbArticle,
     RelatedThemeArticleOwner,
     ArticleAdEligibilityRecord {
@@ -101,6 +106,10 @@ export function createArticleThemeViewModel(
     context.bundle,
     article,
   );
+  const estimatedReadingTimeMinutes = getEstimatedReadingTimeMinutes(
+    article,
+    context.bundle.site.locale,
+  );
 
   return {
     kind: "article",
@@ -121,6 +130,10 @@ export function createArticleThemeViewModel(
     operatorLabel: trust.operatorLabel,
     published: trust.published,
     updated: trust.updated,
+    estimatedReadingTime: {
+      minutes: estimatedReadingTimeMinutes,
+      label: `예상 읽기 시간 약 ${estimatedReadingTimeMinutes}분`,
+    },
     trustLinks: createTrustLinks(trust),
     toc: article.toc.map(({ id, text, level }) => ({ id, label: text, level })),
     sources: trust.sources,

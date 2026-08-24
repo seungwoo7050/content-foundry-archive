@@ -6,6 +6,7 @@ import type {
   ContentRouteViewModel,
   StaticPageRouteViewModel,
 } from "./content-route-view-model.js";
+import type { EstimatedReadingTimeViewModel } from "./presentation-view-model.js";
 
 describe("content route view models", () => {
   it("uses explicit React slots for already-safe rendered content", () => {
@@ -24,6 +25,8 @@ describe("content route view models", () => {
     expectTypeOf<
       ArticleRouteViewModel["advertisingEligible"]
     >().toEqualTypeOf<boolean>();
+    expectTypeOf<ArticleRouteViewModel["estimatedReadingTime"]>()
+      .toEqualTypeOf<EstimatedReadingTimeViewModel | undefined>();
   });
 
   it("discriminates the five public content routes", () => {

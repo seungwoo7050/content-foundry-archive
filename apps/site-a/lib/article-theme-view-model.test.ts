@@ -89,6 +89,7 @@ describe("article theme view model", () => {
       operatorLabel: "생활메모",
       published: { dateTime: "2026-08-20T01:00:00Z", label: "2026년 8월 20일" },
       updated: null,
+      estimatedReadingTime: { minutes: 1, label: "예상 읽기 시간 약 1분" },
       trustLinks: [{ href: "/about", label: "운영 방식 보기" }],
       toc: [{ id: "prepare", label: "준비하기", level: 2 }],
       sources: [],
@@ -142,6 +143,25 @@ describe("article theme view model", () => {
     expect(model).not.toHaveProperty("readingTime");
     expect(model.readerActions).toBe(readerActions);
     expect(JSON.stringify(model.sources)).not.toContain("mailto:");
+  });
+
+  it("projects a display-ready reading time from visible article text", () => {
+    const article = firstArticle(bundle);
+    const markdown = Array.from(
+      { length: 201 },
+      (_, index) => `word${index}`,
+    ).join(" ");
+    const model = createArticleThemeViewModel(
+      { config: { adsEnabled: false }, bundle },
+      { ...article, content: [{ type: "paragraph", markdown }], faq: [] },
+      categoryFor(bundle, article.categoryId),
+      { hero: null, body: "body" },
+    );
+
+    expect(model.estimatedReadingTime).toEqual({
+      minutes: 2,
+      label: "예상 읽기 시간 약 2분",
+    });
   });
 
   it("projects topic labels in tagIds order and preserves an empty list", () => {
