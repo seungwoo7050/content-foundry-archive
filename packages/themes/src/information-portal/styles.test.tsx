@@ -23,6 +23,9 @@ describe("Information Portal styles", () => {
     expect(INFORMATION_PORTAL_STYLES).toContain("repeat(3,minmax(0,1fr))");
     expect(INFORMATION_PORTAL_STYLES).toContain("min-height:44px");
     expect(INFORMATION_PORTAL_STYLES).toContain(
+      ".ip-nav-row .ip-masthead-search{border-color:var(--color-primary);",
+    );
+    expect(INFORMATION_PORTAL_STYLES).toContain(
       ".ip-article-reading-time{justify-self:start;",
     );
     expect(INFORMATION_PORTAL_STYLES).not.toMatch(/ranking|trending|popular/i);

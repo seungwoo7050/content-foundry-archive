@@ -71,6 +71,11 @@ export function InformationPortalShell({
             currentPath={routePath}
             items={shell.primaryNavigation}
           />
+          {shell.searchLink ? (
+            <a className="ip-masthead-search" href={shell.searchLink.href}>
+              {shell.searchLink.label}
+            </a>
+          ) : null}
         </div>
       </header>
       <main className="ip-main" data-route-kind={routeKind} id="main-content" tabIndex={-1}>

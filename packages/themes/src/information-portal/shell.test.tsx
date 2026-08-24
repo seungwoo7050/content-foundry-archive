@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import type { SiteShellViewModel } from "../presentation-view-model.js";
 import { SKIN_TOKENS } from "../skin.js";
 import { InformationPortalShell, PortalRouteIntro } from "./shell.js";
 
@@ -9,6 +10,7 @@ const shell = {
   skipLink: { href: "#main-content", label: "본문으로 바로가기" },
   brand: { href: "/", label: "생활메모" },
   description: "실생활 정보를 정리합니다.",
+  searchLink: { href: "/search", label: "사이트 검색" },
   primaryNavigation: [{
     link: { href: "/category/life", label: "생활" },
     children: [{ link: { href: "/category/life/apply", label: "신청" }, children: [] }],
@@ -39,6 +41,9 @@ describe("Information Portal shell", () => {
     expect(html).toContain('data-theme="information-portal"');
     expect(html).toContain('class="ip-brand-row"');
     expect(html).toContain(
+      '<a class="ip-masthead-search" href="/search">사이트 검색</a>',
+    );
+    expect(html).toContain(
       '<a aria-current="page" href="/category/life/apply">신청</a>',
     );
     expect(html).toContain('<a href="/category/life">생활</a>');
@@ -48,5 +53,30 @@ describe("Information Portal shell", () => {
     expect(html).toContain('aria-current="page">소개</span>');
     expect(html).toContain("© 2026 생활메모");
     expect(html.match(/<main\b/g)).toHaveLength(1);
+  });
+
+  it("omits the masthead search entry when release control is absent", () => {
+    const { searchLink: _searchLink, ...withoutSearchLink } = shell;
+    const render = (shellModel: SiteShellViewModel) =>
+      renderToStaticMarkup(
+        <InformationPortalShell
+          context={{ skinId: "calm-blue", colors: SKIN_TOKENS["calm-blue"] }}
+          routeKind="static-page"
+          routePath="/about"
+          shell={shellModel}
+        >
+          <PortalRouteIntro route={route} />
+        </InformationPortalShell>,
+      );
+    const masthead = (html: string) => html.match(
+      /<header class="ip-masthead">[\s\S]*?<\/header>/,
+    )?.[0];
+
+    expect(masthead(render(withoutSearchLink))).not.toContain(
+      "ip-masthead-search",
+    );
+    expect(masthead(render({ ...shell, searchLink: null }))).not.toContain(
+      "ip-masthead-search",
+    );
   });
 });
