@@ -14,6 +14,12 @@ export {
   type SemanticColorTokens,
   type SkinId,
 } from "./skin.js";
+export {
+  type NotFoundRouteViewModel,
+  type RetiredRouteViewModel,
+  type SearchRouteViewModel,
+  type StateRouteViewModel,
+} from "./state-route-view-model.js";
 export { THEME_IDS, type ThemeId } from "./theme-id.js";
 export {
   type ArchiveRouteViewModel,
