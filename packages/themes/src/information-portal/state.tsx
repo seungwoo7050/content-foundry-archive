@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import type { StateRouteViewModel } from "../state-route-view-model.js";
+import { ThemeRecoveryLinks } from "../theme-links.js";
 import { PortalRouteIntro } from "./shell.js";
 
 export function renderInformationPortalState(
@@ -21,6 +22,7 @@ export function renderInformationPortalState(
           <p className="ip-code">{route.statusCode}</p>
           <PortalRouteIntro route={route} />
           <p><a className="ip-action" href={route.action.href}>{route.action.label}</a></p>
+          <ThemeRecoveryLinks items={route.recoveryLinks} />
         </section>
       );
     default: {
