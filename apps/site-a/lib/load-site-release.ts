@@ -5,6 +5,8 @@ import {
   type BuildTargetConfig,
 } from "@content-foundry/site-core";
 
+import { validateSiteRouteGraph } from "./validate-site-route-graph";
+
 export interface SiteReleaseContext {
   readonly config: BuildTargetConfig;
   readonly bundle: LoadedReleaseBundle;
@@ -14,9 +16,11 @@ export interface SiteReleaseContext {
 export function loadSiteRelease(
   config: BuildTargetConfig,
 ): SiteReleaseContext {
-  const bundle = loadReleaseBundle(config.releaseDirectory, {
-    expectedSiteId: config.siteId,
-  });
+  const bundle = validateSiteRouteGraph(
+    loadReleaseBundle(config.releaseDirectory, {
+      expectedSiteId: config.siteId,
+    }),
+  );
   const canonicalUrl = new URL(bundle.site.origin);
   if (canonicalUrl.origin !== bundle.site.origin) {
     throw new BuildTargetConfigError(
