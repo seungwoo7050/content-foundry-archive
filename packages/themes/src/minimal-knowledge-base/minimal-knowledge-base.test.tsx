@@ -23,7 +23,7 @@ const shell: SiteShellViewModel = {
 const articleItem: ArticleListItemViewModel = {
   link: { href: "/article/start", label: "시작 안내" },
   summary: "글 요약",
-  date: { dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
+  date: { kind: "published", dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
   category: { href: "/category/life", label: "생활" },
   topics: ["신청"],
 };

@@ -1,6 +1,7 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 
 import type {
+  ArticleCardDateViewModel,
   ArticleListItemViewModel,
   CategoryLinkViewModel,
   DateViewModel,
@@ -33,7 +34,12 @@ describe("shared presentation facts", () => {
   it("keeps list entries limited to rendered public facts", () => {
     expectTypeOf<ArticleListItemViewModel["link"]>().toEqualTypeOf<LinkViewModel>();
     expectTypeOf<ArticleListItemViewModel["summary"]>().toEqualTypeOf<string>();
-    expectTypeOf<ArticleListItemViewModel["date"]>().toEqualTypeOf<DateViewModel>();
+    expectTypeOf<ArticleListItemViewModel["date"]>()
+      .toEqualTypeOf<ArticleCardDateViewModel>();
+    expectTypeOf<ArticleCardDateViewModel>().toExtend<DateViewModel>();
+    expectTypeOf<ArticleCardDateViewModel["kind"]>().toEqualTypeOf<
+      "published" | "updated"
+    >();
     expectTypeOf<ArticleListItemViewModel["category"]>().toEqualTypeOf<
       LinkViewModel | null
     >();

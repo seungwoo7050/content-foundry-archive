@@ -29,6 +29,7 @@ describe("getArticleCardDate", () => {
 
   it("shows the publication date when no later review exists", () => {
     expect(getArticleCardDate(article)).toEqual({
+      kind: "published",
       label: "게시",
       dateTime: "2026-08-20T01:00:00Z",
     });
@@ -38,8 +39,10 @@ describe("getArticleCardDate", () => {
     const updatedAt = "2026-08-24T03:00:00Z";
 
     expect(getArticleCardDate({ ...article, updatedAt })).toEqual({
+      kind: "updated",
       label: "업데이트",
       dateTime: updatedAt,
     });
   });
+
 });

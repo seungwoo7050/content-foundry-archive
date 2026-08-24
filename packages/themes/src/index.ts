@@ -1,4 +1,5 @@
 export {
+  type ArticleCardDateViewModel,
   type ArticleListItemViewModel,
   type ArticleSourceViewModel,
   type CategoryLinkViewModel,

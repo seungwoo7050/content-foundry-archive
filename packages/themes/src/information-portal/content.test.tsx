@@ -22,7 +22,7 @@ describe("Information Portal discovery routes", () => {
       articleSectionHeading: "최근 안내",
       articles: [{
         link: { href: "/article/start", label: "신청 안내" }, summary: "신청 절차",
-        date: { dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
+        date: { kind: "published", dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
         category: null, topics: [],
       }],
       categories: [{ href: "/category/life", label: "생활", description: "생활 절차를 확인합니다." }],

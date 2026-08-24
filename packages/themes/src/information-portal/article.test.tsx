@@ -7,7 +7,7 @@ import { InformationPortalArticle } from "./article.js";
 const related = {
   link: { href: "/article/next", label: "다음 안내" },
   summary: "연관 절차",
-  date: { dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
+  date: { kind: "published", dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
   category: null,
   topics: [],
 } as const;

@@ -12,6 +12,10 @@ export interface DateViewModel {
   readonly label: string;
 }
 
+export interface ArticleCardDateViewModel extends DateViewModel {
+  readonly kind: "published" | "updated";
+}
+
 export interface NavigationItemViewModel {
   readonly link: LinkViewModel;
   readonly children: readonly NavigationItemViewModel[];
@@ -30,7 +34,7 @@ export interface SiteShellViewModel {
 export interface ArticleListItemViewModel {
   readonly link: LinkViewModel;
   readonly summary: string;
-  readonly date: DateViewModel;
+  readonly date: ArticleCardDateViewModel;
   readonly category: LinkViewModel | null;
   readonly topics: readonly string[];
 }

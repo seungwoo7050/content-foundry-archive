@@ -67,7 +67,11 @@ export function createThemeArticleListItem(
   return {
     link: { href: article.seo.canonicalPath, label: article.title },
     summary: article.summary,
-    date: { dateTime: displayDate.dateTime, label: dateLabel },
+    date: {
+      kind: displayDate.kind,
+      dateTime: displayDate.dateTime,
+      label: dateLabel,
+    },
     category: { href: `/category/${category.slug}`, label: category.label },
     topics,
   };

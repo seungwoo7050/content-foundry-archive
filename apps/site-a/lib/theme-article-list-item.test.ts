@@ -37,7 +37,11 @@ describe("theme article list item", () => {
         label: "정부24 주민등록등본 발급 방법",
       },
       summary: "정부24에서 주민등록등본을 발급하는 기본 절차를 정리합니다.",
-      date: { dateTime: "2026-08-20T01:00:00Z", label: "2026년 8월 20일" },
+      date: {
+        kind: "published",
+        dateTime: "2026-08-20T01:00:00Z",
+        label: "2026년 8월 20일",
+      },
       category: { href: "/category/daily-admin", label: "생활·행정" },
       topics: ["정부24"],
     });
@@ -50,6 +54,7 @@ describe("theme article list item", () => {
         updatedAt: "2026-08-23T15:30:00Z",
       }).date,
     ).toEqual({
+      kind: "updated",
       dateTime: "2026-08-23T15:30:00Z",
       label: "2026년 8월 24일",
     });

@@ -147,6 +147,7 @@ export function ThemeArticleList({
           <article>
             <p>
               {category ? <><a href={category.href}>{category.label}</a>{" "}</> : null}
+              <span>{date.kind === "published" ? "게시" : "업데이트"}</span>{" "}
               <time dateTime={date.dateTime}>{date.label}</time>
             </p>
             <Heading><a href={link.href}>{link.label}</a></Heading>

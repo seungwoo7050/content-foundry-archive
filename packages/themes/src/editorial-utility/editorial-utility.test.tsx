@@ -31,7 +31,7 @@ const articles: readonly ArticleListItemViewModel[] = Array.from(
   (_, index) => ({
     link: { href: `/article/${index + 1}`, label: `안내 ${index + 1}` },
     summary: `안내 ${index + 1} 요약`,
-    date: { dateTime: `2026-08-2${index + 1}T00:00:00Z`, label: `2026년 8월 2${index + 1}일` },
+    date: { kind: "published", dateTime: `2026-08-2${index + 1}T00:00:00Z`, label: `2026년 8월 2${index + 1}일` },
     category: { href: "/category/life", label: "생활" },
     topics: ["신청"],
   }),

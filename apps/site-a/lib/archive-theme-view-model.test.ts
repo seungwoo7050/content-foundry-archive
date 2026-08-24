@@ -48,6 +48,7 @@ describe("archive theme view model", () => {
           },
           summary: "정부24에서 주민등록등본을 발급하는 기본 절차를 정리합니다.",
           date: {
+            kind: "published",
             dateTime: "2026-08-20T01:00:00Z",
             label: "2026년 8월 20일",
           },
