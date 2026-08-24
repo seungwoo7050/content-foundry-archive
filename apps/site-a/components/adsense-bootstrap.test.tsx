@@ -1,8 +1,11 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { AdSenseBootstrap } from "./adsense-bootstrap";
+import {
+  AdSenseBootstrap,
+  loadAdSenseBootstrap,
+} from "./adsense-bootstrap";
 
 describe("AdSense bootstrap", () => {
   it("renders nothing for disabled advertising", () => {
@@ -11,15 +14,52 @@ describe("AdSense bootstrap", () => {
     }))).toBe("");
   });
 
-  it("renders the validated account meta and official async loader", () => {
+  it("renders only the validated account meta before hydration", () => {
     const html = renderToStaticMarkup(createElement(AdSenseBootstrap, {
       publicClientId: "ca-pub-1234567890123456",
     }));
 
     expect(html).toBe(
-      '<script async="" crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1234567890123456"></script>'
-      + '<meta name="google-adsense-account" content="ca-pub-1234567890123456"/>',
+      '<meta name="google-adsense-account" content="ca-pub-1234567890123456"/>',
     );
+  });
+
+  it("loads and deduplicates the official async script after hydration", () => {
+    const appended: Array<Record<string, unknown>> = [];
+    const script = {
+      async: false,
+      crossOrigin: "",
+      src: "",
+      setAttribute: vi.fn(),
+    };
+    const documentTarget = {
+      querySelector: vi.fn(() => null),
+      createElement: vi.fn(() => script),
+      head: { append: (value: Record<string, unknown>) => appended.push(value) },
+    } as unknown as Document;
+
+    expect(loadAdSenseBootstrap(
+      documentTarget,
+      "ca-pub-1234567890123456",
+    )).toBe(true);
+    expect(script).toMatchObject({
+      async: true,
+      crossOrigin: "anonymous",
+      src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1234567890123456",
+    });
+    expect(script.setAttribute).toHaveBeenCalledWith(
+      "data-content-foundry-provider",
+      "adsense",
+    );
+    expect(appended).toEqual([script]);
+
+    const existing = {
+      querySelector: () => ({}),
+    } as unknown as Document;
+    expect(loadAdSenseBootstrap(
+      existing,
+      "ca-pub-1234567890123456",
+    )).toBe(false);
   });
 
   it("rejects a forged public client at the rendering boundary", () => {

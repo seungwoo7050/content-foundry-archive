@@ -17,6 +17,7 @@ const staticPageRelativePath = "about.html";
 const categorySlug = "daily-admin";
 const categoryRelativePath = `category/${categorySlug}.html`;
 const allowedClientModules = new Set([
+  join(appRoot, "components/adsense-bootstrap.tsx"),
   join(appRoot, "components/ga4-tag.tsx"),
   join(appRoot, "components/manual-ad-slot.tsx"),
   join(appRoot, "components/search-controller.tsx"),
