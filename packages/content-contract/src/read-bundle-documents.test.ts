@@ -6,6 +6,7 @@ import {
   type ReleaseBundleDocumentsByVersion,
   readReleaseBundleDocuments,
   readReleaseBundleDocumentsForVersion,
+  readSupportedReleaseBundleDocuments,
 } from "./read-bundle-documents.js";
 
 const fixture = (version: "2.0.0" | "3.0.0") =>
@@ -55,5 +56,13 @@ describe("readReleaseBundleDocuments", () => {
     expect(() => readReleaseBundleDocuments(fixture("3.0.0"))).toThrowError(
       expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }),
     );
+  });
+
+  it("assembles only currently supported release documents", () => {
+    const bundle = readSupportedReleaseBundleDocuments(fixture("2.0.0"));
+    expect(bundle.release.contractVersion).toBe("2.0.0");
+    expect(() =>
+      readSupportedReleaseBundleDocuments(fixture("3.0.0")),
+    ).toThrowError(expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }));
   });
 });

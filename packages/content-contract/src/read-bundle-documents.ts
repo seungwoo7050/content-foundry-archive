@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { TextDecoder } from "node:util";
 
 import { ContractError, type ContractIssue } from "./errors.js";
+import type { SupportedContractVersion } from "./contract-version.js";
 import type { PublishedArticleProjection } from "./generated/article.js";
 import type { MediaManifest } from "./generated/media-manifest.js";
 import type { PublicSiteNavigation } from "./generated/navigation.js";
@@ -19,6 +20,7 @@ import {
 import {
   verifyReleaseIntegrity,
   verifyReleaseIntegrityForVersion,
+  verifySupportedReleaseIntegrity,
 } from "./verify-integrity.js";
 
 type ContractDocumentV3<K extends ContractDocumentKind> = ReturnType<
@@ -56,6 +58,9 @@ export interface ReleaseBundleDocumentsByVersion {
   "2.0.0": ReleaseBundleDocuments;
   "3.0.0": ReleaseBundleDocumentsV3;
 }
+
+export type SupportedReleaseBundleDocuments =
+  ReleaseBundleDocumentsByVersion[SupportedContractVersion];
 
 function readJson(root: string, path: string): unknown {
   let bytes: Buffer;
@@ -288,4 +293,28 @@ export function readReleaseBundleDocumentsForVersion(
 
 export function readReleaseBundleDocuments(root: string): ReleaseBundleDocuments {
   return assembleReleaseBundleDocumentsV2(root, verifyReleaseIntegrity(root));
+}
+
+export function readSupportedReleaseBundleDocuments(
+  root: string,
+): SupportedReleaseBundleDocuments {
+  const release = verifySupportedReleaseIntegrity(root) as
+    | PublicSiteReleaseManifest
+    | ContractDocumentV3<"release">;
+  if (release.contractVersion === "2.0.0") {
+    return assembleReleaseBundleDocumentsV2(
+      root,
+      release,
+    ) as SupportedReleaseBundleDocuments;
+  }
+  if (release.contractVersion === "3.0.0") {
+    // The runtime support gate above opens this branch only when the tuple does.
+    return assembleReleaseBundleDocumentsV3(
+      root,
+      release,
+    ) as unknown as SupportedReleaseBundleDocuments;
+  }
+
+  const unhandledVersion: never = release;
+  throw new Error(`Unhandled supported release: ${String(unhandledVersion)}`);
 }
