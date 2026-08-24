@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 export interface LinkViewModel {
   readonly href: string;
   readonly label: string;
@@ -45,6 +47,7 @@ export interface SiteShellViewModel {
 }
 
 export interface ArticleListItemViewModel {
+  readonly artwork?: ReactNode | null;
   readonly link: LinkViewModel;
   readonly summary: string;
   readonly date: ArticleCardDateViewModel;

@@ -155,6 +155,7 @@ export function ThemeArticleList({
   return (
     <List>
       {articles.map(({
+        artwork,
         link,
         summary,
         date,
@@ -164,6 +165,7 @@ export function ThemeArticleList({
       }) => (
         <li key={link.href}>
           <article>
+            {artwork ?? null}
             <p>
               {category ? <><a href={category.href}>{category.label}</a>{" "}</> : null}
               <span>{date.kind === "published" ? "게시" : "업데이트"}</span>{" "}

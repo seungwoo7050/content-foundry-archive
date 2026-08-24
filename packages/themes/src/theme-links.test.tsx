@@ -88,12 +88,13 @@ describe("shared theme link primitives", () => {
 
   it("renders only supplied article facts in a semantic ordered list", () => {
     const html = renderToStaticMarkup(<ThemeArticleList ordered headingLevel={3} articles={[{
+      artwork: <figure aria-label="안내 이미지" />,
       link: { href: "/article/start", label: "시작 안내" }, summary: "요약",
       date: { kind: "updated", dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
       estimatedReadingTime: { minutes: 3, label: "예상 읽기 시간 약 3분" },
       category: { href: "/category/life", label: "생활" }, topics: ["신청"],
     }]} />);
-    expect(html).toBe('<ol><li><article><p><a href="/category/life">생활</a> <span>업데이트</span> <time dateTime="2026-08-24T00:00:00Z">2026년 8월 24일</time> <span>예상 읽기 시간 약 3분</span></p><h3><a href="/article/start">시작 안내</a></h3><p>요약</p><ul><li>신청</li></ul></article></li></ol>');
+    expect(html).toBe('<ol><li><article><figure aria-label="안내 이미지"></figure><p><a href="/category/life">생활</a> <span>업데이트</span> <time dateTime="2026-08-24T00:00:00Z">2026년 8월 24일</time> <span>예상 읽기 시간 약 3분</span></p><h3><a href="/article/start">시작 안내</a></h3><p>요약</p><ul><li>신청</li></ul></article></li></ol>');
     expect(html).not.toMatch(/badge|ranking|popular|trending/i);
   });
 
