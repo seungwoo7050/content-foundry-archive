@@ -12,5 +12,7 @@ next-env.d.ts
 .DS_Store
 /apps/site-a/.site-build/
 /apps/site-a/public/_media/
+/.lighthouseci/
+/.playwright-cli/
 /output/playwright/
 /output/lighthouse/
