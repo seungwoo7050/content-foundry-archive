@@ -5,18 +5,10 @@ import type {
   ThemePageViewModel,
   ThemeRenderContext,
 } from "./html-route-view-model.js";
+import { AD_SLOT_IDS, type AdSlotId } from "./theme-ad-slot.js";
 import type { ThemeId } from "./theme-id.js";
 
-export const AD_SLOT_IDS = Object.freeze([
-  "home-feed",
-  "article-after-summary",
-  "article-mid-1",
-  "article-mid-2",
-  "article-end",
-  "desktop-sidebar",
-] as const);
-
-export type AdSlotId = (typeof AD_SLOT_IDS)[number];
+export { AD_SLOT_IDS, type AdSlotId };
 
 export interface ThemeQualityProfile {
   readonly routeKinds: readonly HtmlRouteKind[];

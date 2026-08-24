@@ -34,6 +34,11 @@ export {
   ThemeNavigation,
 } from "./theme-links.js";
 export {
+  getThemeAdSlot,
+  type ThemeAdSlotContext,
+  type ThemeAdSlots,
+} from "./theme-ad-slot.js";
+export {
   AD_SLOT_IDS,
   type AdSlotId,
   type ThemeModule,
