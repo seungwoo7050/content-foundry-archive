@@ -74,7 +74,7 @@ export function EditorialShell({
           />
         </div>
       </header>
-      <main className="editorial-main" id="main-content">
+      <main className="editorial-main" id="main-content" tabIndex={-1}>
         {breadcrumbs.length > 0 ? (
           <div className="editorial-breadcrumbs">
             <ThemeBreadcrumbs
