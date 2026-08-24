@@ -7,6 +7,7 @@ import {
 const reservedNamespaces = [
   ["/article", "article route namespace"],
   ["/category", "category route namespace"],
+  ["/index", "Next static export namespace"],
 ] as const;
 
 function validatePageRouteOwnership(bundle: LoadedReleaseBundle) {

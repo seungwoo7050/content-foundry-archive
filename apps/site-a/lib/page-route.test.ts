@@ -34,6 +34,8 @@ describe("static page route selection", () => {
     ["/article/legal/terms", "article route namespace"],
     ["/category", "category route namespace"],
     ["/category/daily-admin", "category route namespace"],
+    ["/index", "Next static export namespace"],
+    ["/index/legal", "Next static export namespace"],
   ])("rejects a page path owned by %s", (path, owner) => {
     const conflictingBundle = structuredClone(bundle);
     conflictingBundle.pages[0]!.path = path;
@@ -66,12 +68,18 @@ describe("static page route selection", () => {
         id: "category-guide",
         path: "/category-guide",
       },
+      {
+        ...structuredClone(allowedBundle.pages[0]!),
+        id: "index-guide",
+        path: "/index-guide",
+      },
     ];
 
     expect(getPageStaticParams({ ...allowedBundle, pages })).toEqual([
       { pagePath: ["about"] },
       { pagePath: ["articles"] },
       { pagePath: ["category-guide"] },
+      { pagePath: ["index-guide"] },
     ]);
   });
 });
