@@ -101,9 +101,14 @@ function readDocumentV3<K extends ContractDocumentKind>(
   return validateContractDocumentForVersion("3.0.0", kind, readJson(root, path));
 }
 
+interface RecordEntry<T> {
+  readonly path: string;
+  readonly record: T;
+}
+
 interface RecordGroup<T> {
   readonly directoryMissing: boolean;
-  readonly records: readonly T[];
+  readonly entries: readonly RecordEntry<T>[];
 }
 
 function readRecords<T>(
@@ -116,7 +121,7 @@ function readRecords<T>(
     names = readdirSync(join(root, directory));
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-      return { directoryMissing: true, records: [] };
+      return { directoryMissing: true, entries: [] };
     }
     throw new ContractError(
       "CONTRACT_INVALID",
@@ -125,7 +130,7 @@ function readRecords<T>(
     );
   }
 
-  const records = names
+  const entries = names
     .sort((left, right) => Buffer.compare(Buffer.from(left), Buffer.from(right)))
     .map((name) => {
       if (!name.endsWith(".json")) {
@@ -134,12 +139,31 @@ function readRecords<T>(
           `Unexpected ${directory} entry: ${name}`,
         );
       }
-      return readRecord(`${directory}/${name}`);
+      const path = `${directory}/${name}`;
+      return { path, record: readRecord(path) };
     });
-  return { directoryMissing: false, records };
+  return { directoryMissing: false, entries };
 }
 
-function readReleaseRecords<Article, Page>(
+function appendIdentityIssues<T extends { readonly id: string }>(
+  issues: ContractIssue[],
+  entries: readonly RecordEntry<T>[],
+) {
+  for (const { path, record } of entries) {
+    const expected = path.slice(path.lastIndexOf("/") + 1, -".json".length);
+    if (record.id !== expected) {
+      issues.push({
+        path: `/${path}/id`,
+        message: `expected ${expected}, got ${record.id}`,
+      });
+    }
+  }
+}
+
+function readReleaseRecords<
+  Article extends { readonly id: string },
+  Page extends { readonly id: string },
+>(
   root: string,
   release: { readonly articleCount: number; readonly pageCount: number },
   readArticle: (path: string) => Article,
@@ -161,6 +185,8 @@ function readReleaseRecords<Article, Page>(
       message: `expected 0, got ${release.pageCount}`,
     });
   }
+  appendIdentityIssues(issues, articles.entries);
+  appendIdentityIssues(issues, pages.entries);
   if (issues.length > 0) {
     throw new ContractError(
       "REFERENCE_INVALID",
@@ -169,7 +195,10 @@ function readReleaseRecords<Article, Page>(
     );
   }
 
-  return { articles: articles.records, pages: pages.records };
+  return {
+    articles: articles.entries.map(({ record }) => record),
+    pages: pages.entries.map(({ record }) => record),
+  };
 }
 
 function assembleReleaseBundleDocumentsV2(
