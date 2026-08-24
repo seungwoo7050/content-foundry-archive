@@ -18,3 +18,7 @@ export {
   type AdvertisingProviderConfig,
   type AdvertisingReleaseIdentity,
 } from "./provider.js";
+export {
+  canLoadAdvertising,
+  type AdvertisingConsentState,
+} from "./advertising-consent.js";
