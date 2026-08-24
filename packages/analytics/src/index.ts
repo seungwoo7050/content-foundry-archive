@@ -25,3 +25,8 @@ export {
   type AnalyticsSkinId,
   type AnalyticsThemeId,
 } from "./event-payload.js";
+export {
+  toGa4EventCall,
+  type Ga4EventCall,
+  type Ga4EventParameter,
+} from "./ga4-event.js";
