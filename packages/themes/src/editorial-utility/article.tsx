@@ -9,6 +9,9 @@ function ArticleMetadata({ route }: { readonly route: ArticleRouteViewModel }) {
   return (
     <>
       <dl className="editorial-article-meta">
+        {route.estimatedReadingTime ? (
+          <div><dt>분량</dt><dd>{route.estimatedReadingTime.label}</dd></div>
+        ) : null}
         <div><dt>작성</dt><dd>{route.authorLabel}</dd></div>
         <div><dt>운영</dt><dd>{route.operatorLabel}</dd></div>
         <div><dt>게시</dt><dd><time dateTime={route.published.dateTime}>{route.published.label}</time></dd></div>
