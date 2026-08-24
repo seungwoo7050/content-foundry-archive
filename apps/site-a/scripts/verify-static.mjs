@@ -46,6 +46,23 @@ function assertCanonical(html, expected) {
   );
 }
 
+function readJsonLdScripts(label, html) {
+  return [...html.matchAll(
+    /<script\b([^>]*)>([\s\S]*?)<\/script>/gi,
+  )].flatMap((match) => {
+    const attributes = match[1];
+    if (!/\btype="application\/ld\+json"/i.test(attributes)) return [];
+    assert.match(
+      attributes,
+      /^\s*type="application\/ld\+json"\s*$/i,
+      `${label} JSON-LD script includes unexpected attributes`,
+    );
+    const source = match[2].trim();
+    assert.doesNotMatch(source, /</, `${label} JSON-LD includes a raw less-than sign`);
+    return [JSON.parse(source)];
+  });
+}
+
 function assertSafeScripts(label, html) {
   for (const match of html.matchAll(/<script\b[^>]*\bsrc="([^"]+)"[^>]*>/gi)) {
     assert.ok(
@@ -55,9 +72,24 @@ function assertSafeScripts(label, html) {
   }
 
   for (const match of html.matchAll(
-    /<script\b(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi,
+    /<script\b(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi,
   )) {
-    const source = match[1].trim();
+    const attributes = match[1];
+    const source = match[2].trim();
+    if (/\btype="application\/ld\+json"/i.test(attributes)) {
+      assert.match(
+        attributes,
+        /^\s*type="application\/ld\+json"\s*$/i,
+        `${label} JSON-LD script includes unexpected attributes`,
+      );
+      assert.doesNotMatch(
+        source,
+        /</,
+        `${label} JSON-LD includes a raw less-than sign`,
+      );
+      JSON.parse(source);
+      continue;
+    }
     assert.match(
       source,
       /^(?:\(self\.__next_f=self\.__next_f\|\|\[\]\)\.push|self\.__next_f\.push)/,
@@ -198,6 +230,22 @@ assert.match(
   /<nav aria-label="주요 메뉴"><ul><li><a href="\/">홈<\/a><\/li><li><a href="\/category\/daily-admin">생활·행정<\/a><\/li><\/ul><\/nav>/,
 );
 assert.match(article, /<h1>정부24 주민등록등본 발급 방법<\/h1>/);
+const articleStructuredData = readJsonLdScripts("article", article);
+assert.equal(articleStructuredData.length, 1);
+assert.deepEqual(articleStructuredData[0], {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: "정부24 주민등록등본 발급 방법",
+  description: "정부24에서 주민등록등본을 발급하는 기본 절차를 정리합니다.",
+  url: `https://example.com/article/${articleSlug}`,
+  inLanguage: "ko-KR",
+  datePublished: "2026-08-20T01:00:00Z",
+  ...(identity.contractVersion === "3.0.0"
+    ? { dateModified: "2026-08-24T02:30:00Z" }
+    : {}),
+  author: { "@type": "Person", name: "생활메모" },
+  publisher: { "@type": "Person", name: "생활메모" },
+});
 assert.match(article, /<h2 id="article-trust-title">이 안내의 정보<\/h2>/);
 assert.match(article, /<dt>작성<\/dt><dd>생활메모<\/dd>/);
 assert.match(article, /<dt>운영<\/dt><dd>생활메모<\/dd>/);

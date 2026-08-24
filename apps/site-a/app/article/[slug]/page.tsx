@@ -4,12 +4,14 @@ import { notFound } from "next/navigation";
 import { ArticleEvidence } from "../../../components/article-evidence";
 import { ArticleTrustSummary } from "../../../components/article-trust-summary";
 import { RetiredRoute } from "../../../components/retired-route";
+import { StructuredData } from "../../../components/structured-data";
 import { VersionedContentBlocks } from "../../../components/versioned-content-blocks";
 import { createArticleMetadata } from "../../../lib/article-metadata";
 import {
   findArticleBySlug,
   getArticlePageStaticParams,
 } from "../../../lib/article-route";
+import { createArticleStructuredData } from "../../../lib/article-structured-data";
 import { findGoneRoute } from "../../../lib/gone-route";
 import { createArticleTrustViewModel } from "../../../lib/article-trust-view-model";
 import type { VersionedSiteReleaseContext } from "../../../lib/load-site-release";
@@ -91,6 +93,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   return (
     <article className="article-page">
+      <StructuredData
+        value={createArticleStructuredData(
+          { canonicalOrigin: context.canonicalOrigin, site: bundle.site },
+          article,
+        )}
+      />
       <header className="article-header">
         {category ? <p>{category.label}</p> : null}
         <h1>{article.title}</h1>
