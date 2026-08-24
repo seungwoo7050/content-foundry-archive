@@ -4,6 +4,7 @@ import {
   loadReleaseBundle,
   type LoadedReleaseBundleV3,
 } from "@content-foundry/content-contract";
+import type { ResponsiveImageAsset } from "@content-foundry/media";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
@@ -19,6 +20,21 @@ const fixture = resolve(
 const bundle = loadReleaseBundle(fixture);
 const context = { canonicalOrigin: bundle.site.origin, site: bundle.site };
 const article = bundle.articles[0]!;
+const heroAsset: ResponsiveImageAsset = {
+  fallback: {
+    mediaId: "MED-HERO",
+    relativePath: "_media/hero/source.webp",
+    publicPath: "/_media/hero/source.webp",
+    sha256: "a".repeat(64),
+    mimeType: "image/webp",
+    width: 1536,
+    height: 1024,
+    alt: "중립 추상 안내 이미지",
+    credit: null,
+    license: "QA only",
+  },
+  derivatives: [],
+};
 
 describe("article structured data", () => {
   it("accepts v3 facts and omits a non-material modification claim", () => {
@@ -51,5 +67,14 @@ describe("article structured data", () => {
     expect(data).not.toHaveProperty("image");
     expect(data).not.toHaveProperty("reviewedBy");
     expect(data).not.toHaveProperty("lastReviewed");
+  });
+
+  it("adds only an explicitly prepared article hero image", () => {
+    const data = createArticleStructuredData({
+      ...context,
+      mediaAssets: new Map([["MED-HERO", heroAsset]]),
+    }, { ...article, heroMediaId: "MED-HERO" });
+
+    expect(data.image).toBe("https://example.com/_media/hero/source.webp");
   });
 });

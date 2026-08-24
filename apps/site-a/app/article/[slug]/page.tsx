@@ -144,7 +144,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     <>
       <StructuredData
         value={createArticleStructuredData(
-          { canonicalOrigin: context.canonicalOrigin, site: bundle.site },
+          {
+            canonicalOrigin: context.canonicalOrigin,
+            mediaAssets: context.mediaAssets,
+            site: bundle.site,
+          },
           article,
         )}
       />
