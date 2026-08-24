@@ -35,6 +35,22 @@ export function ThemeNavigation({
   ) : null;
 }
 
+export function ThemeFooterNavigation({
+  items,
+}: {
+  readonly items: readonly LinkViewModel[];
+}) {
+  return items.length > 0 ? (
+    <nav aria-label="운영 및 정책">
+      <ul>
+        {items.map((item) => (
+          <li key={item.href}><a href={item.href}>{item.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+  ) : null;
+}
+
 export function ThemeBreadcrumbs({
   items,
   currentPath,

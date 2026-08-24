@@ -23,6 +23,7 @@ export interface SiteShellViewModel {
   readonly brand: LinkViewModel;
   readonly description: string;
   readonly primaryNavigation: readonly NavigationItemViewModel[];
+  readonly footerNavigation?: readonly LinkViewModel[];
   readonly footerText: string;
 }
 

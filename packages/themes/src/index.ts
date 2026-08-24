@@ -31,6 +31,7 @@ export {
 export {
   ThemeArticleList,
   ThemeBreadcrumbs,
+  ThemeFooterNavigation,
   ThemeNavigation,
 } from "./theme-links.js";
 export {

@@ -4,10 +4,24 @@ import { describe, expect, it } from "vitest";
 import {
   ThemeArticleList,
   ThemeBreadcrumbs,
+  ThemeFooterNavigation,
   ThemeNavigation,
 } from "./theme-links.js";
 
 describe("shared theme link primitives", () => {
+  it("renders accessible footer navigation only when links exist", () => {
+    expect(renderToStaticMarkup(<ThemeFooterNavigation items={[]} />)).toBe("");
+    expect(renderToStaticMarkup(<ThemeFooterNavigation items={[
+      { href: "/privacy", label: "개인정보 처리방침" },
+      { href: "/contact", label: "문의" },
+    ]} />)).toBe(
+      '<nav aria-label="운영 및 정책"><ul>'
+      + '<li><a href="/privacy">개인정보 처리방침</a></li>'
+      + '<li><a href="/contact">문의</a></li>'
+      + "</ul></nav>",
+    );
+  });
+
   it("renders recursive navigation with its caller-provided label", () => {
     const html = renderToStaticMarkup(<ThemeNavigation ariaLabel="주요 메뉴" items={[
       { link: { href: "/guide", label: "안내" }, children: [
