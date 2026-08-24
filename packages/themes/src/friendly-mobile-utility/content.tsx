@@ -5,7 +5,11 @@ import {
   getThemeAdSlot,
   type ThemeAdSlotContext,
 } from "../theme-ad-slot.js";
-import { ThemeArticleList, ThemeHomeAboutTeaser } from "../theme-links.js";
+import {
+  ThemeArticleList,
+  ThemeHomeAboutTeaser,
+  ThemePagination,
+} from "../theme-links.js";
 import { FriendlyArticle } from "./article.js";
 import { FriendlyRouteIntro } from "./shell.js";
 
@@ -49,6 +53,7 @@ export function renderFriendlyContentRoute(
           <section aria-labelledby="fmu-category-articles" className="fmu-list">
             <h2 id="fmu-category-articles">{route.articleSectionHeading}</h2>
             <ThemeArticleList articles={route.articles} headingLevel={3} />
+            <ThemePagination pagination={route.pagination} />
           </section>
           {route.topicSectionHeading && route.topics.length > 0 ? (
             <section aria-labelledby="fmu-category-topics" className="fmu-panel">
@@ -68,6 +73,7 @@ export function renderFriendlyContentRoute(
           <FriendlyRouteIntro route={route} />
           <section aria-label={route.heading} className="fmu-list">
             <ThemeArticleList articles={route.articles} headingLevel={2} ordered />
+            <ThemePagination pagination={route.pagination} />
           </section>
         </div>
       );
