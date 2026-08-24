@@ -3,7 +3,10 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { ActionLinkBlock } from "./action-link-block";
+import {
+  ActionLinkBlock,
+  externalActionTargetId,
+} from "./action-link-block";
 
 function render(block: PublishedActionLinkBlockV3) {
   return renderToStaticMarkup(createElement(ActionLinkBlock, { block }));
@@ -52,9 +55,28 @@ describe("ActionLinkBlock", () => {
     });
 
     expect(html).toContain(`data-action-kind="${action.kind}"`);
+    expect(html).toContain(`data-analytics-event="${
+      action.kind === "affiliate"
+        ? "affiliate_click"
+        : "external_official_click"
+    }"`);
+    expect(html).toContain(
+      action.kind === "affiliate"
+        ? 'data-analytics-partner-id="partner-example" data-analytics-placement="article-body"'
+        : 'data-analytics-target-id="official-example"',
+    );
     expect(html).toContain(`href="${action.href}"`);
     expect(html).toContain(`rel="${action.rel}" target="_blank"`);
     expect(html).toContain(`${action.label} <span>(${action.disclosure})</span>`);
+  });
+
+  it("derives a bounded target token without exposing a full URL", () => {
+    expect(externalActionTargetId(
+      new URL("https://www.Service.Example/path?private=value"),
+    )).toBe("service-example");
+    expect(externalActionTargetId(
+      new URL(`https://${"long".repeat(20)}.example/path`),
+    )).toBeNull();
   });
 
   it("rejects action hrefs that bypass contract validation", () => {
