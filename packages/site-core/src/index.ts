@@ -12,6 +12,12 @@ export {
   type ConsentBuildConfig,
   type ConsentProvider,
 } from "./consent-config.js";
+export {
+  GOOGLE_CMP_PURPOSE_STATUS,
+  canLoadGoogleAdvertising,
+  canLoadGoogleAnalytics,
+  type GoogleCmpConsentModeValues,
+} from "./google-cmp-consent.js";
 export { parseProductionOrigins } from "./production-origins.js";
 export {
   CONSENT_STATE_VERSION,
