@@ -19,7 +19,7 @@ export function isArticleAdvertisingEligible(
   return (
     context.config.adsEnabled &&
     context.site.ads.enabled &&
-    context.site.ads.provider !== "disabled" &&
+    context.site.ads.provider === "adsense" &&
     article.advertising.enabled
   );
 }

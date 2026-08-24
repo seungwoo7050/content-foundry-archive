@@ -35,14 +35,22 @@ describe("article advertising eligibility", () => {
     );
   });
 
+  it.each(["disabled", "other", "future-provider"])(
+    "rejects non-AdSense provider %s even when every other layer opts in",
+    (provider) => {
+      const context = {
+        ...eligibleContext,
+        site: { ads: { provider, enabled: true } },
+      } as unknown as ArticleAdEligibilityContext;
+
+      expect(isArticleAdvertisingEligible(context, eligibleArticle)).toBe(false);
+    },
+  );
+
   it.each([
     [{ ...eligibleContext, config: { adsEnabled: false } }, eligibleArticle],
     [
       { ...eligibleContext, site: { ads: { provider: "adsense", enabled: false } } },
-      eligibleArticle,
-    ],
-    [
-      { ...eligibleContext, site: { ads: { provider: "disabled", enabled: true } } },
       eligibleArticle,
     ],
     [eligibleContext, { advertising: { enabled: false } }],
