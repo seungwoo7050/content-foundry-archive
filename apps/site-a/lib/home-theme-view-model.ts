@@ -1,5 +1,13 @@
-import type { HomeRouteViewModel } from "@content-foundry/themes";
+import type {
+  ArticleListItemViewModel,
+  CategoryLinkViewModel,
+  HomeRouteViewModel,
+} from "@content-foundry/themes";
 
+import {
+  createHomePresentationViewModel,
+  type HomePresentationSource,
+} from "./home-presentation-view-model";
 import {
   createThemeArticleListItem,
   type ThemeArticleListRecord,
@@ -16,7 +24,8 @@ interface HomeThemeTaxonRecord {
   readonly label: string;
 }
 
-export interface HomeThemeSource {
+export interface HomeThemeSource
+  extends HomePresentationSource<HomeThemeArticleRecord> {
   readonly site: ThemeArticleListSource["site"] & {
     readonly name: string;
     readonly description: string;
@@ -33,7 +42,17 @@ export interface HomeThemeSource {
     readonly title: string;
     readonly summary: string;
   }[];
-  readonly articles: readonly HomeThemeArticleRecord[];
+}
+
+export interface HomeThemeViewModel extends HomeRouteViewModel {
+  readonly featuredArticles: readonly ArticleListItemViewModel[];
+  readonly currentArticles: readonly ArticleListItemViewModel[];
+  readonly evergreenArticles: readonly ArticleListItemViewModel[];
+  readonly latestArticles: readonly ArticleListItemViewModel[];
+  readonly categoryHighlights: readonly {
+    readonly category: CategoryLinkViewModel;
+    readonly articles: readonly ArticleListItemViewModel[];
+  }[];
 }
 
 function compareRecentArticles(
@@ -49,8 +68,11 @@ function compareRecentArticles(
 
 export function createHomeThemeViewModel(
   bundle: HomeThemeSource,
-): HomeRouteViewModel {
+): HomeThemeViewModel {
   const aboutPage = bundle.pages.find(({ path }) => path === "/about");
+  const presentation = createHomePresentationViewModel(bundle);
+  const projectArticles = (articles: readonly HomeThemeArticleRecord[]) =>
+    articles.map((article) => createThemeArticleListItem(bundle, article));
   return {
     kind: "home",
     path: "/",
@@ -61,6 +83,30 @@ export function createHomeThemeViewModel(
     articles: [...bundle.articles]
       .sort(compareRecentArticles)
       .map((article) => createThemeArticleListItem(bundle, article)),
+    featuredArticles: projectArticles(presentation.featuredArticles),
+    currentArticles: projectArticles(presentation.currentArticles),
+    evergreenArticles: projectArticles(presentation.evergreenArticles),
+    latestArticles: projectArticles(presentation.latestArticles),
+    categoryHighlights: presentation.categoryHighlights.map(
+      ({ categoryId, articles }) => {
+        const category = bundle.taxonomy.categories.find(
+          ({ id }) => id === categoryId,
+        );
+        if (!category) {
+          throw new Error(
+            `Validated presentation category is missing: ${categoryId}`,
+          );
+        }
+        return {
+          category: {
+            href: `/category/${category.slug}`,
+            label: category.label,
+            description: category.description,
+          },
+          articles: projectArticles(articles),
+        };
+      },
+    ),
     categories: bundle.taxonomy.categories.map(({ slug, label, description }) => ({
       href: `/category/${slug}`,
       label,

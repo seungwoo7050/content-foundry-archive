@@ -5,25 +5,33 @@ import {
   type LoadedReleaseBundleV3,
 } from "@content-foundry/content-contract";
 import type { HomeRouteViewModel } from "@content-foundry/themes";
+import { resolveBuildTargetConfig } from "@content-foundry/site-core";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
   createHomeThemeViewModel,
   type HomeThemeSource,
+  type HomeThemeViewModel,
 } from "./home-theme-view-model";
+import { loadValidatedSiteReleaseV4 } from "./load-site-release";
 
 const fixture = resolve(
   process.cwd(),
   "../../packages/content-contract/vendor/2.0.0/fixtures/bundles/valid/site-a-minimal",
 );
 const bundle = loadReleaseBundle(fixture);
+const v4Fixture = resolve(
+  process.cwd(),
+  "../../packages/content-contract/vendor/4.0.0/fixtures/bundles/valid/site-a-minimal",
+);
 
 describe("home theme view model", () => {
   it("accepts v3 and returns the closed home route contract", () => {
     expectTypeOf<LoadedReleaseBundleV3>().toExtend<HomeThemeSource>();
-    expectTypeOf<ReturnType<typeof createHomeThemeViewModel>>().toEqualTypeOf<
-      HomeRouteViewModel
-    >();
+    expectTypeOf<
+      ReturnType<typeof createHomeThemeViewModel>
+    >().toEqualTypeOf<HomeThemeViewModel>();
+    expectTypeOf<HomeThemeViewModel>().toExtend<HomeRouteViewModel>();
   });
 
   it("projects only actual home discovery facts", () => {
@@ -57,8 +65,47 @@ describe("home theme view model", () => {
       },
       topics: ["정부24"],
     });
+    expect(model.featuredArticles).toEqual([]);
+    expect(model.currentArticles).toEqual([]);
+    expect(model.evergreenArticles).toEqual([]);
+    expect(model.latestArticles).toEqual(model.articles);
+    expect(model.categoryHighlights).toEqual([]);
     expect(model).not.toHaveProperty("popularArticles");
     expect(model).not.toHaveProperty("trendingArticles");
+  });
+
+  it("maps exact v4 placements into renderer-ready article cards", () => {
+    const config = resolveBuildTargetConfig(
+      { CONTENT_RELEASE_DIR: v4Fixture },
+      {
+        siteId: "site-a",
+        templateReleaseDirectory: fixture,
+        allowedProductionOrigins: [],
+      },
+    );
+    const model = createHomeThemeViewModel(
+      loadValidatedSiteReleaseV4(config).bundle,
+    );
+
+    expect(model.featuredArticles[0]).toMatchObject({
+      link: {
+        href: "/article/government24-resident-registration-guide",
+        label: "정부24 주민등록등본 발급 방법",
+      },
+      category: { href: "/category/daily-admin", label: "생활·행정" },
+    });
+    expect(model.currentArticles).toEqual([]);
+    expect(model.evergreenArticles).toEqual([]);
+    expect(model.latestArticles).toEqual([]);
+    expect(model.categoryHighlights[0]).toMatchObject({
+      category: {
+        href: "/category/daily-admin",
+        label: "생활·행정",
+        description: "생활과 행정 절차 안내",
+      },
+      articles: [{ link: { label: "정부24 주민등록등본 발급 방법" } }],
+    });
+    expect(model.articles).toHaveLength(1);
   });
 
   it("sorts by material update and omits a disabled search action", () => {
