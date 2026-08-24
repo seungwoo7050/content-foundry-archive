@@ -9,6 +9,11 @@ import {
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import {
+  getPaginationRouteFromArtifact,
+  getPaginationRouteFromPathname,
+} from "./static-pagination-artifacts.mjs";
+
 const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outRoot = join(appRoot, "out");
 const articleSlug = "government24-resident-registration-guide";
@@ -274,6 +279,28 @@ const sitemapEntries = [...sitemap.matchAll(
   url: match[1],
   ...(match[2] ? { lastModified: match[2] } : {}),
 }));
+const exportedPaginationRoutes = listFiles(outRoot)
+  .map((path) => path.slice(outRoot.length + 1))
+  .flatMap((path) => getPaginationRouteFromArtifact(path) ?? [])
+  .sort();
+const sitemapPaginationEntries = sitemapEntries.flatMap((entry) => {
+  const route = getPaginationRouteFromPathname(new URL(entry.url).pathname);
+  return route ? [{ route, url: entry.url }] : [];
+});
+assert.deepEqual(
+  exportedPaginationRoutes,
+  sitemapPaginationEntries.map(({ route }) => route).sort(),
+  "Exported pagination artifacts must exactly match sitemap pagination routes",
+);
+for (const { route, url } of sitemapPaginationEntries) {
+  const html = readArtifact(`${route.slice(1)}.html`);
+  const page = route.split("/").at(-1);
+  assertMinimalThemeRoute(route, html, route.startsWith("/archive/")
+    ? "archive"
+    : "category");
+  assertCanonical(html, url);
+  assert.match(html, new RegExp(`<title>[^<]*${page}페이지 \\|`));
+}
 const expectedArticleLastModified =
   identity.contractVersion !== "2.0.0"
     ? "2026-08-24T02:30:00Z"
