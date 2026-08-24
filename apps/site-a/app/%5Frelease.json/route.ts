@@ -1,10 +1,12 @@
-import { createReleaseIdentity } from "../../lib/release-identity";
+import { createReleaseBuildMetadata } from "../../lib/release-build-metadata";
 import { getVersionedSiteReleaseContext } from "../../lib/site-release";
 
 export const dynamic = "force-static";
 
 export function GET() {
-  const identity = createReleaseIdentity(getVersionedSiteReleaseContext().bundle);
+  const metadata = createReleaseBuildMetadata(
+    getVersionedSiteReleaseContext().bundle,
+  );
 
-  return Response.json(identity);
+  return Response.json(metadata);
 }

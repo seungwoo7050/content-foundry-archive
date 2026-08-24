@@ -105,6 +105,8 @@ const expectedIdentities = {
     contractVersion: "2.0.0",
     bundleChecksum:
       "sha256:0a8f03190b0a5d63fefc52e3efab08080a08263a6c8d716f0e4936382eee6f27",
+    supportedContractVersions: ["2.0.0"],
+    routeCount: 5,
   },
   "3.0.0": {
     releaseId: "REL-2026-000043",
@@ -112,6 +114,8 @@ const expectedIdentities = {
     contractVersion: "3.0.0",
     bundleChecksum:
       "sha256:45a1c3f057fb59b3a7fd28e5e87a8c41eb299d0446c71949e5d4e32d2a92d745",
+    supportedContractVersions: ["2.0.0"],
+    routeCount: 5,
   },
 };
 assert.deepEqual(identity, expectedIdentities[identity.contractVersion]);
@@ -182,7 +186,9 @@ const identityFields = {
   contractVersion: "content-foundry-contract-version",
   bundleChecksum: "content-foundry-bundle-checksum",
 };
-assert.deepEqual(Object.keys(identity).sort(), Object.keys(identityFields).sort());
+const releaseIdentity = Object.fromEntries(
+  Object.keys(identityFields).map((field) => [field, identity[field]]),
+);
 for (const [field, metaName] of Object.entries(identityFields)) {
   assert.equal(readMeta(home, metaName), identity[field]);
   assert.equal(readMeta(article, metaName), identity[field]);
@@ -273,7 +279,7 @@ if (identity.contractVersion === "2.0.0") {
       releaseId: projection.releaseId,
       bundleChecksum: projection.bundleChecksum,
     },
-    identity,
+    releaseIdentity,
   );
   assert.equal(projection.assets.length, 2);
 }
