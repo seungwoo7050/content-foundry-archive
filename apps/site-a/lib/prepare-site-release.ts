@@ -42,14 +42,17 @@ export async function prepareSiteRelease(
 
   const context = loadValidatedSiteReleaseV3(config);
   const immutableObjectDirectory = options.immutableObjectDirectory?.trim();
-  if (!immutableObjectDirectory) {
+  const requiresImmutableObjects = context.bundle.mediaManifest.items.some(
+    ({ source }) => source === "immutable-object",
+  );
+  if (requiresImmutableObjects && !immutableObjectDirectory) {
     throw new BuildTargetConfigError(
       "IMMUTABLE_MEDIA_DIR is required for contract 3.0.0",
     );
   }
   await prepareV3SiteBuildArtifacts(context.bundle, {
     ...options,
-    immutableObjectDirectory,
+    immutableObjectDirectory: immutableObjectDirectory ?? config.releaseDirectory,
     releaseDirectory: config.releaseDirectory,
   });
   return context.contractVersion;

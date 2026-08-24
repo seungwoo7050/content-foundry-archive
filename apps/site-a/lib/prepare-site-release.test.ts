@@ -11,7 +11,27 @@ import { dirname, join, resolve } from "node:path";
 
 import type { MediaManifestV3 } from "@content-foundry/content-contract";
 import type { BuildTargetConfig } from "@content-foundry/site-core";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+const loaderOverride = vi.hoisted(() => ({
+  mediaManifest: undefined as MediaManifestV3 | undefined,
+}));
+
+vi.mock("./load-site-release", async (importOriginal) => {
+  const loader = await importOriginal<typeof import("./load-site-release")>();
+  return {
+    ...loader,
+    loadValidatedSiteReleaseV3: (config: BuildTargetConfig) => {
+      const context = loader.loadValidatedSiteReleaseV3(config);
+      return loaderOverride.mediaManifest
+        ? {
+            ...context,
+            bundle: { ...context.bundle, mediaManifest: loaderOverride.mediaManifest },
+          }
+        : context;
+    },
+  };
+});
 
 import { prepareSiteRelease } from "./prepare-site-release";
 
@@ -61,17 +81,22 @@ function writeV3Objects(root: string) {
   });
 }
 
+function writePriorArtifacts(paths: ReturnType<typeof workspace>) {
+  mkdirSync(join(paths.publicDirectory, "_media"), { recursive: true });
+  mkdirSync(dirname(paths.projectionPath), { recursive: true });
+  writeFileSync(join(paths.publicDirectory, "_media/generated.webp"), "generated");
+  writeFileSync(paths.projectionPath, "projection");
+}
+
 afterEach(() => {
+  loaderOverride.mediaManifest = undefined;
   for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 
 describe("prepareSiteRelease", () => {
   it("validates v2 before clearing only its generated artifacts", async () => {
     const paths = workspace();
-    mkdirSync(join(paths.publicDirectory, "_media"), { recursive: true });
-    mkdirSync(dirname(paths.projectionPath), { recursive: true });
-    writeFileSync(join(paths.publicDirectory, "_media/generated.webp"), "generated");
-    writeFileSync(paths.projectionPath, "projection");
+    writePriorArtifacts(paths);
 
     await expect(prepareSiteRelease(config(fixture("2.0.0")), paths)).resolves.toBe(
       "2.0.0",
@@ -82,6 +107,7 @@ describe("prepareSiteRelease", () => {
 
   it("requires an immutable-object directory for a validated v3 release", async () => {
     const workspacePaths = workspace();
+    writePriorArtifacts(workspacePaths);
     const paths = {
       projectionPath: workspacePaths.projectionPath,
       publicDirectory: workspacePaths.publicDirectory,
@@ -90,6 +116,23 @@ describe("prepareSiteRelease", () => {
     await expect(prepareSiteRelease(config(fixture("3.0.0")), paths)).rejects.toThrow(
       "IMMUTABLE_MEDIA_DIR is required for contract 3.0.0",
     );
+    expect(readFileSync(paths.projectionPath, "utf8")).toBe("projection");
+    expect(
+      readFileSync(join(paths.publicDirectory, "_media/generated.webp"), "utf8"),
+    ).toBe("generated");
+  });
+
+  it("preserves prior artifacts when the selected release is invalid", async () => {
+    const paths = workspace();
+    writePriorArtifacts(paths);
+
+    await expect(
+      prepareSiteRelease(config(join(paths.root, "missing-release")), paths),
+    ).rejects.toBeDefined();
+    expect(readFileSync(paths.projectionPath, "utf8")).toBe("projection");
+    expect(
+      readFileSync(join(paths.publicDirectory, "_media/generated.webp"), "utf8"),
+    ).toBe("generated");
   });
 
   it("publishes the complete v3 projection", async () => {
@@ -101,5 +144,21 @@ describe("prepareSiteRelease", () => {
     );
     expect(readFileSync(paths.projectionPath, "utf8")).toContain("REL-2026-000043");
     expect(existsSync(join(paths.publicDirectory, "_media"))).toBe(true);
+  });
+
+  it("prepares an empty v3 media manifest without an immutable-object root", async () => {
+    const paths = workspace();
+    loaderOverride.mediaManifest = { items: [] };
+
+    await expect(
+      prepareSiteRelease(config(fixture("3.0.0")), {
+        projectionPath: paths.projectionPath,
+        publicDirectory: paths.publicDirectory,
+      }),
+    ).resolves.toBe("3.0.0");
+    expect(JSON.parse(readFileSync(paths.projectionPath, "utf8"))).toMatchObject({
+      contractVersion: "3.0.0",
+      assets: [],
+    });
   });
 });
