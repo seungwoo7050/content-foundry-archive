@@ -29,6 +29,7 @@ describe("Information Portal shell", () => {
       <InformationPortalShell
         context={{ skinId: "calm-blue", colors: SKIN_TOKENS["calm-blue"] }}
         routeKind="static-page"
+        routePath="/category/life/apply"
         shell={shell}
       >
         <PortalRouteIntro route={route} />
@@ -37,7 +38,10 @@ describe("Information Portal shell", () => {
 
     expect(html).toContain('data-theme="information-portal"');
     expect(html).toContain('class="ip-brand-row"');
-    expect(html).toContain('href="/category/life/apply">신청</a>');
+    expect(html).toContain(
+      '<a aria-current="page" href="/category/life/apply">신청</a>',
+    );
+    expect(html).toContain('<a href="/category/life">생활</a>');
     expect(html).toContain(
       '<main class="ip-main" data-route-kind="static-page" id="main-content" tabindex="-1">',
     );

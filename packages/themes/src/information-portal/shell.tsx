@@ -40,11 +40,13 @@ export function PortalRouteIntro({
 export function InformationPortalShell({
   shell,
   routeKind,
+  routePath,
   context,
   children,
 }: {
   readonly shell: SiteShellViewModel;
   readonly routeKind: HtmlRouteKind;
+  readonly routePath: string;
   readonly context: ThemeRenderContext;
   readonly children: ReactNode;
 }) {
@@ -64,7 +66,11 @@ export function InformationPortalShell({
           <p className="ip-description">{shell.description}</p>
         </div>
         <div className="ip-nav-row">
-          <ThemeNavigation ariaLabel="주요 메뉴" items={shell.primaryNavigation} />
+          <ThemeNavigation
+            ariaLabel="주요 메뉴"
+            currentPath={routePath}
+            items={shell.primaryNavigation}
+          />
         </div>
       </header>
       <main className="ip-main" data-route-kind={routeKind} id="main-content" tabIndex={-1}>

@@ -81,6 +81,11 @@ describe("Information Portal route and skin matrix", () => {
         expect(html).toContain(`<h1>${route.heading}</h1>`);
         expect(html).toContain('<main class="ip-main"');
         expect(html).not.toMatch(/ranking|trending|popular|count|verified|newsletter|bookmark|saved|순위|인기|조회|검증됨|뉴스레터|저장/i);
+        if (route.kind === "home") {
+          expect(html).toContain('<a aria-current="page" href="/">홈</a>');
+        } else {
+          expect(html).not.toContain('aria-current="page" href="/"');
+        }
         if (route.kind === "article") expect(html).not.toMatch(/adsbygoogle|data-ad-|>광고</i);
       });
     }
