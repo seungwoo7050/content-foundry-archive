@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import {
   cpSync,
   mkdtempSync,
@@ -43,6 +44,18 @@ function rewriteRelease(root: string, rewrite: ReleaseRewrite) {
   const source = readFileSync(path, "utf8");
   const release = JSON.parse(source) as Record<string, unknown>;
   writeFileSync(path, rewrite(release, source));
+}
+
+function addListedPayload(root: string, path: string, content: string) {
+  const bytes = Buffer.from(content);
+  writeFileSync(join(root, path), bytes);
+  const manifest = join(root, "checksums.txt");
+  const lines = readFileSync(manifest, "utf8").slice(0, -1).split("\n");
+  lines.push(`${createHash("sha256").update(bytes).digest("hex")}  ${path}`);
+  lines.sort((left, right) =>
+    Buffer.compare(Buffer.from(left.slice(66)), Buffer.from(right.slice(66))),
+  );
+  writeFileSync(manifest, `${lines.join("\n")}\n`);
 }
 
 function prependChecksumField(root: string, field: string) {
@@ -242,6 +255,33 @@ describe("verifyReleaseIntegrity", () => {
     writeFileSync(join(root, "unexpected.json"), "{}\n");
     expect(() => verifyReleaseIntegrity(root)).toThrowError(
       expect.objectContaining({ code: "INTEGRITY_FAILED" }),
+    );
+  });
+
+  it.each([
+    {
+      boundary: "public v2",
+      source: fixture,
+      verify: (root: string) => verifyReleaseIntegrity(root),
+    },
+    {
+      boundary: "internal v3",
+      source: v3Fixture,
+      verify: (root: string) =>
+        verifyReleaseIntegrityForVersion("3.0.0", root),
+    },
+  ])("rejects a listed producer search index at the $boundary boundary", ({
+    source,
+    verify,
+  }) => {
+    const root = copyFixture(source);
+    addListedPayload(root, "search-index.json", "{}\n");
+
+    expect(() => verify(root)).toThrowError(
+      expect.objectContaining({
+        code: "INTEGRITY_FAILED",
+        message: "Noncanonical bundle path: search-index.json",
+      }),
     );
   });
 

@@ -13,6 +13,7 @@ import { resolveSupportedContractVersion } from "./contract-version.js";
 import { ContractError } from "./errors.js";
 import type { PublicSiteReleaseManifest as PublicSiteReleaseManifestV3 } from "./generated/3.0.0/release.js";
 import type { PublicSiteReleaseManifest } from "./generated/release.js";
+import { validateBundleLayout } from "./validate-bundle-layout.js";
 import {
   type RegisteredContractSchemaVersion,
   validateContractDocumentForVersion,
@@ -195,6 +196,7 @@ function verifyReleaseIntegrityWithManifest(
     if (hash !== entry.hash) fail(`Checksum mismatch: ${entry.path}`);
   }
 
+  validateBundleLayout(listed);
   const checksumFieldCount = countTopLevelField(
     releaseSource,
     "bundleChecksum",
