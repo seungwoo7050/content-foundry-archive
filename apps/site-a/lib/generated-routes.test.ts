@@ -12,16 +12,27 @@ const fixture = resolve(
 const bundle = loadReleaseBundle(fixture);
 
 describe("generated route inventory", () => {
-  it("contains exactly the navigable HTML routes in release order", () => {
+  it("contains exactly the navigable HTML routes", () => {
     const routes = getGeneratedRoutes(bundle);
 
-    expect([...routes]).toEqual([
+    expect(routes).toEqual(new Set([
       "/",
       "/article/government24-resident-registration-guide",
       "/about",
       "/category/daily-admin",
-    ]);
+    ]));
     expect(routes.has("/404")).toBe(false);
     expect(routes.has("/_release.json")).toBe(false);
+  });
+
+  it("rejects duplicate claims before collapsing them into a set", () => {
+    const duplicate = structuredClone(bundle.pages[0]!);
+
+    expect(() =>
+      getGeneratedRoutes({
+        ...bundle,
+        pages: [...bundle.pages, { ...duplicate, id: "about-copy" }],
+      }),
+    ).toThrowError(expect.objectContaining({ code: "REFERENCE_INVALID" }));
   });
 });
