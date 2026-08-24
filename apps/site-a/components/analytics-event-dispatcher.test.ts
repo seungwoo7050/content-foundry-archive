@@ -8,6 +8,7 @@ import type { SiteAnalyticsRouteProjection } from "../lib/site-analytics-route-p
 import {
   dispatchAnalyticsEvent,
   resolveAnalyticsEventContext,
+  resolveInternalLinkEvent,
 } from "./analytics-event-dispatcher";
 
 const context: AnalyticsEventContext = {
@@ -37,7 +38,16 @@ const projection: SiteAnalyticsRouteProjection = {
     "/article/guide": "article",
     "/retired-guide": "retired",
   },
-  routeDestinationsByPath: {},
+  routeDestinationsByPath: {
+    "/article/guide": {
+      destinationType: "article",
+      destinationId: "ART-GUIDE-1",
+    },
+    "/category/daily-admin": {
+      destinationType: "category",
+      destinationId: "daily-admin",
+    },
+  },
 };
 
 describe("Site A analytics event dispatch", () => {
@@ -45,6 +55,37 @@ describe("Site A analytics event dispatch", () => {
     expect(resolveAnalyticsEventContext(projection, "/article/guide").routeType).toBe("article");
     expect(resolveAnalyticsEventContext(projection, "/retired-guide").routeType).toBe("retired");
     expect(resolveAnalyticsEventContext(projection, "/ARTICLE/GUIDE").routeType).toBe("not-found");
+  });
+
+  it("resolves only same-origin article and category destinations", () => {
+    expect(resolveInternalLinkEvent(
+      projection,
+      "/article/guide?source=home#steps",
+      "https://guides.example.kr",
+    )).toEqual({
+      eventName: "internal_link_click",
+      destinationType: "article",
+      destinationId: "ART-GUIDE-1",
+    });
+    expect(resolveInternalLinkEvent(
+      projection,
+      "https://guides.example.kr/category/daily-admin",
+      "https://guides.example.kr",
+    )).toEqual({
+      eventName: "internal_link_click",
+      destinationType: "category",
+      destinationId: "daily-admin",
+    });
+    expect(resolveInternalLinkEvent(
+      projection,
+      "https://other.example/article/guide",
+      "https://guides.example.kr",
+    )).toBeNull();
+    expect(resolveInternalLinkEvent(
+      projection,
+      "/about",
+      "https://guides.example.kr",
+    )).toBeNull();
   });
 
   it("sends a validated event after analytics consent", () => {

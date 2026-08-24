@@ -60,6 +60,24 @@ export function resolveAnalyticsEventContext(
   };
 }
 
+export function resolveInternalLinkEvent(
+  projection: SiteAnalyticsRouteProjection,
+  href: string,
+  currentOrigin: string,
+): AnalyticsEventDetail | null {
+  const url = URL.parse(href, currentOrigin);
+  if (
+    url === null ||
+    url.origin !== currentOrigin ||
+    url.username.length > 0 ||
+    url.password.length > 0
+  ) return null;
+  const destination = projection.routeDestinationsByPath[url.pathname];
+  return destination
+    ? { eventName: "internal_link_click", ...destination }
+    : null;
+}
+
 export function AnalyticsEventDispatcher({
   projection,
 }: {
@@ -72,17 +90,34 @@ export function AnalyticsEventDispatcher({
   useGoogleCmpConsent(rememberConsent);
 
   useEffect(() => {
-    const handleEvent = (event: Event) => {
-      const detail = event instanceof CustomEvent ? event.detail : undefined;
+    const dispatchCurrent = (detail: unknown) =>
       dispatchAnalyticsEvent(
         consent.current,
         resolveAnalyticsEventContext(projection, window.location.pathname),
         detail,
         (window as unknown as { gtag?: unknown }).gtag,
       );
+    const handleEvent = (event: Event) => {
+      const detail = event instanceof CustomEvent ? event.detail : undefined;
+      dispatchCurrent(detail);
+    };
+    const handleClick = (event: MouseEvent) => {
+      if (!(event.target instanceof Element)) return;
+      const anchor = event.target.closest<HTMLAnchorElement>("a[href]");
+      if (anchor === null) return;
+      const detail = resolveInternalLinkEvent(
+        projection,
+        anchor.href,
+        window.location.origin,
+      );
+      if (detail !== null) dispatchCurrent(detail);
     };
     document.addEventListener(ANALYTICS_EVENT_TYPE, handleEvent);
-    return () => document.removeEventListener(ANALYTICS_EVENT_TYPE, handleEvent);
+    document.addEventListener("click", handleClick);
+    return () => {
+      document.removeEventListener(ANALYTICS_EVENT_TYPE, handleEvent);
+      document.removeEventListener("click", handleClick);
+    };
   }, [projection]);
 
   return null;
