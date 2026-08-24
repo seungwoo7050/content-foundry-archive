@@ -78,11 +78,14 @@ describe("Information Portal article", () => {
   });
 
   it("preserves the existing article header when reading time is absent", () => {
-    const { estimatedReadingTime: _readingTime, ...withoutReadingTime } = route;
+    const withoutReadingTime = Object.assign({}, route, {
+      estimatedReadingTime: undefined,
+    });
     const html = renderToStaticMarkup(
       <InformationPortalArticle route={withoutReadingTime} />,
     );
 
+    expect(withoutReadingTime).toHaveProperty("estimatedReadingTime", undefined);
     expect(html).not.toContain("ip-article-reading-time");
     expect(html).toContain("<header><h1>신청 안내</h1></header>");
     expect(html).toContain(

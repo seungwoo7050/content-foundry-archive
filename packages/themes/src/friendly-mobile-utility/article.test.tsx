@@ -58,11 +58,14 @@ describe("Friendly Mobile Utility article", () => {
   });
 
   it("preserves the existing article intro when reading time is absent", () => {
-    const { estimatedReadingTime: _readingTime, ...withoutReadingTime } = route;
+    const withoutReadingTime = Object.assign({}, route, {
+      estimatedReadingTime: undefined,
+    });
     const html = renderToStaticMarkup(
       <FriendlyArticle route={withoutReadingTime} />,
     );
 
+    expect(withoutReadingTime).toHaveProperty("estimatedReadingTime", undefined);
     expect(html).not.toContain("fmu-article-reading-time");
     expect(html).toContain("<h1>신청 안내</h1>");
     expect(html).toContain('<p class="fmu-eyebrow"><a href="/category/life">생활</a></p>');

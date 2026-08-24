@@ -181,12 +181,15 @@ describe("Editorial Utility", () => {
   it("preserves existing header facts when reading time is absent", () => {
     const article = routes[2]!;
     if (article.kind !== "article") throw new Error("Expected article fixture");
-    const { estimatedReadingTime: _readingTime, ...withoutReadingTime } = article;
+    const withoutReadingTime = Object.assign({}, article, {
+      estimatedReadingTime: undefined,
+    });
     const html = render(withoutReadingTime);
     const header = html.match(
       /<header class="editorial-article-header">[\s\S]*?<\/header>/,
     )?.[0];
 
+    expect(withoutReadingTime).toHaveProperty("estimatedReadingTime", undefined);
     expect(header).not.toContain("예상 읽기 시간");
     expect(header).toContain('<dl class="editorial-article-meta">');
     expect(header).toContain("<dt>작성</dt><dd>작성자</dd>");

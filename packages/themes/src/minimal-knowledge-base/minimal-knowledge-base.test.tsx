@@ -168,12 +168,15 @@ describe("Minimal Knowledge Base", () => {
   it("preserves the existing article header when reading time is absent", () => {
     const article = routeAt(2);
     if (article.kind !== "article") throw new Error("Expected article fixture");
-    const { estimatedReadingTime: _readingTime, ...withoutReadingTime } = article;
+    const withoutReadingTime = Object.assign({}, article, {
+      estimatedReadingTime: undefined,
+    });
     const html = render(withoutReadingTime);
     const header = html.match(
       /<header class="kb-answer-first">[\s\S]*?<\/header>/,
     )?.[0];
 
+    expect(withoutReadingTime).toHaveProperty("estimatedReadingTime", undefined);
     expect(header).not.toContain("kb-article-duration");
     expect(header).toContain(
       "<h1>시작 안내</h1><p>시작 안내 설명</p></header>",

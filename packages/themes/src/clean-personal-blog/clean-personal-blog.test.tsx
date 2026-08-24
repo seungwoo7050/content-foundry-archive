@@ -125,12 +125,15 @@ describe("Clean Personal Blog", () => {
   it("preserves the existing article header when reading time is absent", () => {
     const article = routes[2]!;
     if (article.kind !== "article") throw new Error("article fixture is missing");
-    const { estimatedReadingTime: _readingTime, ...withoutReadingTime } = article;
+    const withoutReadingTime = Object.assign({}, article, {
+      estimatedReadingTime: undefined,
+    });
     const html = render(withoutReadingTime, "warm-neutral");
     const header = html.match(
       /<header class="personal-article-header">[\s\S]*?<\/header>/,
     )?.[0];
 
+    expect(withoutReadingTime).toHaveProperty("estimatedReadingTime", undefined);
     expect(header).not.toContain("personal-article-reading-time");
     expect(header).toContain("<h1>안내 글</h1>");
     expect(header).toContain('<p class="personal-article-summary">안내 글 설명</p>');
