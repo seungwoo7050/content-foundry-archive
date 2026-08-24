@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { CategoryListing } from "../../../components/category-listing";
+import { RetiredRoute } from "../../../components/retired-route";
 import {
   getCategoryArticles,
   getCategoryTags,
@@ -9,8 +10,10 @@ import {
 import { createCategoryMetadata } from "../../../lib/category-metadata";
 import {
   findCategoryBySlug,
-  getCategoryStaticParams,
+  getCategoryPageStaticParams,
 } from "../../../lib/category-route";
+import { findGoneRoute } from "../../../lib/gone-route";
+import { createRetiredRouteMetadata } from "../../../lib/retired-route-metadata";
 import { getVersionedSiteReleaseContext } from "../../../lib/site-release";
 
 export const dynamicParams = false;
@@ -20,7 +23,7 @@ interface CategoryPageProps {
 }
 
 export function generateStaticParams() {
-  return getCategoryStaticParams(getVersionedSiteReleaseContext().bundle);
+  return getCategoryPageStaticParams(getVersionedSiteReleaseContext().bundle);
 }
 
 export async function generateMetadata({
@@ -31,6 +34,9 @@ export async function generateMetadata({
   const category = findCategoryBySlug(context.bundle, slug);
 
   if (!category) {
+    if (findGoneRoute(context.bundle, `/category/${slug}`)) {
+      return createRetiredRouteMetadata();
+    }
     notFound();
   }
 
@@ -43,6 +49,15 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const category = findCategoryBySlug(bundle, slug);
 
   if (!category) {
+    const retiredRoute = findGoneRoute(bundle, `/category/${slug}`);
+    if (retiredRoute) {
+      return (
+        <RetiredRoute
+          path={retiredRoute.path}
+          replacementPath={retiredRoute.replacementPath}
+        />
+      );
+    }
     notFound();
   }
 

@@ -3,6 +3,11 @@ import {
   type ContractIssue,
 } from "@content-foundry/content-contract";
 
+import {
+  getGoneCategoryStaticParams,
+  type GoneRouteSource,
+} from "./gone-route";
+
 export interface CategoryRouteRecord {
   readonly id: string;
   readonly slug: string;
@@ -48,6 +53,15 @@ export function getCategoryStaticParams(bundle: CategoryRouteSource) {
   return bundle.taxonomy.categories.map((category) => ({
     category: category.slug,
   }));
+}
+
+export function getCategoryPageStaticParams(
+  bundle: CategoryRouteSource & GoneRouteSource,
+) {
+  return [
+    ...getCategoryStaticParams(bundle),
+    ...getGoneCategoryStaticParams(bundle),
+  ];
 }
 
 export function findCategoryBySlug<TCategory extends CategoryRouteRecord>(

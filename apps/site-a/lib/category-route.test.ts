@@ -8,6 +8,7 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
   findCategoryBySlug,
+  getCategoryPageStaticParams,
   getCategoryStaticParams,
   type CategoryRouteSource,
 } from "./category-route";
@@ -54,6 +55,25 @@ describe("category route selection", () => {
       { category: "daily-admin" },
       { category: "digital" },
     ]);
+  });
+
+  it("adds retired category slugs to the static page set", () => {
+    expect(
+      getCategoryPageStaticParams({
+        articles: [{ categoryId: "current" }],
+        taxonomy: { categories: [{ id: "current", slug: "current" }] },
+        redirects: {
+          items: [
+            {
+              type: "gone",
+              path: "/category/retired",
+              status: 410,
+              replacementPath: "/category/current",
+            },
+          ],
+        },
+      }),
+    ).toEqual([{ category: "current" }, { category: "retired" }]);
   });
 
   it("looks up categories only by their exact slug", () => {
