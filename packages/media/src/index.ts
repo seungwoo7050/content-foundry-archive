@@ -1,4 +1,8 @@
 export {
+  createBundleMediaSourceReader,
+  type MediaSourceReader,
+} from "./read-bundle-media-source.js";
+export {
   type ImageMediaRecord,
   type VerifiedMediaBytes,
   verifyMediaByteIdentity,
