@@ -1,27 +1,26 @@
 import {
   AdvertisingConfigError,
   isAdSensePublicClientId,
-  type AdvertisingProviderConfig,
 } from "@content-foundry/advertising";
 
 export function AdSenseBootstrap({
-  config,
+  publicClientId,
 }: {
-  readonly config: AdvertisingProviderConfig;
+  readonly publicClientId: string | null;
 }) {
-  if (config.provider === "disabled") return null;
-  if (!isAdSensePublicClientId(config.publicClientId)) {
+  if (publicClientId === null) return null;
+  if (!isAdSensePublicClientId(publicClientId)) {
     throw new AdvertisingConfigError(
       "AdSense bootstrap requires a valid public client ID",
     );
   }
   return (
     <>
-      <meta name="google-adsense-account" content={config.publicClientId} />
+      <meta name="google-adsense-account" content={publicClientId} />
       <script
         async
         crossOrigin="anonymous"
-        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${config.publicClientId}`}
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publicClientId}`}
       />
     </>
   );
