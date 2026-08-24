@@ -99,6 +99,7 @@ const category = readArtifact(categoryRelativePath);
 const archive = readArtifact("archive.html");
 const notFound = readArtifact("404.html");
 const robots = readArtifact("robots.txt");
+const rss = readArtifact("rss.xml");
 const sitemap = readArtifact("sitemap.xml");
 const identity = JSON.parse(readArtifact("_release.json"));
 const expectedIdentities = {
@@ -134,6 +135,18 @@ const expectedArticleLastModified =
   identity.contractVersion === "3.0.0"
     ? "2026-08-24T02:30:00Z"
     : "2026-08-20T01:00:00Z";
+assert.match(rss, /^<\?xml version="1\.0" encoding="UTF-8"\?>\n<rss version="2\.0">/);
+assert.match(rss, /<title>생활메모<\/title>/);
+assert.match(
+  rss,
+  new RegExp(`<link>https://example\\.com/article/${articleSlug}</link>`),
+);
+assert.match(
+  rss,
+  /<pubDate>Thu, 20 Aug 2026 01:00:00 GMT<\/pubDate>/,
+);
+assert.match(rss, /<category>생활·행정<\/category>/);
+assert.equal([...rss.matchAll(/<item>/g)].length, 1);
 assert.deepEqual(sitemapEntries, [
   { url: "https://example.com/" },
   { url: "https://example.com/archive" },

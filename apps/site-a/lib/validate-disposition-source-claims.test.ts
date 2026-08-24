@@ -50,6 +50,7 @@ describe("route disposition source claims", () => {
     ["/_release.json", "fixed-release-identity", "fixed release-identity route"],
     ["/sitemap.xml", "fixed-sitemap", "fixed sitemap route"],
     ["/robots.txt", "fixed-robots", "fixed robots route"],
+    ["/rss.xml", "fixed-rss", "fixed RSS route"],
     [
       "/article/government24-resident-registration-guide",
       "article",
