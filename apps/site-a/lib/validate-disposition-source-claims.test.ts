@@ -2,11 +2,15 @@ import { resolve } from "node:path";
 
 import {
   loadReleaseBundle,
+  type LoadedReleaseBundleV3,
   type PublicRouteDispositions,
 } from "@content-foundry/content-contract";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { validateDispositionSourceClaims } from "./validate-disposition-source-claims";
+import {
+  type DispositionRouteSource,
+  validateDispositionSourceClaims,
+} from "./validate-disposition-source-claims";
 
 const fixture = resolve(
   process.cwd(),
@@ -24,6 +28,10 @@ function withDisposition(
 }
 
 describe("route disposition source claims", () => {
+  it("accepts the v3 release disposition structure", () => {
+    expectTypeOf<LoadedReleaseBundleV3>().toExtend<DispositionRouteSource>();
+  });
+
   it("returns a release whose disposition sources are unclaimed", () => {
     const release = withDisposition({
       type: "redirect",

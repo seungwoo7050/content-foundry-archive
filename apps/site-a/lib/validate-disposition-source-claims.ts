@@ -1,14 +1,28 @@
 import {
   ContractError,
   type ContractIssue,
-  type LoadedReleaseBundle,
 } from "@content-foundry/content-contract";
 
-import { getRouteClaims } from "./route-claims";
+import {
+  getRouteClaims,
+  type GeneratedRouteSource,
+} from "./route-claims";
 
-export function validateDispositionSourceClaims(
-  bundle: LoadedReleaseBundle,
-): LoadedReleaseBundle {
+type RouteDisposition =
+  | { readonly type: "redirect"; readonly fromPath: string; readonly toPath: string }
+  | {
+      readonly type: "gone";
+      readonly path: string;
+      readonly replacementPath: string | null;
+    };
+
+export interface DispositionRouteSource extends GeneratedRouteSource {
+  readonly redirects: { readonly items: readonly RouteDisposition[] };
+}
+
+export function validateDispositionSourceClaims<T extends DispositionRouteSource>(
+  bundle: T,
+): T {
   const claims = getRouteClaims(bundle);
   const issues: ContractIssue[] = [];
 

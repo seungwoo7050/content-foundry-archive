@@ -1,14 +1,14 @@
 import {
   ContractError,
   type ContractIssue,
-  type LoadedReleaseBundle,
 } from "@content-foundry/content-contract";
 
 import { getGeneratedRoutes } from "./generated-routes";
+import { type DispositionRouteSource } from "./validate-disposition-source-claims";
 
-export function validateDispositionTargets(
-  bundle: LoadedReleaseBundle,
-): LoadedReleaseBundle {
+export function validateDispositionTargets<T extends DispositionRouteSource>(
+  bundle: T,
+): T {
   const generatedRoutes = getGeneratedRoutes(bundle);
   const issues: ContractIssue[] = [];
 
