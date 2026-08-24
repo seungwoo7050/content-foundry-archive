@@ -22,6 +22,11 @@ describe("generated route claims", () => {
   it("preserves fixed and release-record provenance", () => {
     expect(Object.fromEntries(getRouteClaims(bundle))).toEqual({
       "/": { kind: "fixed-home", navigable: true, source: "fixed home route" },
+      "/archive": {
+        kind: "fixed-archive",
+        navigable: true,
+        source: "fixed archive route",
+      },
       "/404": {
         kind: "fixed-not-found",
         navigable: false,
@@ -47,6 +52,7 @@ describe("generated route claims", () => {
   });
 
   it.each([
+    ["/archive", "fixed-archive", "fixed archive route"],
     ["/404", "fixed-not-found", "fixed not-found route"],
     [
       "/article/government24-resident-registration-guide",

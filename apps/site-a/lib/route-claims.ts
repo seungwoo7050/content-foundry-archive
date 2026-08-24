@@ -15,6 +15,7 @@ export interface GeneratedRouteSource {
 
 export type RouteClaimKind =
   | "fixed-home"
+  | "fixed-archive"
   | "fixed-not-found"
   | "fixed-release-identity"
   | "article"
@@ -36,6 +37,12 @@ export function getRouteClaims(
 ): ReadonlyMap<string, RouteClaim> {
   const candidates: RouteClaimCandidate[] = [
     { path: "/", kind: "fixed-home", navigable: true, source: "fixed home route" },
+    {
+      path: "/archive",
+      kind: "fixed-archive",
+      navigable: true,
+      source: "fixed archive route",
+    },
     {
       path: "/404",
       kind: "fixed-not-found",

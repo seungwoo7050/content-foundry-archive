@@ -17,6 +17,7 @@ describe("generated route inventory", () => {
 
     expect(routes).toEqual(new Set([
       "/",
+      "/archive",
       "/article/government24-resident-registration-guide",
       "/about",
       "/category/daily-admin",

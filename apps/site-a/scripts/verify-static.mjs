@@ -96,6 +96,7 @@ const home = readArtifact("index.html");
 const article = readArtifact(articleRelativePath);
 const staticPage = readArtifact(staticPageRelativePath);
 const category = readArtifact(categoryRelativePath);
+const archive = readArtifact("archive.html");
 const notFound = readArtifact("404.html");
 const identity = JSON.parse(readArtifact("_release.json"));
 const expectedIdentities = {
@@ -106,7 +107,7 @@ const expectedIdentities = {
     bundleChecksum:
       "sha256:0a8f03190b0a5d63fefc52e3efab08080a08263a6c8d716f0e4936382eee6f27",
     supportedContractVersions: ["2.0.0", "3.0.0"],
-    routeCount: 5,
+    routeCount: 6,
   },
   "3.0.0": {
     releaseId: "REL-2026-000043",
@@ -115,7 +116,7 @@ const expectedIdentities = {
     bundleChecksum:
       "sha256:45a1c3f057fb59b3a7fd28e5e87a8c41eb299d0446c71949e5d4e32d2a92d745",
     supportedContractVersions: ["2.0.0", "3.0.0"],
-    routeCount: 5,
+    routeCount: 6,
   },
 };
 assert.deepEqual(identity, expectedIdentities[identity.contractVersion]);
@@ -149,6 +150,17 @@ assert.match(
 assert.match(category, /정부24에서 주민등록등본을 발급하는 기본 절차를 정리합니다\./);
 assert.match(category, /<h2 id="category-topics">관련 주제<\/h2>/);
 assert.match(category, /<li>정부24<\/li>/);
+assert.match(archive, /<h1>전체 글<\/h1>/);
+assert.match(archive, /게시일 최신순으로 모았습니다\./);
+assert.match(archive, /href="\/category\/daily-admin">생활·행정<\/a>/);
+assert.match(
+  archive,
+  /<time dateTime="2026-08-20T01:00:00Z">2026년 8월 20일<\/time>/,
+);
+assert.match(
+  archive,
+  new RegExp(`href="/article/${articleSlug}">정부24 주민등록등본 발급 방법`),
+);
 assert.match(
   staticPage,
   /생활메모의 운영 목적과 정보 준비 방법을 안내합니다\./,
@@ -163,6 +175,7 @@ assert.match(home, /<meta name="robots" content="noindex, nofollow"/);
 assert.match(article, /<meta name="robots" content="noindex, nofollow"/);
 assert.match(staticPage, /<meta name="robots" content="noindex, nofollow"/);
 assert.match(category, /<meta name="robots" content="noindex, nofollow"/);
+assert.match(archive, /<meta name="robots" content="noindex, nofollow"/);
 assertCanonical(home, "https://example.com");
 assertCanonical(
   article,
@@ -170,6 +183,8 @@ assertCanonical(
 );
 assertCanonical(staticPage, "https://example.com/about");
 assertCanonical(category, `https://example.com/category/${categorySlug}`);
+assertCanonical(archive, "https://example.com/archive");
+assert.match(archive, /<title>전체 글 \| 생활메모<\/title>/);
 assert.match(category, /<title>생활·행정 \| 생활메모<\/title>/);
 assert.equal(readMeta(category, "description"), "생활과 행정 절차 안내");
 assert.match(category, /<meta property="og:type" content="website"/);
@@ -194,6 +209,7 @@ for (const [field, metaName] of Object.entries(identityFields)) {
   assert.equal(readMeta(article, metaName), identity[field]);
   assert.equal(readMeta(staticPage, metaName), identity[field]);
   assert.equal(readMeta(category, metaName), identity[field]);
+  assert.equal(readMeta(archive, metaName), identity[field]);
 }
 
 const articleArtifacts = readdirSync(join(outRoot, "article"))
@@ -212,10 +228,12 @@ assert.match(home, /property="og:image" content="https:\/\/example\.com\/og\.png
 assert.doesNotMatch(article, /(?:og:image|twitter:image|og\.png)/);
 assert.doesNotMatch(staticPage, /(?:og:image|twitter:image|og\.png)/);
 assert.doesNotMatch(category, /(?:og:image|twitter:image|og\.png)/);
+assert.doesNotMatch(archive, /(?:og:image|twitter:image|og\.png)/);
 assertSafeHtml("home", home);
 assertSafeHtml("article", article);
 assertSafeHtml("static page", staticPage);
 assertSafeHtml("category", category);
+assertSafeHtml("archive", archive);
 assertSafeHtml("404", notFound);
 
 const projectionPath = join(appRoot, ".site-build/media-projection.json");
