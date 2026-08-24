@@ -1,14 +1,21 @@
 import type { MetadataRoute } from "next";
 
-export interface SitemapSource {
+import {
+  getRouteClaims,
+  type GeneratedRouteSource,
+  type RouteClaimKind,
+} from "./route-claims";
+
+export interface SitemapSource extends GeneratedRouteSource {
   readonly articles: readonly {
+    readonly categoryId: string;
+    readonly id: string;
+    readonly publishedAt: string;
     readonly updatedAt: string;
     readonly seo: { readonly canonicalPath: string; readonly index: boolean };
   }[];
-  readonly taxonomy: {
-    readonly categories: readonly { readonly slug: string }[];
-  };
   readonly pages: readonly {
+    readonly path: string;
     readonly seo: { readonly canonicalPath: string; readonly index: boolean };
   }[];
 }
@@ -22,11 +29,34 @@ function comparePath(
   return 0;
 }
 
+function getClaimedSitemapEntries(
+  canonicalOrigin: string,
+  claims: ReadonlyMap<string, { readonly kind: RouteClaimKind }>,
+  kind: RouteClaimKind,
+) {
+  return [...claims]
+    .filter(([, claim]) => claim.kind === kind)
+    .map(([path]) => ({ path }))
+    .sort(comparePath)
+    .map(({ path }) => ({ url: new URL(path, canonicalOrigin).href }));
+}
+
 export function createSitemapEntries(
   canonicalOrigin: string,
   bundle: SitemapSource,
 ): MetadataRoute.Sitemap {
   const toUrl = (path: string) => new URL(path, canonicalOrigin).href;
+  const routeClaims = getRouteClaims(bundle);
+  const archivePages = getClaimedSitemapEntries(
+    canonicalOrigin,
+    routeClaims,
+    "archive-page",
+  );
+  const categoryPages = getClaimedSitemapEntries(
+    canonicalOrigin,
+    routeClaims,
+    "category-page",
+  );
   const articles = bundle.articles
     .filter(({ seo }) => seo.index)
     .map((article) => ({
@@ -48,8 +78,10 @@ export function createSitemapEntries(
   return [
     { url: toUrl("/") },
     { url: toUrl("/archive") },
+    ...archivePages,
     ...articles,
     ...categories,
+    ...categoryPages,
     ...pages,
   ];
 }

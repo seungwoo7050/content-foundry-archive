@@ -34,23 +34,44 @@ describe("sitemap projection", () => {
     const page = structuredClone(bundle.pages[0]!);
     const entries = createSitemapEntries("https://example.com", {
       articles: [
-        { ...article, seo: { ...article.seo, canonicalPath: "/article/z" } },
         {
           ...article,
+          categoryId: "z-category",
+          seo: { ...article.seo, canonicalPath: "/article/z" },
+        },
+        {
+          ...article,
+          categoryId: "z-category",
           seo: { ...article.seo, canonicalPath: "/article/hidden", index: false },
         },
-        { ...article, seo: { ...article.seo, canonicalPath: "/article/a" } },
+        {
+          ...article,
+          categoryId: "a-category",
+          seo: { ...article.seo, canonicalPath: "/article/a" },
+        },
       ],
       taxonomy: {
-        categories: [{ slug: "z-category" }, { slug: "a-category" }],
+        categories: [
+          { id: "z-category", label: "Z", slug: "z-category" },
+          { id: "a-category", label: "A", slug: "a-category" },
+        ],
       },
       pages: [
-        { ...page, seo: { ...page.seo, canonicalPath: "/z-page" } },
         {
           ...page,
+          path: "/z-page",
+          seo: { ...page.seo, canonicalPath: "/z-page" },
+        },
+        {
+          ...page,
+          path: "/hidden",
           seo: { ...page.seo, canonicalPath: "/hidden", index: false },
         },
-        { ...page, seo: { ...page.seo, canonicalPath: "/a-page" } },
+        {
+          ...page,
+          path: "/a-page",
+          seo: { ...page.seo, canonicalPath: "/a-page" },
+        },
       ],
     });
 
@@ -65,5 +86,26 @@ describe("sitemap projection", () => {
       "/z-page",
     ]);
     expect(entries.filter((entry) => "lastModified" in entry)).toHaveLength(2);
+  });
+
+  it("includes every generated archive and category pagination page", () => {
+    const article = bundle.articles[0];
+    if (!article) throw new Error("Site A fixture article is missing");
+    const entries = createSitemapEntries("https://example.com", {
+      ...bundle,
+      articles: Array.from({ length: 13 }, (_, index) => ({
+        ...article,
+        id: `ART-${String(index + 1).padStart(6, "0")}`,
+        seo: { ...article.seo, canonicalPath: `/article/guide-${index + 1}` },
+      })),
+    });
+
+    expect(entries
+      .map(({ url }) => new URL(url).pathname)
+      .filter((path) => path.includes("/page/")))
+      .toEqual([
+        "/archive/page/2",
+        "/category/daily-admin/page/2",
+      ]);
   });
 });
