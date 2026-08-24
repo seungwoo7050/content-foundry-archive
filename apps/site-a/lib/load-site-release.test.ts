@@ -17,6 +17,7 @@ import { resolveBuildTargetConfig } from "@content-foundry/site-core";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
+  bindValidatedSiteReleaseV3,
   loadSiteRelease,
   loadSiteReleaseV3,
   loadValidatedSiteReleaseV3,
@@ -74,10 +75,12 @@ describe("loadSiteRelease", () => {
   it("assembles a fully validated synchronous v3 release context", () => {
     const config = templateConfig(v3Fixture);
     const validated = loadValidatedSiteReleaseV3(config);
+    const bound = bindValidatedSiteReleaseV3(validated, mediaAssets());
     const context = loadSiteReleaseV3(config, {
       mediaAssets: mediaAssets(),
     });
 
+    expect(bound).toEqual(context);
     expect(validated.bundle).toEqual(context.bundle);
     expect(validated.nicheComponents).toEqual(context.nicheComponents);
     expect(context.contractVersion).toBe("3.0.0");

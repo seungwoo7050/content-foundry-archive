@@ -107,11 +107,18 @@ export function loadSiteReleaseV3(
   options: LoadSiteReleaseV3Options,
 ): SiteReleaseContextV3 {
   const validated = loadValidatedSiteReleaseV3(config);
+  return bindValidatedSiteReleaseV3(validated, options.mediaAssets);
+}
+
+export function bindValidatedSiteReleaseV3(
+  validated: ValidatedSiteReleaseV3,
+  mediaAssets: Iterable<ResponsiveImageAsset>,
+): SiteReleaseContextV3 {
   return {
     ...validated,
     mediaAssets: createResponsiveImageAssetRegistry(
       validated.bundle.mediaManifest,
-      options.mediaAssets,
+      mediaAssets,
     ),
   };
 }
