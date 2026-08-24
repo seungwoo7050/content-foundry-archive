@@ -136,9 +136,15 @@ export {
   type LoadReleaseBundleOptions,
   type LoadSupportedReleaseBundleOptions,
   type LoadV3ReleaseBundleOptions,
+  validateV4ReleaseBundle,
 } from "./load-release-bundle.js";
 export {
   type LoadedReleaseBundleV3,
   type V3ReleaseConsumerContext,
   validateV3ReleaseConsumerContext,
 } from "./validate-v3-release-consumer-context.js";
+export {
+  type LoadedReleaseBundleV4,
+  validateV4PresentationStructure,
+} from "./validate-v4-presentation-structure.js";
+export { validateV4PresentationReferences } from "./validate-v4-presentation-references.js";

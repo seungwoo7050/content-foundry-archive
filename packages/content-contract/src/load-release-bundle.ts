@@ -19,6 +19,11 @@ import {
   type V3ReleaseConsumerContext,
   validateV3ReleaseConsumerContext,
 } from "./validate-v3-release-consumer-context.js";
+import { validateV4PresentationReferences } from "./validate-v4-presentation-references.js";
+import {
+  type LoadedReleaseBundleV4,
+  validateV4PresentationStructure,
+} from "./validate-v4-presentation-structure.js";
 
 export type LoadedReleaseBundle = ReleaseBundleDocuments;
 
@@ -96,6 +101,16 @@ function validateStructuredReleaseBundle<
   return validated;
 }
 
+export function validateV4ReleaseBundle(
+  bundle: LoadedReleaseBundleV4,
+  options: LoadReleaseBundleOptions = {},
+): LoadedReleaseBundleV4 {
+  const validated = validateStructuredReleaseBundle(bundle, options);
+  validateV4PresentationStructure(validated);
+  validateV4PresentationReferences(validated);
+  return validated;
+}
+
 export function loadReleaseBundleForVersion(
   version: "2.0.0",
   root: string,
@@ -129,7 +144,7 @@ export function loadReleaseBundleForVersion(
     );
   }
   if (version === "4.0.0") {
-    return validateStructuredReleaseBundle(
+    return validateV4ReleaseBundle(
       readReleaseBundleDocumentsForVersion("4.0.0", root),
       options,
     );

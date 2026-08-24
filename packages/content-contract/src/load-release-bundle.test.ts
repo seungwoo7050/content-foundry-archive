@@ -6,6 +6,7 @@ import {
   loadReleaseBundle,
   loadReleaseBundleForVersion,
   validateV3ReleaseBundle,
+  validateV4ReleaseBundle,
 } from "./load-release-bundle.js";
 import type { ReleaseBundleDocumentsByVersion } from "./read-bundle-documents.js";
 
@@ -66,6 +67,37 @@ describe("loadReleaseBundle", () => {
     >();
     expect(bundle.release.contractVersion).toBe("4.0.0");
     expect(bundle.presentation.home.featuredArticleIds).toEqual(["ART-000123"]);
+  });
+
+  it("composes v4 presentation structure before reference validation", () => {
+    const bundle = loadReleaseBundleForVersion("4.0.0", fixtureV4);
+    bundle.presentation.home.currentArticleIds = ["ART-000123"];
+    bundle.presentation.home.evergreenArticleIds = ["ART-MISSING"];
+
+    expect(() => validateV4ReleaseBundle(bundle)).toThrowError(
+      expect.objectContaining({
+        code: "CONTRACT_INVALID",
+        issues: [
+          expect.objectContaining({
+            path: "/presentation/home/currentArticleIds/0",
+          }),
+        ],
+      }),
+    );
+  });
+
+  it("composes v4 presentation reference validation", () => {
+    const bundle = loadReleaseBundleForVersion("4.0.0", fixtureV4);
+    bundle.presentation.brand.faviconMediaId = "MED-MISSING";
+
+    expect(() => validateV4ReleaseBundle(bundle)).toThrowError(
+      expect.objectContaining({
+        code: "REFERENCE_INVALID",
+        issues: [
+          expect.objectContaining({ path: "/presentation/brand/faviconMediaId" }),
+        ],
+      }),
+    );
   });
 
   it("applies expected identity options to v3", () => {
