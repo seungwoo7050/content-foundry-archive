@@ -8,8 +8,10 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
   findCategoryBySlug,
+  getCategoryAdditionalPageStaticParams,
   getCategoryPageStaticParams,
   getCategoryStaticParams,
+  resolveCategoryAdditionalPage,
   type CategoryRouteSource,
 } from "./category-route";
 
@@ -76,6 +78,38 @@ describe("category route selection", () => {
     ).toEqual([{ category: "current" }, { category: "retired" }]);
   });
 
+  it("enumerates only page-two-and-later category routes", () => {
+    const articles = Array.from({ length: 25 }, (_, index) => ({
+      categoryId: index < 13 ? "guides" : "news",
+    }));
+
+    expect(getCategoryAdditionalPageStaticParams({
+      articles,
+      taxonomy: {
+        categories: [
+          { id: "guides", slug: "guides" },
+          { id: "news", slug: "news" },
+        ],
+      },
+    })).toEqual([{ category: "guides", page: "2" }]);
+  });
+
+  it("resolves only exact category slugs and canonical in-range page values", () => {
+    const source = {
+      articles: Array.from({ length: 13 }, () => ({ categoryId: "guides" })),
+      taxonomy: { categories: [{ id: "guides", slug: "daily-guides" }] },
+    };
+
+    expect(resolveCategoryAdditionalPage(source, "daily-guides", "2")).toEqual({
+      category: source.taxonomy.categories[0],
+      page: 2,
+    });
+    expect(resolveCategoryAdditionalPage(source, "guides", "2")).toBeNull();
+    expect(resolveCategoryAdditionalPage(source, "daily-guides", "1")).toBeNull();
+    expect(resolveCategoryAdditionalPage(source, "daily-guides", "02")).toBeNull();
+    expect(resolveCategoryAdditionalPage(source, "daily-guides", "3")).toBeNull();
+  });
+
   it("looks up categories only by their exact slug", () => {
     const changedBundle = structuredClone(bundle);
     const category = changedBundle.taxonomy.categories[0];
@@ -118,5 +152,8 @@ describe("category route selection", () => {
         ],
       }),
     );
+    expect(() =>
+      resolveCategoryAdditionalPage(incompleteBundle, "daily-admin", "2")
+    ).toThrowError(expect.objectContaining({ code: "REFERENCE_INVALID" }));
   });
 });

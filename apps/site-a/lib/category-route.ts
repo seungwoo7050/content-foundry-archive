@@ -7,6 +7,10 @@ import {
   getGoneCategoryStaticParams,
   type GoneRouteSource,
 } from "./gone-route";
+import {
+  getStaticListAdditionalPages,
+  resolveStaticListAdditionalPage,
+} from "./static-list-pagination";
 
 export interface CategoryRouteRecord {
   readonly id: string;
@@ -62,6 +66,38 @@ export function getCategoryPageStaticParams(
     ...getCategoryStaticParams(bundle),
     ...getGoneCategoryStaticParams(bundle),
   ];
+}
+
+export function getCategoryAdditionalPageStaticParams(
+  bundle: CategoryRouteSource,
+) {
+  validateCategoryRouteReadiness(bundle);
+  return bundle.taxonomy.categories.flatMap((category) => {
+    const articleCount = bundle.articles.filter(
+      (article) => article.categoryId === category.id,
+    ).length;
+    return getStaticListAdditionalPages(articleCount).map((page) => ({
+      category: category.slug,
+      page: String(page),
+    }));
+  });
+}
+
+export function resolveCategoryAdditionalPage<
+  TCategory extends CategoryRouteRecord,
+>(
+  bundle: CategoryRouteSource<TCategory>,
+  categorySlug: string,
+  pageValue: string,
+): { readonly category: TCategory; readonly page: number } | null {
+  validateCategoryRouteReadiness(bundle);
+  const category = findCategoryBySlug(bundle, categorySlug);
+  if (!category) return null;
+  const articleCount = bundle.articles.filter(
+    (article) => article.categoryId === category.id,
+  ).length;
+  const page = resolveStaticListAdditionalPage(pageValue, articleCount);
+  return page === null ? null : { category, page };
 }
 
 export function findCategoryBySlug<TCategory extends CategoryRouteRecord>(
