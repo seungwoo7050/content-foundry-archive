@@ -54,6 +54,19 @@ describe("createArticleMetadata", () => {
       url: "https://example.com/article/government24-resident-registration-guide",
       images: [],
     });
+    expect(metadata.openGraph).not.toHaveProperty("modifiedTime");
     expect(metadata.twitter).toMatchObject({ card: "summary", images: [] });
+  });
+
+  it("publishes modifiedTime only for a later material update", () => {
+    const article = context.bundle.articles[0];
+    if (!article) throw new Error("Site A fixture article is missing");
+
+    expect(
+      createArticleMetadata(context, {
+        ...article,
+        updatedAt: "2026-08-24T02:30:00Z",
+      }).openGraph,
+    ).toMatchObject({ modifiedTime: "2026-08-24T02:30:00Z" });
   });
 });

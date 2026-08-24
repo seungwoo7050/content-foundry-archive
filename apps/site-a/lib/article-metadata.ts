@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { hasMaterialArticleUpdate } from "./article-update";
 import type { MetadataContext } from "./metadata-context";
 
 export interface ArticleMetadataSource {
@@ -36,7 +37,9 @@ export function createArticleMetadata(
       description: article.seo.description,
       url: canonical,
       publishedTime: article.publishedAt,
-      modifiedTime: article.updatedAt,
+      ...(hasMaterialArticleUpdate(article)
+        ? { modifiedTime: article.updatedAt }
+        : {}),
       images: [],
     },
     twitter: {
