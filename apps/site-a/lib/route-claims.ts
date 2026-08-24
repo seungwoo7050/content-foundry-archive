@@ -20,6 +20,7 @@ export type RouteClaimKind =
   | "fixed-release-identity"
   | "fixed-robots"
   | "fixed-rss"
+  | "fixed-search-index"
   | "fixed-sitemap"
   | "article"
   | "category"
@@ -88,6 +89,13 @@ export function getRouteClaims(
       navigable: false,
       outputKind: "machine",
       source: "fixed RSS route",
+    },
+    {
+      path: "/search-index.json",
+      kind: "fixed-search-index",
+      navigable: false,
+      outputKind: "machine",
+      source: "fixed search-index route",
     },
     ...bundle.articles.map((article, index) => ({
       path: article.seo.canonicalPath,
