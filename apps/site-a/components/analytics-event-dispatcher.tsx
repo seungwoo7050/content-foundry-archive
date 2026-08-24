@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useLayoutEffect, useState } from "react";
 
 import {
   toGa4EventCall,
@@ -10,7 +10,16 @@ import {
 import { canLoadGoogleAnalytics } from "@content-foundry/site-core";
 
 import type { SiteAnalyticsRouteProjection } from "../lib/site-analytics-route-projection";
-import { useGoogleCmpConsent } from "../lib/use-google-cmp-consent";
+import {
+  registerGoogleCmpConsentCallback,
+  type GoogleCmpWindow,
+} from "../lib/use-google-cmp-consent";
+import {
+  createAnalyticsEventCandidate,
+  createAnalyticsEventRuntime,
+  type AnalyticsEventRuntime,
+} from "./analytics-event-runtime";
+import { GA4_PROVIDER_READY_EVENT } from "./ga4-tag";
 
 export const ANALYTICS_EVENT_TYPE = "content-foundry:analytics-event";
 
@@ -19,10 +28,6 @@ type DetailOf<T> = T extends AnalyticsEventPayload
   : never;
 
 export type AnalyticsEventDetail = DetailOf<AnalyticsEventPayload>;
-
-const CONTEXT_KEYS: ReadonlyArray<keyof AnalyticsEventContext> = [
-  "eventContractVersion", "siteId", "releaseId", "routeType", "themeId", "skinId",
-];
 
 export function emitAnalyticsEvent(detail: AnalyticsEventDetail): boolean {
   return document.dispatchEvent(new CustomEvent(ANALYTICS_EVENT_TYPE, {
@@ -37,13 +42,11 @@ export function dispatchAnalyticsEvent(
   gtag: unknown,
 ): boolean {
   if (!canLoadGoogleAnalytics(consent) || typeof gtag !== "function") return false;
-  if (typeof detail !== "object" || detail === null || Array.isArray(detail)) {
-    return false;
-  }
-  if (CONTEXT_KEYS.some((key) => key in detail)) return false;
+  const event = createAnalyticsEventCandidate(context, detail);
+  if (event === null) return false;
 
   try {
-    gtag(...toGa4EventCall({ ...detail, ...context } as AnalyticsEventPayload));
+    gtag(...toGa4EventCall(event as AnalyticsEventPayload));
     return true;
   } catch {
     return false;
@@ -109,23 +112,21 @@ export function AnalyticsEventDispatcher({
 }: {
   readonly projection: SiteAnalyticsRouteProjection;
 }) {
-  const consent = useRef<unknown>(undefined);
-  const rememberConsent = useCallback((values: unknown) => {
-    consent.current = values;
-  }, []);
-  useGoogleCmpConsent(rememberConsent);
+  const [runtime] = useState<AnalyticsEventRuntime>(() => createAnalyticsEventRuntime((payload) => {
+    const gtag = (window as unknown as { gtag?: unknown }).gtag;
+    if (typeof gtag !== "function") return;
+    try { gtag(...toGa4EventCall(payload)); } catch { /* provider failure is fail-closed */ }
+  }));
 
-  useEffect(() => {
-    const dispatchCurrent = (detail: unknown) =>
-      dispatchAnalyticsEvent(
-        consent.current,
+  useLayoutEffect(() => {
+    const captureCurrent = (detail: unknown) =>
+      runtime.capture(
         resolveAnalyticsEventContext(projection, window.location.pathname),
         detail,
-        (window as unknown as { gtag?: unknown }).gtag,
       );
     const handleEvent = (event: Event) => {
       const detail = event instanceof CustomEvent ? event.detail : undefined;
-      dispatchCurrent(detail);
+      captureCurrent(detail);
     };
     const handleClick = (event: MouseEvent) => {
       if (!(event.target instanceof Element)) return;
@@ -133,7 +134,7 @@ export function AnalyticsEventDispatcher({
       if (anchor === null) return;
       const classified = resolveClassifiedExternalLinkEvent(anchor.dataset);
       if (classified !== null) {
-        dispatchCurrent(classified);
+        captureCurrent(classified);
         return;
       }
       const detail = resolveInternalLinkEvent(
@@ -141,15 +142,28 @@ export function AnalyticsEventDispatcher({
         anchor.href,
         window.location.origin,
       );
-      if (detail !== null) dispatchCurrent(detail);
+      if (detail !== null) captureCurrent(detail);
+    };
+    const handleProviderReady = () => {
+      if (typeof (window as unknown as { gtag?: unknown }).gtag === "function") {
+        runtime.providerReady();
+      }
     };
     document.addEventListener(ANALYTICS_EVENT_TYPE, handleEvent);
+    document.addEventListener(GA4_PROVIDER_READY_EVENT, handleProviderReady);
     document.addEventListener("click", handleClick);
+    runtime.listenerReady();
+    registerGoogleCmpConsentCallback(
+      window as unknown as GoogleCmpWindow,
+      (values) => runtime.updateConsent(values),
+    );
+    handleProviderReady();
     return () => {
       document.removeEventListener(ANALYTICS_EVENT_TYPE, handleEvent);
+      document.removeEventListener(GA4_PROVIDER_READY_EVENT, handleProviderReady);
       document.removeEventListener("click", handleClick);
     };
-  }, [projection]);
+  }, [projection, runtime]);
 
   return null;
 }
