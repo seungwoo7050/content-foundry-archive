@@ -66,7 +66,7 @@ describe("Site A advertising release binding", () => {
 
   it.each([
     ["friendly-mobile-utility", "desktop-sidebar"],
-    ["minimal-knowledge-base", "article-end"],
+    ["minimal-knowledge-base", "home-feed"],
   ] as const)("rejects unsupported %s slot %s", (defaultTheme, slotId) => {
     expect(() => resolveSiteAdvertisingConfig({
       ...enabledSource,
