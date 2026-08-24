@@ -40,6 +40,7 @@ function renderRoute(
     <FriendlyMobileShell
       context={context}
       routeKind={model.route.kind}
+      routePath={model.route.path}
       shell={model.shell}
     >
       {renderRouteContent(model, context)}

@@ -43,11 +43,13 @@ export function FriendlyRouteIntro({
 export function FriendlyMobileShell({
   shell,
   routeKind,
+  routePath,
   context,
   children,
 }: {
   readonly shell: SiteShellViewModel;
   readonly routeKind: HtmlRouteKind;
+  readonly routePath: string;
   readonly context: ThemeRenderContext;
   readonly children: ReactNode;
 }) {
@@ -70,7 +72,11 @@ export function FriendlyMobileShell({
           </a>
           <p className="fmu-tagline">{shell.description}</p>
           <div className="fmu-nav">
-            <ThemeNavigation ariaLabel="주요 메뉴" items={shell.primaryNavigation} />
+            <ThemeNavigation
+              ariaLabel="주요 메뉴"
+              currentPath={routePath}
+              items={shell.primaryNavigation}
+            />
           </div>
         </div>
       </header>

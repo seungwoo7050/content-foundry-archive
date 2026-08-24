@@ -82,7 +82,12 @@ describe("Friendly Mobile Utility route matrix", () => {
       expect(html).toContain('<main class="fmu-main"');
       expect(html).toContain(shell.footerText);
       expect(html).not.toMatch(/saved|bookmark|verification|popular|ranking|trending|저장|검증됨|인기|순위/i);
-      if (route.kind === "home") expect(html).toContain("생활 절차 안내");
+      if (route.kind === "home") {
+        expect(html).toContain("생활 절차 안내");
+        expect(html).toContain('<a aria-current="page" href="/">홈</a>');
+      } else {
+        expect(html).not.toContain('aria-current="page" href="/"');
+      }
       if (route.kind === "article") {
         expect(html).toContain('href="#step">신청 단계</a>');
         expect(html).toContain("공식 절차 변경");
