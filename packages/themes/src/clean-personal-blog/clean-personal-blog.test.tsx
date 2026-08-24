@@ -92,6 +92,37 @@ describe("Clean Personal Blog", () => {
     expect(html).toContain("한 사람이 정리하는 실생활 안내");
   });
 
+  it("renders release-provided home groups in an authorial column hierarchy", () => {
+    const home = routes[0]!;
+    if (home.kind !== "home") throw new Error("home fixture is missing");
+    const placed = ["선정 글", "현재 글", "기본 글", "최근 글"].map(
+      (label, index) => ({
+        ...item,
+        link: { href: `/article/placed-${index}`, label },
+      }),
+    );
+    const html = render({
+      ...home,
+      featuredArticles: [placed[0]!],
+      currentArticles: [placed[1]!],
+      evergreenArticles: [placed[2]!],
+      latestArticles: [placed[3]!],
+      categoryHighlights: [{ category: home.categories[0]!, articles: [placed[0]!] }],
+    }, "warm-neutral");
+
+    const facts = ["먼저 읽을 글", ">선정 글</a>", "지금 살펴볼 글", ">현재 글</a>", "두고 읽을 글", ">기본 글</a>", "최근 글", ">최근 글</a>"];
+    const positions = facts.map((fact) => html.indexOf(fact));
+    expect(positions.every((position) => position >= 0)).toBe(true);
+    expect(positions).toEqual([...positions].sort((left, right) => left - right));
+    expect(html).toContain(
+      '<h2 id="personal-highlight-0"><a href="/category/life">생활</a></h2><p>생활 안내 모음</p>',
+    );
+    expect(render(home, "warm-neutral")).toContain('id="personal-latest-title"');
+    expect(render({ ...home, featuredArticles: [] }, "warm-neutral"))
+      .not.toContain('id="personal-latest-title"');
+    expect(html).not.toMatch(/인기|급상승|popular|trending|ranking/i);
+  });
+
   it("marks only the exact current masthead navigation link", () => {
     const archive = render(routes[4]!, "warm-neutral");
     const article = render(routes[2]!, "warm-neutral");

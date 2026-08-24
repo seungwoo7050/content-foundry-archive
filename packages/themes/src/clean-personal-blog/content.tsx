@@ -1,4 +1,7 @@
-import type { ContentRouteViewModel } from "../content-route-view-model.js";
+import type {
+  ContentRouteViewModel,
+  HomeRouteViewModel,
+} from "../content-route-view-model.js";
 import {
   getThemeAdSlot,
   type ThemeAdSlotContext,
@@ -20,6 +23,25 @@ function RouteHeader({
   return <header className="personal-route-header"><h1>{heading}</h1><p>{description}</p></header>;
 }
 
+function PersonalHomeGroup({
+  articles,
+  className,
+  heading,
+  headingId,
+}: {
+  readonly articles: HomeRouteViewModel["articles"] | undefined;
+  readonly className: string;
+  readonly heading: string;
+  readonly headingId: string;
+}) {
+  return articles && articles.length > 0 ? (
+    <section aria-labelledby={headingId} className={`${className} personal-article-list personal-section`}>
+      <h2 id={headingId}>{heading}</h2>
+      <ThemeArticleList articles={articles} headingLevel={3} />
+    </section>
+  ) : null;
+}
+
 function unreachable(value: never): never {
   throw new Error(`Unsupported personal content route: ${JSON.stringify(value)}`);
 }
@@ -32,7 +54,12 @@ export function CleanPersonalContent({
   readonly route: ContentRouteViewModel;
 }) {
   switch (route.kind) {
-    case "home":
+    case "home": {
+      const hasHomeGroups = route.featuredArticles !== undefined
+        || route.currentArticles !== undefined
+        || route.evergreenArticles !== undefined
+        || route.latestArticles !== undefined
+        || route.categoryHighlights !== undefined;
       return (
         <div className="personal-home">
           <RouteHeader heading={route.heading} description={route.description} />
@@ -45,14 +72,30 @@ export function CleanPersonalContent({
               ))}</ul>
             </section>
           ) : null}
-          <section aria-labelledby="personal-latest-title" className="personal-article-list personal-section">
-            <h2 id="personal-latest-title">{route.articleSectionHeading}</h2>
-            <ThemeArticleList articles={route.articles} headingLevel={3} />
+          {hasHomeGroups ? <>
+            <PersonalHomeGroup articles={route.featuredArticles} className="personal-home-featured" heading="먼저 읽을 글" headingId="personal-featured-title" />
+            <PersonalHomeGroup articles={route.currentArticles} className="personal-home-current" heading="지금 살펴볼 글" headingId="personal-current-title" />
+            <PersonalHomeGroup articles={route.evergreenArticles} className="personal-home-reference" heading="두고 읽을 글" headingId="personal-reference-title" />
+            <PersonalHomeGroup articles={route.latestArticles} className="personal-home-latest" heading={route.articleSectionHeading} headingId="personal-group-latest-title" />
+            {route.categoryHighlights?.map(({ category, articles }, index) => (
+              <section aria-labelledby={`personal-highlight-${index}`} className="personal-home-category-highlight personal-article-list personal-section" key={category.href}>
+                <h2 id={`personal-highlight-${index}`}><a href={category.href}>{category.label}</a></h2>
+                <p>{category.description}</p>
+                {articles.length > 0 ? <ThemeArticleList articles={articles} headingLevel={3} /> : null}
+              </section>
+            ))}
             {getThemeAdSlot(context, "home-feed")}
-          </section>
+          </> : (
+            <section aria-labelledby="personal-latest-title" className="personal-article-list personal-section">
+              <h2 id="personal-latest-title">{route.articleSectionHeading}</h2>
+              <ThemeArticleList articles={route.articles} headingLevel={3} />
+              {getThemeAdSlot(context, "home-feed")}
+            </section>
+          )}
           <ThemeHomeAboutTeaser teaser={route.aboutTeaser} />
         </div>
       );
+    }
     case "category":
       return (
         <div className="personal-category-route">
