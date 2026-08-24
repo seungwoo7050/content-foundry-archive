@@ -2,6 +2,7 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
   AD_SLOT_IDS,
+  MANUAL_AD_UNITS_INPUT_NAME,
   type AdSlotId,
   ManualAdUnitConfigError,
   hasValidManualAdUnits,
@@ -10,6 +11,13 @@ import {
 } from "./manual-units.js";
 
 describe("provider-neutral manual ad units", () => {
+  it("names the external serialized input without confusing it with slot IDs", () => {
+    expect(MANUAL_AD_UNITS_INPUT_NAME).toBe("ADSENSE_MANUAL_UNITS");
+    expect(() => parseManualAdUnits(undefined)).toThrow(
+      "ADSENSE_MANUAL_UNITS is required",
+    );
+  });
+
   it("uses the exact theme-neutral slot vocabulary", () => {
     expect(AD_SLOT_IDS).toEqual([
       "home-feed",

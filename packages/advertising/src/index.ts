@@ -1,5 +1,6 @@
 export {
   AD_SLOT_IDS,
+  MANUAL_AD_UNITS_INPUT_NAME,
   ManualAdUnitConfigError,
   hasValidManualAdUnits,
   isAdSenseUnitId,

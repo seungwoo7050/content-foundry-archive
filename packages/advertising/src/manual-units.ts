@@ -11,6 +11,7 @@ export const AD_SLOT_IDS = Object.freeze([
   "article-end",
   "desktop-sidebar",
 ] as const);
+export const MANUAL_AD_UNITS_INPUT_NAME = "ADSENSE_MANUAL_UNITS" as const;
 
 export type AdSlotId = (typeof AD_SLOT_IDS)[number];
 export type AdSenseUnitId = string & { readonly __adsenseUnitId: unique symbol };
@@ -43,19 +44,27 @@ export function hasValidManualAdUnits(value: unknown): value is ManualAdUnits {
 }
 
 export function parseManualAdUnits(serialized: string | null | undefined): ManualAdUnits {
-  if (typeof serialized !== "string") return fail("AD_SLOT_IDS is required");
+  if (typeof serialized !== "string") {
+    return fail(`${MANUAL_AD_UNITS_INPUT_NAME} is required`);
+  }
   let pairs: ReadonlyArray<readonly [string, string]>;
   try {
     pairs = parseStrictJsonStringMap(serialized);
   } catch (error) {
-    if (error instanceof StrictJsonStringMapError) return fail(`invalid AD_SLOT_IDS: ${error.message}`);
+    if (error instanceof StrictJsonStringMapError) {
+      return fail(`invalid ${MANUAL_AD_UNITS_INPUT_NAME}: ${error.message}`);
+    }
     throw error;
   }
   const parsed = new Map(pairs);
   if (parsed.size === 0) return fail("enabled advertising requires a manual ad unit");
   for (const [key, unitId] of pairs) {
-    if (!slotIds.has(key)) return fail(`AD_SLOT_IDS contains unknown slot ${key}`);
-    if (!isAdSenseUnitId(unitId)) return fail(`AD_SLOT_IDS has invalid unit ID for ${key}`);
+    if (!slotIds.has(key)) {
+      return fail(`${MANUAL_AD_UNITS_INPUT_NAME} contains unknown slot ${key}`);
+    }
+    if (!isAdSenseUnitId(unitId)) {
+      return fail(`${MANUAL_AD_UNITS_INPUT_NAME} has invalid unit ID for ${key}`);
+    }
   }
   return Object.freeze(Object.fromEntries(
     AD_SLOT_IDS.flatMap((key) => parsed.has(key) ? [[key, parsed.get(key)]] : []),
