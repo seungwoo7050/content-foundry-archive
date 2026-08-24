@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { ContractError, type ContractIssue } from "@content-foundry/content-contract";
 import type { ArticleRouteViewModel } from "@content-foundry/themes";
 
 import {
@@ -38,6 +39,7 @@ export interface ArticleThemeRecord
     RelatedThemeArticleOwner,
     ArticleAdEligibilityRecord {
   readonly summary: string;
+  readonly tagIds: readonly string[];
   readonly toc: readonly {
     readonly id: string;
     readonly text: string;
@@ -62,6 +64,30 @@ function createTrustLinks(
       ? [{ href: trust.contactPath, label: "수정 요청하기" }]
       : []),
   ];
+}
+
+function createTopicLabels(
+  bundle: ArticleThemeContext["bundle"],
+  tagIds: readonly string[],
+): readonly string[] {
+  const issues: ContractIssue[] = [];
+  const topics = tagIds.flatMap((tagId, index) => {
+    const tag = bundle.taxonomy.tags.find(({ id }) => id === tagId);
+    if (tag) return [tag.label];
+    issues.push({
+      path: `/article/tagIds/${index}`,
+      message: `unknown article topic tag: ${tagId}`,
+    });
+    return [];
+  });
+  if (issues.length > 0) {
+    throw new ContractError(
+      "REFERENCE_INVALID",
+      "Article topics reference missing taxonomy",
+      issues,
+    );
+  }
+  return topics;
 }
 
 export function createArticleThemeViewModel(
@@ -90,6 +116,7 @@ export function createArticleThemeViewModel(
       href: `/category/${category.slug}`,
       label: category.label,
     },
+    topics: createTopicLabels(context.bundle, article.tagIds),
     authorLabel: trust.authorLabel,
     operatorLabel: trust.operatorLabel,
     published: trust.published,

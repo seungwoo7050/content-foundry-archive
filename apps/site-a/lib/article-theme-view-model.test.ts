@@ -84,6 +84,7 @@ describe("article theme view model", () => {
         { href: "/article/government24-resident-registration-guide", label: "정부24 주민등록등본 발급 방법" },
       ],
       category: { href: "/category/daily-admin", label: "생활·행정" },
+      topics: ["정부24"],
       authorLabel: "생활메모",
       operatorLabel: "생활메모",
       published: { dateTime: "2026-08-20T01:00:00Z", label: "2026년 8월 20일" },
@@ -141,6 +142,48 @@ describe("article theme view model", () => {
     expect(model).not.toHaveProperty("readingTime");
     expect(model.readerActions).toBe(readerActions);
     expect(JSON.stringify(model.sources)).not.toContain("mailto:");
+  });
+
+  it("projects topic labels in tagIds order and preserves an empty list", () => {
+    const article = firstArticle(bundle);
+    const secondTag = {
+      ...bundle.taxonomy.tags[0]!,
+      id: "second-tag",
+      slug: "second-tag",
+      label: "두 번째 태그",
+    };
+    const orderedBundle = {
+      ...bundle,
+      taxonomy: {
+        ...bundle.taxonomy,
+        tags: [...bundle.taxonomy.tags, secondTag],
+      },
+    };
+    const project = (tagIds: readonly string[]) => createArticleThemeViewModel(
+      { config: { adsEnabled: false }, bundle: orderedBundle },
+      { ...article, tagIds },
+      categoryFor(bundle, article.categoryId),
+      { hero: null, body: "body" },
+    ).topics;
+
+    expect(project([secondTag.id, article.tagIds[0]!])).toEqual([
+      "두 번째 태그",
+      "정부24",
+    ]);
+    expect(project([])).toEqual([]);
+  });
+
+  it("fails closed when an article topic ID is missing from taxonomy", () => {
+    const article = firstArticle(bundle);
+    expect(() => createArticleThemeViewModel(
+      { config: { adsEnabled: false }, bundle },
+      { ...article, tagIds: ["missing-tag"] },
+      categoryFor(bundle, article.categoryId),
+      { hero: null, body: "body" },
+    )).toThrowError(expect.objectContaining({
+      code: "REFERENCE_INVALID",
+      issues: [expect.objectContaining({ path: "/article/tagIds/0" })],
+    }));
   });
 
   it.each([null, undefined])("normalizes empty reader actions from %s", (readerActions) => {

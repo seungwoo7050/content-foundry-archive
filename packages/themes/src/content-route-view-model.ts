@@ -32,6 +32,7 @@ export interface CategoryRouteViewModel extends RouteBaseViewModel<"category"> {
 
 export interface ArticleRouteViewModel extends RouteBaseViewModel<"article"> {
   readonly category: LinkViewModel | null;
+  readonly topics?: readonly string[];
   readonly authorLabel: string;
   readonly operatorLabel: string;
   readonly published: DateViewModel;
