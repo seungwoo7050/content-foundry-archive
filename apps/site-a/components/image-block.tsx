@@ -1,15 +1,13 @@
 import type { PublishedContentBlockV3 } from "@content-foundry/content-contract";
-import type { ResponsiveImageAsset } from "@content-foundry/media";
+
+import type { ResponsiveImageAssetRegistry } from "../lib/responsive-image-asset-registry";
+
+export type { ResponsiveImageAssetRegistry } from "../lib/responsive-image-asset-registry";
 
 export type PublishedImageBlockV3 = Extract<
   PublishedContentBlockV3,
   { type: "image" }
 >;
-export type ResponsiveImageAssetRegistry = ReadonlyMap<
-  string,
-  ResponsiveImageAsset
->;
-
 interface ImageBlockProps {
   readonly block: PublishedImageBlockV3;
   readonly assets: ResponsiveImageAssetRegistry;
