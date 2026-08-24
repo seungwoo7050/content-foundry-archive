@@ -2,6 +2,7 @@ import type { ValidatedVersionedSiteRelease } from "./load-site-release";
 import { validateSiteLaunchAdDeliveryPolicy } from "./site-launch-ad-delivery-policy";
 import type { SiteLaunchAttestations } from "./site-launch-attestations";
 import { validateSiteLaunchContent } from "./site-launch-content-policy";
+import { validateSiteLaunchDiscovery } from "./site-launch-discovery-policy";
 import { validateSiteLaunchGooglePolicy } from "./site-launch-google-policy";
 import { validateSiteLaunchOrigin } from "./site-launch-origin-policy";
 import { SiteLaunchReadinessError } from "./site-launch-readiness-error";
@@ -22,6 +23,7 @@ export function validateSiteLaunchReadiness(
       context.bundle,
       footerNavigation,
     ),
+    () => validateSiteLaunchDiscovery(context.config.mode, context.bundle),
     () => validateSiteLaunchGooglePolicy({
       mode: context.config.mode,
       consent: providers.consent,

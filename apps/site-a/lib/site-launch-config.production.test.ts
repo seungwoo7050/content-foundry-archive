@@ -7,6 +7,7 @@ import { loadSiteRelease } from "./load-site-release";
 import { resolveSiteBuildConfig } from "./site-build-config";
 import { resolveSiteLaunchConfig } from "./site-launch-config";
 import { REQUIRED_SITE_A_PAGE_PATHS } from "./site-launch-content-policy";
+import { SITE_A_LAUNCH_CATEGORIES } from "./site-launch-discovery-policy";
 
 function productionContext(): SiteReleaseContext {
   const template = loadSiteRelease(resolveSiteBuildConfig({}));
@@ -18,6 +19,11 @@ function productionContext(): SiteReleaseContext {
     title: `Launch page ${index}`,
     seo: { ...about.seo, canonicalPath: path },
   }));
+  const categories = SITE_A_LAUNCH_CATEGORIES.map((category) => ({
+    ...category,
+    description: `${category.label} 실용 안내`,
+  }));
+  const referenceArticle = template.bundle.articles[0]!;
   const bundle: LoadedReleaseBundle = {
     ...template.bundle,
     site: {
@@ -31,9 +37,31 @@ function productionContext(): SiteReleaseContext {
         publicClientId: "ca-pub-1234567890123456",
       },
     },
+    taxonomy: { ...template.bundle.taxonomy, categories },
+    navigation: {
+      items: [
+        { id: "home", label: "홈", path: "/", children: [] },
+        ...categories.map((category) => ({
+          id: category.id,
+          label: category.label,
+          path: `/category/${category.slug}`,
+          children: [],
+        })),
+        { id: "search", label: "검색", path: "/search", children: [] },
+        { id: "about", label: "소개", path: "/about", children: [] },
+      ],
+    },
     pages,
-    articles: template.bundle.articles.map((article) => ({
-      ...article,
+    articles: categories.map((category, index) => ({
+      ...referenceArticle,
+      id: `ART-LAUNCH-${index}`,
+      slug: `launch-${category.slug}`,
+      title: `${category.label} launch article`,
+      categoryId: category.id,
+      seo: {
+        ...referenceArticle.seo,
+        canonicalPath: `/article/launch-${category.slug}`,
+      },
       advertising: { enabled: true },
     })),
   };
