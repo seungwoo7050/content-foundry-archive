@@ -16,6 +16,9 @@ const articleRelativePath = `article/${articleSlug}.html`;
 const staticPageRelativePath = "about.html";
 const categorySlug = "daily-admin";
 const categoryRelativePath = `category/${categorySlug}.html`;
+const allowedClientModules = new Set([
+  join(appRoot, "components/search-controller.tsx"),
+]);
 
 function readArtifact(relativePath) {
   const artifactPath = join(outRoot, relativePath);
@@ -377,7 +380,12 @@ if (identity.contractVersion === "2.0.0") {
 for (const sourceRoot of ["app", "components", "lib"]) {
   for (const sourcePath of listSourceFiles(join(appRoot, sourceRoot))) {
     const source = readFileSync(sourcePath, "utf8");
-    assert.doesNotMatch(source, /^["']use client["'];/m, `${sourcePath} is a client module`);
+    const isClientModule = /^["']use client["'];/m.test(source);
+    assert.equal(
+      isClientModule,
+      allowedClientModules.has(sourcePath),
+      `${sourcePath} has an unexpected client-module classification`,
+    );
     assert.doesNotMatch(
       source,
       /dangerouslySetInnerHTML/,
