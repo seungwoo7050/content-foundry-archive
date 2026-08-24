@@ -1,19 +1,18 @@
-import type {
-  PublicSiteTaxonomy,
-  PublishedArticleProjection,
-} from "@content-foundry/content-contract";
+import {
+  getCategoryDescription,
+  type CategoryMetadataSource,
+} from "../lib/category-metadata";
+import { ArticleCard, type ArticleCardSource } from "./article-card";
+import { CategoryTopics, type CategoryTopic } from "./category-topics";
 
-import { getCategoryDescription } from "../lib/category-metadata";
-import { ArticleCard } from "./article-card";
-import { CategoryTopics } from "./category-topics";
-
-type Category = PublicSiteTaxonomy["categories"][number];
-type Tag = PublicSiteTaxonomy["tags"][number];
+export interface CategoryListingArticle extends ArticleCardSource {
+  readonly id: string;
+}
 
 interface CategoryListingProps {
-  readonly category: Category;
-  readonly articles: readonly PublishedArticleProjection[];
-  readonly tags: readonly Tag[];
+  readonly category: CategoryMetadataSource;
+  readonly articles: readonly CategoryListingArticle[];
+  readonly tags: readonly CategoryTopic[];
   readonly locale: string;
   readonly timeZone: string;
 }

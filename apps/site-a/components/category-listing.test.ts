@@ -1,11 +1,19 @@
 import { resolve } from "node:path";
 
-import { loadReleaseBundle } from "@content-foundry/content-contract";
+import {
+  loadReleaseBundle,
+  type LoadedReleaseBundleV3,
+} from "@content-foundry/content-contract";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { CategoryListing } from "./category-listing";
+import {
+  CategoryListing,
+  type CategoryListingArticle,
+} from "./category-listing";
+import type { CategoryTopic } from "./category-topics";
+import type { CategoryMetadataSource } from "../lib/category-metadata";
 
 const fixture = resolve(
   process.cwd(),
@@ -14,6 +22,18 @@ const fixture = resolve(
 const bundle = loadReleaseBundle(fixture);
 
 describe("CategoryListing", () => {
+  it("accepts v3 category listing records", () => {
+    expectTypeOf<
+      LoadedReleaseBundleV3["articles"][number]
+    >().toExtend<CategoryListingArticle>();
+    expectTypeOf<
+      LoadedReleaseBundleV3["taxonomy"]["categories"][number]
+    >().toExtend<CategoryMetadataSource>();
+    expectTypeOf<
+      LoadedReleaseBundleV3["taxonomy"]["tags"][number]
+    >().toExtend<CategoryTopic>();
+  });
+
   it("composes a labelled category with its complete article cards", () => {
     const category = bundle.taxonomy.categories[0];
     const article = bundle.articles[0];
