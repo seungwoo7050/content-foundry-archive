@@ -7,6 +7,10 @@ export {
   type ImmutableObjectLoader,
 } from "./read-immutable-object-media-source.js";
 export {
+  type MediaSourceReaders,
+  resolveImageSource,
+} from "./resolve-image-source.js";
+export {
   type ImageMediaRecord,
   type VerifiedMediaBytes,
   verifyMediaByteIdentity,
