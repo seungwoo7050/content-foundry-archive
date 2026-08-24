@@ -10,7 +10,8 @@
     "prepare:release": "tsx scripts/prepare-site-release.ts",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json",
-    "verify:static": "node scripts/verify-static.mjs"
+    "verify:static": "node scripts/verify-static.mjs",
+    "verify:static:paired": "node scripts/verify-paired-static.mjs"
   },
   "dependencies": {
     "@content-foundry/content-contract": "workspace:*",
