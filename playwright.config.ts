@@ -45,6 +45,35 @@ export default defineConfig({
         viewport: { width: 390, height: 844 },
       },
     },
+    {
+      name: "chromium-reflow",
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 320, height: 800 },
+      },
+    },
+    {
+      name: "chromium-javascript-off",
+      use: {
+        ...devices["Desktop Chrome"],
+        javaScriptEnabled: false,
+        viewport: { width: 1_440, height: 1_000 },
+      },
+    },
+    {
+      name: "firefox-desktop",
+      use: {
+        ...devices["Desktop Firefox"],
+        viewport: { width: 1_440, height: 1_000 },
+      },
+    },
+    {
+      name: "webkit-mobile",
+      use: {
+        ...devices["iPhone 13"],
+        viewport: { width: 390, height: 844 },
+      },
+    },
   ],
   webServer: {
     command:
