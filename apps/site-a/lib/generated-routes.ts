@@ -1,6 +1,8 @@
-import type { LoadedReleaseBundle } from "@content-foundry/content-contract";
-
-import { getRouteClaims, type RouteClaimKind } from "./route-claims";
+import {
+  getRouteClaims,
+  type GeneratedRouteSource,
+  type RouteClaimKind,
+} from "./route-claims";
 
 const navigableKinds = new Set<RouteClaimKind>([
   "fixed-home",
@@ -10,7 +12,7 @@ const navigableKinds = new Set<RouteClaimKind>([
 ]);
 
 export function getGeneratedRoutes(
-  bundle: LoadedReleaseBundle,
+  bundle: GeneratedRouteSource,
 ): ReadonlySet<string> {
   return new Set(
     [...getRouteClaims(bundle)]

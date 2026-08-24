@@ -1,8 +1,17 @@
 import {
   ContractError,
   type ContractIssue,
-  type LoadedReleaseBundle,
 } from "@content-foundry/content-contract";
+
+export interface GeneratedRouteSource {
+  readonly articles: readonly {
+    readonly seo: { readonly canonicalPath: string };
+  }[];
+  readonly taxonomy: {
+    readonly categories: readonly { readonly slug: string }[];
+  };
+  readonly pages: readonly { readonly path: string }[];
+}
 
 export type RouteClaimKind =
   | "fixed-home"
@@ -22,7 +31,7 @@ interface RouteClaimCandidate extends RouteClaim {
 }
 
 export function getRouteClaims(
-  bundle: LoadedReleaseBundle,
+  bundle: GeneratedRouteSource,
 ): ReadonlyMap<string, RouteClaim> {
   const candidates: RouteClaimCandidate[] = [
     { path: "/", kind: "fixed-home", source: "fixed home route" },

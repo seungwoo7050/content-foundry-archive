@@ -1,9 +1,12 @@
 import { resolve } from "node:path";
 
-import { loadReleaseBundle } from "@content-foundry/content-contract";
-import { describe, expect, it } from "vitest";
+import {
+  loadReleaseBundle,
+  type LoadedReleaseBundleV3,
+} from "@content-foundry/content-contract";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { getRouteClaims } from "./route-claims";
+import { getRouteClaims, type GeneratedRouteSource } from "./route-claims";
 
 const fixture = resolve(
   process.cwd(),
@@ -12,6 +15,10 @@ const fixture = resolve(
 const bundle = loadReleaseBundle(fixture);
 
 describe("generated route claims", () => {
+  it("accepts the v3 release route structure", () => {
+    expectTypeOf<LoadedReleaseBundleV3>().toExtend<GeneratedRouteSource>();
+  });
+
   it("preserves fixed and release-record provenance", () => {
     expect(Object.fromEntries(getRouteClaims(bundle))).toEqual({
       "/": { kind: "fixed-home", source: "fixed home route" },
