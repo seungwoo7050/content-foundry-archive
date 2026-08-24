@@ -46,6 +46,7 @@ const routes: readonly HtmlRouteViewModel[] = [
     category: { href: "/category/life", label: "생활" }, authorLabel: "작성자", operatorLabel: "운영자",
     published: { dateTime: "2026-08-20T00:00:00Z", label: "2026년 8월 20일" },
     updated: { dateTime: "2026-08-24T00:00:00Z", label: "2026년 8월 24일" },
+    estimatedReadingTime: undefined,
     trustLinks: [{ href: "/about", label: "운영 방식" }],
     toc: [{ id: "step", label: "신청 단계", level: 2 }],
     sources: [{ label: "공식 안내", href: "https://official.example/guide" }],

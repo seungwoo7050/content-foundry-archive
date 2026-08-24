@@ -45,6 +45,7 @@ const routes: readonly HtmlRouteViewModel[] = [
     ...base("/article/guide", "생활 안내"), kind: "article",
     category: { href: "/category/life", label: "생활" }, authorLabel: "작성자", operatorLabel: "운영자",
     published: { dateTime: "2026-08-20T00:00:00Z", label: "2026년 8월 20일" }, updated: null,
+    estimatedReadingTime: undefined,
     trustLinks: [], toc: [{ id: "step", label: "신청 단계", level: 2 }], sources: [],
     updateTriggers: [], faq: [], relatedSectionHeading: "관련 안내", relatedArticles: [item],
     advertisingEligible: true, hero: null, body: <section id="step">신청 본문</section>,

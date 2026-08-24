@@ -40,7 +40,7 @@ export interface ArticleRouteViewModel extends RouteBaseViewModel<"article"> {
   readonly operatorLabel: string;
   readonly published: DateViewModel;
   readonly updated: DateViewModel | null;
-  readonly estimatedReadingTime?: EstimatedReadingTimeViewModel;
+  readonly estimatedReadingTime: EstimatedReadingTimeViewModel | undefined;
   readonly trustLinks: readonly LinkViewModel[];
   readonly toc: readonly TocItemViewModel[];
   readonly sources: readonly ArticleSourceViewModel[];
