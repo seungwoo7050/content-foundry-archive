@@ -17,5 +17,6 @@ if (resolve(process.cwd()) !== appDirectory) {
 const immutableObjectDirectory = process.env.IMMUTABLE_MEDIA_DIR?.trim();
 await prepareSiteRelease(resolveSiteBuildConfig(process.env), {
   ...resolveSiteBuildArtifactPaths(appDirectory),
+  environment: process.env,
   ...(immutableObjectDirectory ? { immutableObjectDirectory } : {}),
 });

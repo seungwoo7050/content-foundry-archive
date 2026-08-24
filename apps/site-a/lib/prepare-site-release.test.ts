@@ -148,6 +148,28 @@ describe("prepareSiteRelease", () => {
     );
   });
 
+  it("preserves prior artifacts when production readiness fails", async () => {
+    const paths = workspace();
+    writePriorArtifacts(paths);
+    const productionConfig: BuildTargetConfig = {
+      ...config(fixture("2.0.0")),
+      mode: "production",
+      origin: "https://example.com",
+      noindex: false,
+    };
+
+    await expect(prepareSiteRelease(productionConfig, paths)).rejects.toThrow(
+      "production origin must not use reserved hostname example.com",
+    );
+    expect(readFileSync(paths.projectionPath, "utf8")).toBe("projection");
+    expect(
+      readFileSync(join(paths.publicDirectory, "_media/generated.webp"), "utf8"),
+    ).toBe("generated");
+    expect(readFileSync(paths.dispositionPath, "utf8")).toBe(
+      "prior dispositions",
+    );
+  });
+
   it("restores prior dispositions when v3 media publication fails", async () => {
     const paths = workspace();
     writePriorArtifacts(paths);

@@ -1,4 +1,4 @@
-import type { VersionedSiteReleaseContext } from "./load-site-release";
+import type { ValidatedVersionedSiteRelease } from "./load-site-release";
 import { validateSiteLaunchAdDeliveryPolicy } from "./site-launch-ad-delivery-policy";
 import type { SiteLaunchAttestations } from "./site-launch-attestations";
 import { validateSiteLaunchContent } from "./site-launch-content-policy";
@@ -9,7 +9,7 @@ import type { SiteProviderConfig } from "./site-provider-config";
 import { createThemeShellViewModel } from "./theme-shell-view-model";
 
 export function validateSiteLaunchReadiness(
-  context: VersionedSiteReleaseContext,
+  context: ValidatedVersionedSiteRelease,
   providers: SiteProviderConfig,
   attestations: SiteLaunchAttestations,
 ): void {

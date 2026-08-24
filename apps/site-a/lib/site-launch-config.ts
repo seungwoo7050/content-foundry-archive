@@ -1,4 +1,4 @@
-import type { VersionedSiteReleaseContext } from "./load-site-release";
+import type { ValidatedVersionedSiteRelease } from "./load-site-release";
 import {
   resolveSiteLaunchAttestations,
   type SiteLaunchAttestations,
@@ -16,7 +16,7 @@ export interface SiteLaunchConfig extends SiteProviderConfig {
 }
 
 export function resolveSiteLaunchConfig(
-  context: VersionedSiteReleaseContext,
+  context: ValidatedVersionedSiteRelease,
   environment: Readonly<Record<string, string | undefined>>,
 ): SiteLaunchConfig {
   const providers = resolveSiteProviderConfig(context, environment);
