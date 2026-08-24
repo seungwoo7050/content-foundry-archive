@@ -44,6 +44,11 @@ describe("home theme view model", () => {
         },
       ],
       searchLink: { href: "/search", label: "사이트 검색" },
+      aboutTeaser: {
+        href: "/about",
+        label: "소개",
+        description: "생활메모의 운영 목적과 정보 준비 방법을 안내합니다.",
+      },
     });
     expect(model.articles[0]).toMatchObject({
       link: {
@@ -78,5 +83,11 @@ describe("home theme view model", () => {
       "정부24 주민등록등본 발급 방법",
     ]);
     expect(model.searchLink).toBeNull();
+  });
+
+  it("omits an about teaser when the release has no about page", () => {
+    const model = createHomeThemeViewModel({ ...bundle, pages: [] });
+
+    expect(model.aboutTeaser).toBeNull();
   });
 });

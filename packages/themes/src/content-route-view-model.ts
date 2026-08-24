@@ -11,11 +11,16 @@ import type {
 } from "./presentation-view-model.js";
 import type { RouteBaseViewModel } from "./route-base-view-model.js";
 
+export interface HomeAboutTeaserViewModel extends LinkViewModel {
+  readonly description: string;
+}
+
 export interface HomeRouteViewModel extends RouteBaseViewModel<"home"> {
   readonly articleSectionHeading: string;
   readonly articles: readonly ArticleListItemViewModel[];
   readonly categories: readonly CategoryLinkViewModel[];
   readonly searchLink: LinkViewModel | null;
+  readonly aboutTeaser?: HomeAboutTeaserViewModel | null;
 }
 
 export interface CategoryRouteViewModel extends RouteBaseViewModel<"category"> {

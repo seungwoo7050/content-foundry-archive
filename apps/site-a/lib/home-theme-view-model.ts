@@ -28,6 +28,11 @@ export interface HomeThemeSource {
     })[];
     readonly tags: readonly HomeThemeTaxonRecord[];
   };
+  readonly pages: readonly {
+    readonly path: string;
+    readonly title: string;
+    readonly summary: string;
+  }[];
   readonly articles: readonly HomeThemeArticleRecord[];
 }
 
@@ -45,6 +50,7 @@ function compareRecentArticles(
 export function createHomeThemeViewModel(
   bundle: HomeThemeSource,
 ): HomeRouteViewModel {
+  const aboutPage = bundle.pages.find(({ path }) => path === "/about");
   return {
     kind: "home",
     path: "/",
@@ -62,6 +68,13 @@ export function createHomeThemeViewModel(
     })),
     searchLink: bundle.site.search.enabled
       ? { href: "/search", label: "사이트 검색" }
+      : null,
+    aboutTeaser: aboutPage
+      ? {
+          href: aboutPage.path,
+          label: aboutPage.title,
+          description: aboutPage.summary,
+        }
       : null,
   };
 }
