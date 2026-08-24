@@ -25,6 +25,11 @@ interface ChecksumEntry {
   readonly path: string;
 }
 
+interface ParsedReleaseManifest {
+  readonly release: Record<string, unknown>;
+  readonly source: string;
+}
+
 const fail = (message: string): never => {
   throw new ContractError("INTEGRITY_FAILED", message);
 };
@@ -96,25 +101,56 @@ function collectFiles(root: string, directory = root): readonly string[] {
   });
 }
 
-function readReleaseManifest(root: string): Record<string, unknown> {
-  let release: Record<string, unknown>;
+function countTopLevelField(source: string, field: string) {
+  const containers: string[] = [];
+  let count = 0;
+
+  for (let index = 0; index < source.length; index += 1) {
+    const token = source[index];
+    if (token === '"') {
+      const start = index;
+      for (index += 1; index < source.length; index += 1) {
+        if (source[index] === "\\") {
+          index += 1;
+        } else if (source[index] === '"') {
+          break;
+        }
+      }
+      let next = index + 1;
+      while (/[\t\n\r ]/.test(source[next] ?? "")) next += 1;
+      if (
+        containers.length === 1 &&
+        containers[0] === "{" &&
+        source[next] === ":" &&
+        JSON.parse(source.slice(start, index + 1)) === field
+      ) {
+        count += 1;
+      }
+    } else if (token === "{" || token === "[") {
+      containers.push(token);
+    } else if (token === "}" || token === "]") {
+      containers.pop();
+    }
+  }
+  return count;
+}
+
+function readReleaseManifest(root: string): ParsedReleaseManifest {
   try {
-    release = JSON.parse(readFileSync(join(root, "release.json"), "utf8")) as Record<
-      string,
-      unknown
-    >;
+    const source = readFileSync(join(root, "release.json"), "utf8");
+    const release = JSON.parse(source) as Record<string, unknown>;
+    return { release, source };
   } catch (error) {
     throw new ContractError("CONTRACT_INVALID", "Cannot parse release.json", [
       { path: "/release.json", message: String(error) },
     ]);
   }
-
-  return release;
 }
 
 function verifyReleaseIntegrityWithManifest(
   root: string,
   release: Record<string, unknown>,
+  releaseSource: string,
 ) {
   const checksums = readIntegrityFile(root, "checksums.txt");
   const entries = parseChecksums(checksums);
@@ -139,6 +175,15 @@ function verifyReleaseIntegrityWithManifest(
     if (hash !== entry.hash) fail(`Checksum mismatch: ${entry.path}`);
   }
 
+  const checksumFieldCount = countTopLevelField(
+    releaseSource,
+    "bundleChecksum",
+  );
+  if (checksumFieldCount !== 1) {
+    fail(
+      `release.json must contain exactly one bundleChecksum field (found ${checksumFieldCount})`,
+    );
+  }
   const expected = release.bundleChecksum;
   release.bundleChecksum = ZERO_CHECKSUM;
   const normalized = canonicalize(release);
@@ -171,7 +216,7 @@ export function verifyReleaseIntegrityForVersion(
   version: RegisteredContractSchemaVersion,
   root: string,
 ): PublicSiteReleaseManifest | PublicSiteReleaseManifestV3 {
-  const release = readReleaseManifest(root);
+  const { release, source } = readReleaseManifest(root);
   if (release.contractVersion !== version) {
     throw new ContractError(
       "CONTRACT_INVALID",
@@ -180,7 +225,7 @@ export function verifyReleaseIntegrityForVersion(
     );
   }
 
-  verifyReleaseIntegrityWithManifest(root, release);
+  verifyReleaseIntegrityWithManifest(root, release, source);
   if (version === "2.0.0") {
     return validateContractDocumentForVersion("2.0.0", "release", release);
   }
@@ -195,8 +240,8 @@ export function verifyReleaseIntegrityForVersion(
 export function verifyReleaseIntegrity(
   root: string,
 ): PublicSiteReleaseManifest {
-  const release = readReleaseManifest(root);
+  const { release, source } = readReleaseManifest(root);
   const version = resolveSupportedContractVersion(release.contractVersion);
-  verifyReleaseIntegrityWithManifest(root, release);
+  verifyReleaseIntegrityWithManifest(root, release, source);
   return validateContractDocumentForVersion(version, "release", release);
 }

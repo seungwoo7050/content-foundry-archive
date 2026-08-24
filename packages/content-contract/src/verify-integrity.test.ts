@@ -32,6 +32,20 @@ const copyFixture = (source = fixture) => {
   return root;
 };
 
+const releasePath = (root: string) => join(root, "release.json");
+
+function prependChecksumField(root: string, field: string) {
+  const path = releasePath(root);
+  const source = readFileSync(path, "utf8");
+  writeFileSync(
+    path,
+    source.replace(
+      "{\n",
+      `{\n  "${field}": "sha256:${"f".repeat(64)}",\n`,
+    ),
+  );
+}
+
 afterEach(() => {
   for (const root of temporaryRoots.splice(0)) {
     rmSync(root, { recursive: true });
@@ -71,6 +85,45 @@ describe("verifyReleaseIntegrity", () => {
     ).toThrowError(expect.objectContaining({ code: "INTEGRITY_FAILED" }));
   });
 
+  it.each(["bundleChecksum", "\\u0062undleChecksum"])(
+    "rejects a duplicate top-level %s field",
+    (field) => {
+      const root = copyFixture(v3Fixture);
+      prependChecksumField(root, field);
+
+      expect(() =>
+        verifyReleaseIntegrityForVersion("3.0.0", root),
+      ).toThrowError(
+        expect.objectContaining({
+          code: "INTEGRITY_FAILED",
+          message:
+            "release.json must contain exactly one bundleChecksum field (found 2)",
+        }),
+      );
+    },
+  );
+
+  it("rejects a missing top-level bundleChecksum field", () => {
+    const root = copyFixture(v3Fixture);
+    const path = releasePath(root);
+    const release = JSON.parse(readFileSync(path, "utf8")) as Record<
+      string,
+      unknown
+    >;
+    delete release.bundleChecksum;
+    writeFileSync(path, `${JSON.stringify(release, null, 2)}\n`);
+
+    expect(() =>
+      verifyReleaseIntegrityForVersion("3.0.0", root),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "INTEGRITY_FAILED",
+        message:
+          "release.json must contain exactly one bundleChecksum field (found 0)",
+      }),
+    );
+  });
+
   it("rejects an internal version mismatch before integrity validation", () => {
     const root = copyFixture();
     const article = join(root, "articles", "ART-000123.json");
@@ -107,6 +160,7 @@ describe("verifyReleaseIntegrity", () => {
     const release = JSON.parse(readFileSync(manifest, "utf8")) as Record<string, unknown>;
     release.contractVersion = "3.0.0";
     writeFileSync(manifest, `${JSON.stringify(release, null, 2)}\n`);
+    prependChecksumField(root, "\\u0062undleChecksum");
     expect(() => verifyReleaseIntegrity(root)).toThrowError(
       expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }),
     );
