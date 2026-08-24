@@ -6,7 +6,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { ManualAdSlot } from "./manual-ad-slot";
+import { ManualAdSlot, activateManualAdUnit } from "./manual-ad-slot";
 
 const enabled = resolveAdvertisingProviderConfig(true, {
   provider: "adsense",
@@ -31,19 +31,25 @@ describe("manual AdSense slot", () => {
     }))).toBe("");
   });
 
-  it("renders one explicit responsive unit and one initialization push", () => {
+  it("reserves and labels one explicit unit without pre-consent script", () => {
     const html = renderToStaticMarkup(createElement(ManualAdSlot, {
       config: enabled,
       slotId: "article-end",
     }));
 
     expect(html).toBe(
-      '<aside aria-label="광고" data-ad-placement="article-end">'
+      '<aside aria-label="광고" data-ad-placement="article-end" style="min-height:280px">'
+      + '<small aria-hidden="true">광고</small>'
       + '<ins class="adsbygoogle" data-ad-client="ca-pub-1234567890123456" data-ad-format="auto" data-ad-slot="9876543210" data-full-width-responsive="true" style="display:block"></ins>'
-      + '<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>'
       + '</aside>',
     );
-    expect(html).not.toMatch(/enable_page_level_ads|data-adbreak/i);
+    expect(html).not.toMatch(/<script|enable_page_level_ads|data-adbreak/i);
+  });
+
+  it("queues exactly one unit activation per explicit call", () => {
+    const target = { adsbygoogle: [] as unknown[] };
+    activateManualAdUnit(target);
+    expect(target.adsbygoogle).toEqual([{}]);
   });
 
   it("rejects forged client and unit identifiers", () => {
