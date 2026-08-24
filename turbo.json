@@ -7,6 +7,7 @@
         "RELEASE_MODE",
         "CONTENT_RELEASE_DIR",
         "SITE_ORIGIN",
+        "SITE_ALLOWED_PRODUCTION_ORIGINS",
         "ENABLE_ANALYTICS",
         "ENABLE_ADS"
       ],
@@ -19,6 +20,7 @@
         "CONTENT_RELEASE_DIR",
         "IMMUTABLE_MEDIA_DIR",
         "SITE_ORIGIN",
+        "SITE_ALLOWED_PRODUCTION_ORIGINS",
         "ENABLE_ANALYTICS",
         "ENABLE_ADS"
       ],

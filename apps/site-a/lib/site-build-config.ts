@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
 
 import {
+  parseProductionOrigins,
   type BuildTargetConfig,
   resolveBuildTargetConfig,
 } from "@content-foundry/site-core";
@@ -16,6 +17,8 @@ export function resolveSiteBuildConfig(
   return resolveBuildTargetConfig(environment, {
     siteId: "site-a",
     templateReleaseDirectory,
-    allowedProductionOrigins: [],
+    allowedProductionOrigins: parseProductionOrigins(
+      environment.SITE_ALLOWED_PRODUCTION_ORIGINS,
+    ),
   });
 }
