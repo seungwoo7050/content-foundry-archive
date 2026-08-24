@@ -38,7 +38,11 @@ export function CleanPersonalBlogShell({
           </a>
           <p className="personal-tagline">{shell.description}</p>
           <div className="personal-nav">
-            <ThemeNavigation ariaLabel="주요 메뉴" items={shell.primaryNavigation} />
+            <ThemeNavigation
+              ariaLabel="주요 메뉴"
+              currentPath={route.path}
+              items={shell.primaryNavigation}
+            />
           </div>
         </div>
       </header>

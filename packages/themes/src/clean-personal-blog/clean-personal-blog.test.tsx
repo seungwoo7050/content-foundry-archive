@@ -85,6 +85,19 @@ describe("Clean Personal Blog", () => {
     expect(html).toContain("한 사람이 정리하는 실생활 안내");
   });
 
+  it("marks only the exact current masthead navigation link", () => {
+    const archive = render(routes[4]!, "warm-neutral");
+    const article = render(routes[2]!, "warm-neutral");
+
+    expect(archive).toContain(
+      '<a aria-current="page" href="/archive">전체 글</a>',
+    );
+    expect(article).toContain('<a href="/archive">전체 글</a>');
+    expect(article).not.toContain(
+      '<a aria-current="page" href="/archive">전체 글</a>',
+    );
+  });
+
   it("renders a supplied about teaser once and omits absent data", () => {
     const home = routes[0]!;
     if (home.kind !== "home") throw new Error("home fixture is missing");
