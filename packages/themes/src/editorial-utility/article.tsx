@@ -1,4 +1,8 @@
 import type { ArticleRouteViewModel } from "../content-route-view-model.js";
+import {
+  getThemeAdSlot,
+  type ThemeAdSlotContext,
+} from "../theme-ad-slot.js";
 import { ThemeArticleList } from "../theme-links.js";
 
 function ArticleMetadata({ route }: { readonly route: ArticleRouteViewModel }) {
@@ -23,7 +27,13 @@ function ArticleMetadata({ route }: { readonly route: ArticleRouteViewModel }) {
   );
 }
 
-function EvidenceRail({ route }: { readonly route: ArticleRouteViewModel }) {
+function EvidenceRail({
+  context,
+  route,
+}: {
+  readonly context: ThemeAdSlotContext;
+  readonly route: ArticleRouteViewModel;
+}) {
   return (
     <aside className="editorial-evidence" aria-labelledby="editorial-evidence-title">
       <h2 id="editorial-evidence-title">이 안내의 정보</h2>
@@ -57,11 +67,20 @@ function EvidenceRail({ route }: { readonly route: ArticleRouteViewModel }) {
           ))}</ul>
         </section>
       ) : null}
+      {route.advertisingEligible
+        ? getThemeAdSlot(context, "desktop-sidebar")
+        : null}
     </aside>
   );
 }
 
-export function EditorialArticle({ route }: { readonly route: ArticleRouteViewModel }) {
+export function EditorialArticle({
+  context = {},
+  route,
+}: {
+  readonly context?: ThemeAdSlotContext;
+  readonly route: ArticleRouteViewModel;
+}) {
   return (
     <article className="editorial-article" data-route="article">
       <header className="editorial-article-header">
@@ -70,9 +89,15 @@ export function EditorialArticle({ route }: { readonly route: ArticleRouteViewMo
         <p className="editorial-dek">{route.description}</p>
         <ArticleMetadata route={route} />
       </header>
+      {route.advertisingEligible
+        ? getThemeAdSlot(context, "article-after-summary")
+        : null}
       {route.hero ? <div className="editorial-hero">{route.hero}</div> : null}
+      {route.advertisingEligible
+        ? getThemeAdSlot(context, "article-mid-1")
+        : null}
       <div className="editorial-article-layout">
-        <EvidenceRail route={route} />
+        <EvidenceRail context={context} route={route} />
         <div className="editorial-body">{route.body}</div>
       </div>
       {route.faq.length > 0 ? (
@@ -85,12 +110,18 @@ export function EditorialArticle({ route }: { readonly route: ArticleRouteViewMo
           ))}
         </section>
       ) : null}
+      {route.advertisingEligible
+        ? getThemeAdSlot(context, "article-mid-2")
+        : null}
       {route.relatedSectionHeading && route.relatedArticles.length > 0 ? (
         <section className="editorial-related editorial-section">
           <h2>{route.relatedSectionHeading}</h2>
           <ThemeArticleList articles={route.relatedArticles} headingLevel={3} />
         </section>
       ) : null}
+      {route.advertisingEligible
+        ? getThemeAdSlot(context, "article-end")
+        : null}
     </article>
   );
 }

@@ -1,18 +1,27 @@
-import type { HtmlRouteViewModel } from "../html-route-view-model.js";
+import type {
+  HtmlRouteViewModel,
+  ThemeRenderContext,
+} from "../html-route-view-model.js";
 import { HTML_ROUTE_KINDS } from "../html-route-view-model.js";
 import { AD_SLOT_IDS, type ThemeModule } from "../theme-module.js";
 import { EditorialContent } from "./content.js";
 import { EditorialShell } from "./shell.js";
 import { EditorialState } from "./state.js";
 
-function RouteContent({ route }: { readonly route: HtmlRouteViewModel }) {
+function RouteContent({
+  context,
+  route,
+}: {
+  readonly context: ThemeRenderContext;
+  readonly route: HtmlRouteViewModel;
+}) {
   switch (route.kind) {
     case "home":
     case "category":
     case "article":
     case "static-page":
     case "archive":
-      return <EditorialContent route={route} />;
+      return <EditorialContent context={context} route={route} />;
     case "search":
     case "not-found":
     case "retired":
@@ -37,7 +46,7 @@ export const editorialUtilityTheme = Object.freeze({
         skinId={context.skinId}
         colors={context.colors}
       >
-        <RouteContent route={model.route} />
+        <RouteContent context={context} route={model.route} />
       </EditorialShell>
     );
   },

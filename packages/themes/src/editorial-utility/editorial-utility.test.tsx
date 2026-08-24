@@ -10,6 +10,7 @@ import type {
   SiteShellViewModel,
 } from "../presentation-view-model.js";
 import { SKIN_IDS, SKIN_TOKENS, type SkinId } from "../skin.js";
+import type { ThemeAdSlots } from "../theme-ad-slot.js";
 import { AD_SLOT_IDS, type ThemeModule } from "../theme-module.js";
 import { editorialUtilityTheme } from "./module.js";
 
@@ -70,11 +71,19 @@ const markers: Readonly<Record<HtmlRouteViewModel["kind"], string>> = {
   retired: ">410<",
 };
 
-function render(route: HtmlRouteViewModel, skinId: SkinId = "calm-blue") {
+function render(
+  route: HtmlRouteViewModel,
+  skinId: SkinId = "calm-blue",
+  adSlots?: ThemeAdSlots,
+) {
   return renderToStaticMarkup(
     editorialUtilityTheme.renderRoute(
       { shell, route },
-      { skinId, colors: SKIN_TOKENS[skinId] },
+      {
+        skinId,
+        colors: SKIN_TOKENS[skinId],
+        ...(adSlots ? { adSlots } : {}),
+      },
     ),
   );
 }
@@ -134,6 +143,59 @@ describe("Editorial Utility", () => {
     expect(html).toContain('class="editorial-body"');
     expect(html).toContain('class="editorial-evidence"');
     expect(html).not.toMatch(/data-ad|ad-slot|광고 영역/);
+  });
+
+  it("places all six manual slots only at their matching eligible boundaries", () => {
+    const adSlots: ThemeAdSlots = {
+      "home-feed": <i data-test-slot="home-feed">홈</i>,
+      "article-after-summary": <i data-test-slot="article-after-summary">소개 뒤</i>,
+      "article-mid-1": <i data-test-slot="article-mid-1">중간 하나</i>,
+      "article-mid-2": <i data-test-slot="article-mid-2">중간 둘</i>,
+      "article-end": <i data-test-slot="article-end">글 끝</i>,
+      "desktop-sidebar": <i data-test-slot="desktop-sidebar">보조 칸</i>,
+    };
+    const homeHtml = render(routes[0]!, "calm-blue", adSlots);
+    expect(homeHtml).toContain('data-test-slot="home-feed"');
+    expect(homeHtml.indexOf("안내 4 요약")).toBeLessThan(
+      homeHtml.indexOf('data-test-slot="home-feed"'),
+    );
+    expect(homeHtml.match(/data-test-slot=/g)).toHaveLength(1);
+
+    const eligibleArticle = routes[2]!;
+    if (eligibleArticle.kind !== "article") {
+      throw new Error("Editorial article fixture is missing.");
+    }
+    const articleHtml = render(eligibleArticle, "calm-blue", adSlots);
+    expect(articleHtml).not.toContain('data-test-slot="home-feed"');
+    for (const slotId of AD_SLOT_IDS.slice(1)) {
+      expect(articleHtml.match(new RegExp(`data-test-slot="${slotId}"`, "g"))).toHaveLength(1);
+    }
+    const orderedFacts = [
+      "기사 제목 설명",
+      'data-test-slot="article-after-summary"',
+      "대표 이미지",
+      'data-test-slot="article-mid-1"',
+      "정책 변경",
+      'data-test-slot="desktop-sidebar"',
+      "본문 슬롯",
+      'data-test-slot="article-mid-2"',
+      "함께 읽을 안내",
+      'data-test-slot="article-end"',
+    ];
+    const positions = orderedFacts.map((fact) => articleHtml.indexOf(fact));
+    expect(positions.every((position) => position >= 0)).toBe(true);
+    expect(positions).toEqual([...positions].sort((left, right) => left - right));
+
+    expect(render(
+      { ...eligibleArticle, advertisingEligible: false },
+      "calm-blue",
+      adSlots,
+    )).not.toContain("data-test-slot");
+    for (const route of routes) {
+      if (route.kind !== "home" && route.kind !== "article") {
+        expect(render(route, "calm-blue", adSlots)).not.toContain("data-test-slot");
+      }
+    }
   });
 
   it("renders static, archive, search, missing, and retired public facts", () => {

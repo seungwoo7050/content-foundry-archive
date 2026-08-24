@@ -5,6 +5,10 @@ import type {
   HomeRouteViewModel,
   StaticPageRouteViewModel,
 } from "../content-route-view-model.js";
+import {
+  getThemeAdSlot,
+  type ThemeAdSlotContext,
+} from "../theme-ad-slot.js";
 import { ThemeArticleList } from "../theme-links.js";
 import { EditorialArticle } from "./article.js";
 
@@ -18,7 +22,13 @@ function RouteHeader({
   return <header className="editorial-route-header"><h1>{heading}</h1><p>{description}</p></header>;
 }
 
-function Home({ route }: { readonly route: HomeRouteViewModel }) {
+function Home({
+  context,
+  route,
+}: {
+  readonly context: ThemeAdSlotContext;
+  readonly route: HomeRouteViewModel;
+}) {
   const lead = route.articles.slice(0, 1);
   const secondary = route.articles.slice(1, 3);
   const latest = route.articles.slice(3);
@@ -51,6 +61,7 @@ function Home({ route }: { readonly route: HomeRouteViewModel }) {
       <section className="editorial-latest editorial-section">
         <h2>{route.articleSectionHeading}</h2>
         <ThemeArticleList articles={latest} headingLevel={3} />
+        {getThemeAdSlot(context, "home-feed")}
       </section>
     </div>
   );
@@ -100,11 +111,17 @@ function unreachable(value: never): never {
   throw new Error(`Unsupported editorial content route: ${JSON.stringify(value)}`);
 }
 
-export function EditorialContent({ route }: { readonly route: ContentRouteViewModel }) {
+export function EditorialContent({
+  context = {},
+  route,
+}: {
+  readonly context?: ThemeAdSlotContext;
+  readonly route: ContentRouteViewModel;
+}) {
   switch (route.kind) {
-    case "home": return <Home route={route} />;
+    case "home": return <Home context={context} route={route} />;
     case "category": return <Category route={route} />;
-    case "article": return <EditorialArticle route={route} />;
+    case "article": return <EditorialArticle context={context} route={route} />;
     case "static-page": return <StaticPage route={route} />;
     case "archive": return <Archive route={route} />;
     default: return unreachable(route);
