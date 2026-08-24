@@ -23,6 +23,7 @@ export type RouteClaimKind =
 
 export interface RouteClaim {
   readonly kind: RouteClaimKind;
+  readonly navigable: boolean;
   readonly source: string;
 }
 
@@ -34,26 +35,35 @@ export function getRouteClaims(
   bundle: GeneratedRouteSource,
 ): ReadonlyMap<string, RouteClaim> {
   const candidates: RouteClaimCandidate[] = [
-    { path: "/", kind: "fixed-home", source: "fixed home route" },
-    { path: "/404", kind: "fixed-not-found", source: "fixed not-found route" },
+    { path: "/", kind: "fixed-home", navigable: true, source: "fixed home route" },
+    {
+      path: "/404",
+      kind: "fixed-not-found",
+      navigable: false,
+      source: "fixed not-found route",
+    },
     {
       path: "/_release.json",
       kind: "fixed-release-identity",
+      navigable: false,
       source: "fixed release-identity route",
     },
     ...bundle.articles.map((article, index) => ({
       path: article.seo.canonicalPath,
       kind: "article" as const,
+      navigable: true,
       source: `/articles/${index}/seo/canonicalPath`,
     })),
     ...bundle.taxonomy.categories.map((category, index) => ({
       path: `/category/${category.slug}`,
       kind: "category" as const,
+      navigable: true,
       source: `/taxonomy/categories/${index}/slug`,
     })),
     ...bundle.pages.map((page, index) => ({
       path: page.path,
       kind: "page" as const,
+      navigable: true,
       source: `/pages/${index}/path`,
     })),
   ];
