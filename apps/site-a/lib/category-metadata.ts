@@ -5,7 +5,7 @@ import type { SiteReleaseContext } from "./load-site-release";
 
 type Category = PublicSiteTaxonomy["categories"][number];
 
-function getCategoryDescription(category: Category) {
+export function getCategoryDescription(category: Category) {
   return (
     category.description.trim() ||
     `${category.label} 카테고리의 안내 글을 모았습니다.`
