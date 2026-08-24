@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { ContractError } from "./errors.js";
+import { ContractError, type ContractIssue } from "./errors.js";
 import type { PublishedArticleProjection } from "./generated/article.js";
 import type { MediaManifest } from "./generated/media-manifest.js";
 import type { PublicSiteNavigation } from "./generated/navigation.js";
@@ -77,12 +77,31 @@ function readDocumentV3<K extends ContractDocumentKind>(
   return validateContractDocumentForVersion("3.0.0", kind, readJson(root, path));
 }
 
+interface RecordGroup<T> {
+  readonly directoryMissing: boolean;
+  readonly records: readonly T[];
+}
+
 function readRecords<T>(
   root: string,
   directory: string,
   readRecord: (path: string) => T,
-) {
-  return readdirSync(join(root, directory))
+): RecordGroup<T> {
+  let names: string[];
+  try {
+    names = readdirSync(join(root, directory));
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      return { directoryMissing: true, records: [] };
+    }
+    throw new ContractError(
+      "CONTRACT_INVALID",
+      `Cannot read ${directory} records`,
+      [{ path: `/${directory}`, message: "Cannot inspect record directory" }],
+    );
+  }
+
+  const records = names
     .sort((left, right) => Buffer.compare(Buffer.from(left), Buffer.from(right)))
     .map((name) => {
       if (!name.endsWith(".json")) {
@@ -93,14 +112,47 @@ function readRecords<T>(
       }
       return readRecord(`${directory}/${name}`);
     });
+  return { directoryMissing: false, records };
+}
+
+function readReleaseRecords<Article, Page>(
+  root: string,
+  release: { readonly articleCount: number; readonly pageCount: number },
+  readArticle: (path: string) => Article,
+  readPage: (path: string) => Page,
+) {
+  const articles = readRecords(root, "articles", readArticle);
+  const pages = readRecords(root, "pages", readPage);
+  const issues: ContractIssue[] = [];
+
+  if (articles.directoryMissing && release.articleCount !== 0) {
+    issues.push({
+      path: "/release/articleCount",
+      message: `expected 0, got ${release.articleCount}`,
+    });
+  }
+  if (pages.directoryMissing && release.pageCount !== 0) {
+    issues.push({
+      path: "/release/pageCount",
+      message: `expected 0, got ${release.pageCount}`,
+    });
+  }
+  if (issues.length > 0) {
+    throw new ContractError(
+      "REFERENCE_INVALID",
+      "Release identity is inconsistent",
+      issues,
+    );
+  }
+
+  return { articles: articles.records, pages: pages.records };
 }
 
 function assembleReleaseBundleDocumentsV2(
   root: string,
   release: PublicSiteReleaseManifest,
 ): ReleaseBundleDocuments {
-  return {
-    release,
+  const roots = {
     site: readDocumentV2(root, "site.json", "site"),
     navigation: readDocumentV2(root, "navigation.json", "navigation"),
     taxonomy: readDocumentV2(root, "taxonomy.json", "taxonomy"),
@@ -110,12 +162,17 @@ function assembleReleaseBundleDocumentsV2(
       "media-manifest",
     ),
     redirects: readDocumentV2(root, "redirects.json", "redirects"),
-    articles: readRecords(root, "articles", (path) =>
-      readDocumentV2(root, path, "article"),
-    ),
-    pages: readRecords(root, "pages", (path) =>
-      readDocumentV2(root, path, "page"),
-    ),
+  };
+  const records = readReleaseRecords(
+    root,
+    release,
+    (path) => readDocumentV2(root, path, "article"),
+    (path) => readDocumentV2(root, path, "page"),
+  );
+  return {
+    release,
+    ...roots,
+    ...records,
   };
 }
 
@@ -123,8 +180,7 @@ function assembleReleaseBundleDocumentsV3(
   root: string,
   release: ContractDocumentV3<"release">,
 ): ReleaseBundleDocumentsV3 {
-  return {
-    release,
+  const roots = {
     site: readDocumentV3(root, "site.json", "site"),
     navigation: readDocumentV3(root, "navigation.json", "navigation"),
     taxonomy: readDocumentV3(root, "taxonomy.json", "taxonomy"),
@@ -134,12 +190,17 @@ function assembleReleaseBundleDocumentsV3(
       "media-manifest",
     ),
     redirects: readDocumentV3(root, "redirects.json", "redirects"),
-    articles: readRecords(root, "articles", (path) =>
-      readDocumentV3(root, path, "article"),
-    ),
-    pages: readRecords(root, "pages", (path) =>
-      readDocumentV3(root, path, "page"),
-    ),
+  };
+  const records = readReleaseRecords(
+    root,
+    release,
+    (path) => readDocumentV3(root, path, "article"),
+    (path) => readDocumentV3(root, path, "page"),
+  );
+  return {
+    release,
+    ...roots,
+    ...records,
   };
 }
 
