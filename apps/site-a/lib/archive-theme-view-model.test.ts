@@ -88,7 +88,11 @@ describe("archive theme view model", () => {
       "/article/newer",
       "/article/older",
     ]);
-    expect(model.articles[1]!.date.dateTime).toBe("2026-08-25T00:00:00Z");
+    expect(model.articles[1]!.date).toEqual({
+      kind: "published",
+      dateTime: "2026-08-20T00:00:00Z",
+      label: "2026년 8월 20일",
+    });
   });
 
   it("preserves fail-closed taxonomy validation", () => {

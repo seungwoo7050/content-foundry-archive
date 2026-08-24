@@ -5,7 +5,15 @@ export interface ArticleCardDateSource {
 
 export function getArticleCardDate(
   article: ArticleCardDateSource,
+  strategy: "latest" | "published" = "latest",
 ) {
+  if (strategy === "published") {
+    return {
+      kind: "published",
+      label: "게시",
+      dateTime: article.publishedAt,
+    } as const;
+  }
   if (Date.parse(article.updatedAt) > Date.parse(article.publishedAt)) {
     return {
       kind: "updated",

@@ -31,7 +31,7 @@ export function createArchiveThemeViewModel(
   bundle: ArchiveThemeSource,
 ): ArchiveRouteViewModel {
   const articles = getArchiveEntries(bundle).map(({ article }) =>
-    createThemeArticleListItem(bundle, article),
+    createThemeArticleListItem(bundle, article, "published"),
   );
 
   return {

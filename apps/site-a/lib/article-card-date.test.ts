@@ -45,4 +45,16 @@ describe("getArticleCardDate", () => {
     });
   });
 
+  it("keeps the publication date when a chronological surface requests it", () => {
+    expect(
+      getArticleCardDate(
+        { ...article, updatedAt: "2026-08-24T03:00:00Z" },
+        "published",
+      ),
+    ).toEqual({
+      kind: "published",
+      label: "게시",
+      dateTime: "2026-08-20T01:00:00Z",
+    });
+  });
 });

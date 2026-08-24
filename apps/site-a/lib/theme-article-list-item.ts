@@ -30,6 +30,7 @@ export interface ThemeArticleListRecord {
 export function createThemeArticleListItem(
   bundle: ThemeArticleListSource,
   article: ThemeArticleListRecord,
+  dateStrategy: "latest" | "published" = "latest",
 ): ArticleListItemViewModel {
   const issues: ContractIssue[] = [];
   const category = bundle.taxonomy.categories.find(
@@ -58,7 +59,7 @@ export function createThemeArticleListItem(
     );
   }
 
-  const displayDate = getArticleCardDate(article);
+  const displayDate = getArticleCardDate(article, dateStrategy);
   const dateLabel = new Intl.DateTimeFormat(bundle.site.locale, {
     dateStyle: "long",
     timeZone: bundle.site.timeZone,

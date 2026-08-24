@@ -60,6 +60,20 @@ describe("theme article list item", () => {
     });
   });
 
+  it("can project the publication date for chronological lists", () => {
+    expect(
+      createThemeArticleListItem(
+        bundle,
+        { ...article, updatedAt: "2026-08-23T15:30:00Z" },
+        "published",
+      ).date,
+    ).toEqual({
+      kind: "published",
+      dateTime: "2026-08-20T01:00:00Z",
+      label: "2026년 8월 20일",
+    });
+  });
+
   it("fails closed with every missing taxonomy reference", () => {
     expect(() =>
       createThemeArticleListItem(bundle, {
