@@ -6,7 +6,10 @@ import type {
   StaticPageRouteViewModel,
 } from "../content-route-view-model.js";
 import type { ThemeAdSlotContext } from "../theme-ad-slot.js";
-import { ThemeArticleList } from "../theme-links.js";
+import {
+  ThemeArticleList,
+  ThemeHomeAboutTeaser,
+} from "../theme-links.js";
 import { MinimalKnowledgeBaseArticle } from "./article-route.js";
 import { KnowledgeBreadcrumbs } from "./route-chrome.js";
 
@@ -33,6 +36,7 @@ function HomeRoute({ route }: { readonly route: HomeRouteViewModel }) {
         <h2>{route.articleSectionHeading}</h2>
         <ThemeArticleList articles={route.articles} headingLevel={3} />
       </section>
+      <ThemeHomeAboutTeaser teaser={route.aboutTeaser} />
     </div>
   );
 }

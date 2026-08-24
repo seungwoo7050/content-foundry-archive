@@ -46,7 +46,7 @@ function base(path: string, heading: string) {
 }
 
 const routes = [
-  { ...base("/", "홈"), kind: "home", articleSectionHeading: "최근 안내", articles: [articleItem], categories: [{ href: "/category/life", label: "생활", description: "생활 안내 모음" }], searchLink: { href: "/search", label: "검색" } },
+  { ...base("/", "홈"), kind: "home", articleSectionHeading: "최근 안내", articles: [articleItem], categories: [{ href: "/category/life", label: "생활", description: "생활 안내 모음" }], searchLink: { href: "/search", label: "검색" }, aboutTeaser: { href: "/about", label: "운영 방식 보기", description: "한 명의 운영자가 공식 출처를 확인해 안내합니다." } },
   { ...base("/category/life", "생활"), kind: "category", articleSectionHeading: "최근 안내", articles: [articleItem], topicSectionHeading: "관련 주제", topics: ["신청"] },
   { ...base("/article/start", "시작 안내"), kind: "article", category: articleItem.category, authorLabel: "작성자", operatorLabel: "운영자", published: articleItem.date, updated: { dateTime: "2026-08-25T00:00:00Z", label: "2026년 8월 25일" }, trustLinks: [{ href: "/about", label: "운영 방식" }], toc: [{ id: "steps", label: "신청 단계", level: 2 }], sources: [{ label: "공식 출처", href: "https://example.org/source" }], updateTriggers: ["정책 변경"], faq: [{ question: "질문?", answer: "답변" }], relatedSectionHeading: "관련 안내", relatedArticles: [articleItem], advertisingEligible: false, readerActions: <button type="button">독자 기능</button>, hero: <figure>대표 이미지</figure>, body: <p>본문 슬롯</p> },
   { ...base("/about", "소개"), kind: "static-page", body: <p>정적 본문</p> },
@@ -123,6 +123,22 @@ describe("Minimal Knowledge Base", () => {
     const category = render(routeAt(1));
     expect(category.indexOf("kb-category-scope")).toBeLessThan(category.indexOf("kb-category-articles"));
     expect(category.indexOf("kb-category-articles")).toBeLessThan(category.indexOf("kb-category-topics"));
+  });
+
+  it("renders one factual home introduction and omits absent variants", () => {
+    const home = routeAt(0);
+    if (home.kind !== "home") throw new Error("Expected home fixture");
+    const html = render(home);
+    const { aboutTeaser: _omitted, ...withoutTeaser } = home;
+
+    expect(html.match(/<h2 id="home-about-teaser-heading">/g)).toHaveLength(1);
+    expect(html).toContain("한 명의 운영자가 공식 출처를 확인해 안내합니다.");
+    expect(html).toContain('<a href="/about">운영 방식 보기</a>');
+    expect(html.indexOf("kb-latest-articles")).toBeLessThan(
+      html.indexOf("home-about-teaser-heading"),
+    );
+    expect(render({ ...home, aboutTeaser: null })).not.toContain("home-about-teaser-heading");
+    expect(render(withoutTeaser)).not.toContain("home-about-teaser-heading");
   });
 
   it("renders the complete answer-first article truth in order", () => {
