@@ -10,9 +10,14 @@
         "SITE_ALLOWED_PRODUCTION_ORIGINS",
         "CONSENT_PROVIDER",
         "CONSENT_CONFIG_REVISION",
-        "ADSENSE_MANUAL_UNITS",
+        "GOOGLE_CMP_READY",
         "ENABLE_ANALYTICS",
-        "ENABLE_ADS"
+        "SITE_OWNED_GA4_MEASUREMENT_ID",
+        "ENABLE_ADS",
+        "SITE_OWNED_ADSENSE_CLIENT_ID",
+        "ADSENSE_MANUAL_UNITS",
+        "ADSENSE_AUTO_ADS_ENABLED",
+        "ADSENSE_SITE_READY"
       ],
       "outputs": ["dist/**", ".next/**", "out/**"]
     },
@@ -26,9 +31,14 @@
         "SITE_ALLOWED_PRODUCTION_ORIGINS",
         "CONSENT_PROVIDER",
         "CONSENT_CONFIG_REVISION",
-        "ADSENSE_MANUAL_UNITS",
+        "GOOGLE_CMP_READY",
         "ENABLE_ANALYTICS",
-        "ENABLE_ADS"
+        "SITE_OWNED_GA4_MEASUREMENT_ID",
+        "ENABLE_ADS",
+        "SITE_OWNED_ADSENSE_CLIENT_ID",
+        "ADSENSE_MANUAL_UNITS",
+        "ADSENSE_AUTO_ADS_ENABLED",
+        "ADSENSE_SITE_READY"
       ],
       "outputs": [".next/**", "out/**", ".site-build/**", "public/_media/**"]
     },
