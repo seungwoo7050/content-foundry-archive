@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
 
 import type { LoadedReleaseBundleV3 } from "@content-foundry/content-contract";
+import type { ResponsiveImageAsset } from "@content-foundry/media";
 import { resolveBuildTargetConfig } from "@content-foundry/site-core";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
@@ -25,6 +26,21 @@ const context = loadSiteRelease(
     allowedProductionOrigins: [],
   }),
 );
+const heroAsset: ResponsiveImageAsset = {
+  fallback: {
+    mediaId: "MED-HERO",
+    relativePath: "_media/hero/source.webp",
+    publicPath: "/_media/hero/source.webp",
+    sha256: "a".repeat(64),
+    mimeType: "image/webp",
+    width: 1536,
+    height: 1024,
+    alt: "중립 추상 안내 이미지",
+    credit: null,
+    license: "QA only",
+  },
+  derivatives: [],
+};
 
 describe("createArticleMetadata", () => {
   it("accepts v3 article and release context metadata structures", () => {
@@ -68,5 +84,37 @@ describe("createArticleMetadata", () => {
         updatedAt: "2026-08-24T02:30:00Z",
       }).openGraph,
     ).toMatchObject({ modifiedTime: "2026-08-24T02:30:00Z" });
+  });
+
+  it("uses an explicit article hero for Open Graph and Twitter", () => {
+    const article = context.bundle.articles[0];
+    if (!article) throw new Error("Site A fixture article is missing");
+    const metadata = createArticleMetadata({
+      ...context,
+      mediaAssets: new Map([["MED-HERO", heroAsset]]),
+    }, { ...article, heroMediaId: "MED-HERO" });
+
+    expect(metadata.openGraph).toMatchObject({
+      images: [{
+        url: "https://example.com/_media/hero/source.webp",
+        width: 1536,
+        height: 1024,
+        alt: "중립 추상 안내 이미지",
+      }],
+    });
+    expect(metadata.twitter).toMatchObject({
+      card: "summary_large_image",
+      images: ["https://example.com/_media/hero/source.webp"],
+    });
+  });
+
+  it("fails closed when an explicit hero was not prepared", () => {
+    const article = context.bundle.articles[0];
+    if (!article) throw new Error("Site A fixture article is missing");
+
+    expect(() => createArticleMetadata(
+      context,
+      { ...article, heroMediaId: "MED-MISSING" },
+    )).toThrow("Prepared article metadata asset is missing: MED-MISSING");
   });
 });

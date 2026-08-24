@@ -4,6 +4,7 @@ import { hasMaterialArticleUpdate } from "./article-update";
 import type { MetadataContext } from "./metadata-context";
 
 export interface ArticleMetadataSource {
+  readonly heroMediaId: string | null;
   readonly publishedAt: string;
   readonly updatedAt: string;
   readonly seo: {
@@ -25,6 +26,20 @@ export function createArticleMetadata(
   ).href;
   const index = !context.config.noindex && article.seo.index;
   const follow = !context.config.noindex && article.seo.follow;
+  const hero = article.heroMediaId === null
+    ? null
+    : context.mediaAssets?.get(article.heroMediaId);
+  if (article.heroMediaId !== null && hero === undefined) {
+    throw new Error(`Prepared article metadata asset is missing: ${article.heroMediaId}`);
+  }
+  const image = hero
+    ? {
+        url: new URL(hero.fallback.publicPath, context.canonicalOrigin).href,
+        width: hero.fallback.width,
+        height: hero.fallback.height,
+        alt: hero.fallback.alt,
+      }
+    : null;
 
   return {
     title: article.seo.title,
@@ -40,13 +55,13 @@ export function createArticleMetadata(
       ...(hasMaterialArticleUpdate(article)
         ? { modifiedTime: article.updatedAt }
         : {}),
-      images: [],
+      images: image ? [image] : [],
     },
     twitter: {
-      card: "summary",
+      card: image ? "summary_large_image" : "summary",
       title: article.seo.title,
       description: article.seo.description,
-      images: [],
+      images: image ? [image.url] : [],
     },
   };
 }
