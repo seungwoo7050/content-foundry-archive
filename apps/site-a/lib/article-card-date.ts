@@ -1,6 +1,9 @@
-import type { PublishedArticleProjection } from "@content-foundry/content-contract";
+export interface ArticleCardDateSource {
+  readonly publishedAt: string;
+  readonly updatedAt: string;
+}
 
-export function getArticleCardDate(article: PublishedArticleProjection) {
+export function getArticleCardDate(article: ArticleCardDateSource) {
   if (Date.parse(article.updatedAt) > Date.parse(article.publishedAt)) {
     return { label: "업데이트", dateTime: article.updatedAt } as const;
   }

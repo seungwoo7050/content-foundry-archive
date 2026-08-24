@@ -1,9 +1,15 @@
 import { resolve } from "node:path";
 
-import { loadReleaseBundle } from "@content-foundry/content-contract";
-import { describe, expect, it } from "vitest";
+import {
+  loadReleaseBundle,
+  type LoadedReleaseBundleV3,
+} from "@content-foundry/content-contract";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { getArticleCardDate } from "./article-card-date";
+import {
+  getArticleCardDate,
+  type ArticleCardDateSource,
+} from "./article-card-date";
 
 const fixture = resolve(
   process.cwd(),
@@ -15,6 +21,12 @@ if (!article) {
 }
 
 describe("getArticleCardDate", () => {
+  it("accepts v3 article date fields", () => {
+    expectTypeOf<
+      LoadedReleaseBundleV3["articles"][number]
+    >().toExtend<ArticleCardDateSource>();
+  });
+
   it("shows the publication date when no later review exists", () => {
     expect(getArticleCardDate(article)).toEqual({
       label: "게시",
