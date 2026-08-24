@@ -20,6 +20,9 @@ importers:
       '@content-foundry/content-contract':
         specifier: workspace:*
         version: link:../../packages/content-contract
+      '@content-foundry/media':
+        specifier: workspace:*
+        version: link:../../packages/media
       '@content-foundry/site-core':
         specifier: workspace:*
         version: link:../../packages/site-core
