@@ -145,6 +145,24 @@ describe("Editorial Utility", () => {
     expect(html).not.toMatch(/data-ad|ad-slot|광고 영역/);
   });
 
+  it("renders supplied reader actions once near the article end", () => {
+    const article = routes[2]!;
+    if (article.kind !== "article") throw new Error("Expected article fixture");
+    const html = render(
+      { ...article, readerActions: <button data-reader-action="bookmark">저장</button> },
+      "calm-blue",
+      { "article-end": <i data-test-slot="article-end">글 끝</i> },
+    );
+    expect(html.match(/data-reader-action=/g)).toHaveLength(1);
+    expect(html).toContain('aria-label="글 읽기 도구"');
+    expect(html.indexOf("함께 읽을 안내")).toBeLessThan(html.indexOf("글 읽기 도구"));
+    expect(html.indexOf("글 읽기 도구")).toBeLessThan(
+      html.indexOf('data-test-slot="article-end"'),
+    );
+    expect(render(article)).not.toContain("글 읽기 도구");
+    expect(render({ ...article, readerActions: null })).not.toContain("글 읽기 도구");
+  });
+
   it("places all six manual slots only at their matching eligible boundaries", () => {
     const adSlots: ThemeAdSlots = {
       "home-feed": <i data-test-slot="home-feed">홈</i>,

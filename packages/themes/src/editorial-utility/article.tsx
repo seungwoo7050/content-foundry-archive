@@ -119,6 +119,11 @@ export function EditorialArticle({
           <ThemeArticleList articles={route.relatedArticles} headingLevel={3} />
         </section>
       ) : null}
+      {route.readerActions ? (
+        <section className="editorial-reader-actions" aria-label="글 읽기 도구">
+          {route.readerActions}
+        </section>
+      ) : null}
       {route.advertisingEligible
         ? getThemeAdSlot(context, "article-end")
         : null}
