@@ -10,6 +10,7 @@ export {
   type MediaSourceReaders,
   resolveImageSource,
 } from "./resolve-image-source.js";
+export { resolveImageManifest } from "./resolve-image-manifest.js";
 export {
   type ImageMediaRecord,
   type VerifiedMediaBytes,
