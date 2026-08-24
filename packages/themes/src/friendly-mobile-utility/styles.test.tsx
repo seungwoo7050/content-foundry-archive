@@ -31,10 +31,42 @@ describe("Friendly Mobile Utility styles", () => {
     expect(FRIENDLY_MOBILE_STYLES).not.toMatch(/saved|bookmark|popular|ranking/i);
   });
 
+  it("gives every factual home group a distinct hierarchy", () => {
+    for (const id of [
+      "fmu-home-featured",
+      "fmu-home-current",
+      "fmu-home-evergreen",
+      "fmu-home-latest",
+    ]) {
+      expect(FRIENDLY_MOBILE_STYLES).toContain(id);
+    }
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      '.fmu-list:has(>h2>a[href^="/category/"])',
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain("border-top:.3rem solid var(--color-primary)");
+    expect(FRIENDLY_MOBILE_STYLES).toContain("border-left:.3rem solid var(--color-primary)");
+    expect(FRIENDLY_MOBILE_STYLES).not.toMatch(/popular|trending|ranking|인기|순위/i);
+  });
+
+  it("preserves intrinsic artwork and a narrow-screen single column", () => {
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      ".fmu-list .content-image img{display:block;width:100%;max-width:100%;height:auto}",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).not.toMatch(/object-fit:cover|aspect-ratio/);
+    expect(FRIENDLY_MOBILE_STYLES).toContain("@media (max-width:30rem)");
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      "grid-template-columns:repeat(2,minmax(0,1fr))",
+    );
+  });
+
   it("preserves readable content for print and reduced-motion readers", () => {
     expect(FRIENDLY_MOBILE_STYLES).toContain("prefers-reduced-motion:reduce");
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      "animation:none!important;transition:none!important",
+    );
     expect(FRIENDLY_MOBILE_STYLES).toContain("@media print");
     expect(FRIENDLY_MOBILE_STYLES).toContain('.fmu-body a[href^="http"]::after');
     expect(FRIENDLY_MOBILE_STYLES).toContain('.fmu aside[aria-label="광고"]');
+    expect(FRIENDLY_MOBILE_STYLES).toContain("margin-bottom:.8rem;break-inside:avoid");
   });
 });
