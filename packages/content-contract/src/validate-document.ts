@@ -13,7 +13,10 @@ import releaseSchema from "../vendor/2.0.0/schemas/release.schema.json" with { t
 import siteSchema from "../vendor/2.0.0/schemas/site.schema.json" with { type: "json" };
 import taxonomySchema from "../vendor/2.0.0/schemas/taxonomy.schema.json" with { type: "json" };
 
-import { resolveSupportedContractVersion } from "./contract-version.js";
+import {
+  resolveSupportedContractVersion,
+  SUPPORTED_CONTRACT_VERSION,
+} from "./contract-version.js";
 import { ContractError } from "./errors.js";
 import type {
   MediaManifest,
@@ -28,9 +31,9 @@ import type {
   PublishedStructuredContent,
 } from "./index.js";
 
-export { SUPPORTED_CONTRACT_VERSION } from "./contract-version.js";
+export { SUPPORTED_CONTRACT_VERSION };
 
-interface ContractDocuments {
+interface ContractDocumentsV2 {
   article: PublishedArticleProjection;
   "content-block": PublishedContentBlock;
   content: PublishedStructuredContent;
@@ -43,11 +46,26 @@ interface ContractDocuments {
   taxonomy: PublicSiteTaxonomy;
 }
 
-export type ContractDocumentKind = keyof ContractDocuments;
+interface ContractDocumentsBySchemaVersion {
+  "2.0.0": ContractDocumentsV2;
+}
 
-const ajv = new Ajv2020({ allErrors: true, strict: true });
-const addFormats = formatsModule.default as unknown as FormatsPlugin;
-addFormats(ajv);
+export type ContractDocumentKind = keyof ContractDocumentsV2;
+export type RegisteredContractSchemaVersion =
+  keyof ContractDocumentsBySchemaVersion;
+
+type ContractDocumentKindFor<V extends RegisteredContractSchemaVersion> =
+  Extract<keyof ContractDocumentsBySchemaVersion[V], string>;
+type ContractDocumentFor<
+  V extends RegisteredContractSchemaVersion,
+  K extends ContractDocumentKindFor<V>,
+> = ContractDocumentsBySchemaVersion[V][K];
+
+interface ContractSchemaPack {
+  readonly dependencies: readonly object[];
+  readonly names: readonly string[];
+  readonly documents: Readonly<Record<string, object>>;
+}
 
 const schemaNames = [
   "content-block",
@@ -75,17 +93,43 @@ const schemas: Record<ContractDocumentKind, object> = {
   taxonomy: taxonomySchema,
 };
 
-const validators = new Map<ContractDocumentKind, ValidateFunction>();
+const schemaPacks = {
+  "2.0.0": {
+    dependencies: [],
+    names: schemaNames,
+    documents: schemas,
+  },
+} satisfies Record<RegisteredContractSchemaVersion, ContractSchemaPack>;
 
-for (const name of schemaNames) {
-  ajv.addSchema(schemas[name], name);
+function compileSchemaPack(pack: ContractSchemaPack) {
+  const ajv = new Ajv2020({ allErrors: true, strict: true });
+  const addFormats = formatsModule.default as unknown as FormatsPlugin;
+  addFormats(ajv);
+  for (const dependency of pack.dependencies) ajv.addSchema(dependency);
+
+  for (const name of pack.names) {
+    const schema = pack.documents[name];
+    if (!schema) throw new Error(`Contract schema is missing: ${name}`);
+    ajv.addSchema(schema, name);
+  }
+
+  const validators = new Map<string, ValidateFunction>();
+  for (const name of pack.names) {
+    const validator = ajv.getSchema(name);
+    if (!validator) {
+      throw new Error(`Contract schema was not registered: ${name}`);
+    }
+    validators.set(name, validator);
+  }
+  return validators;
 }
 
-for (const name of schemaNames) {
-  const validator = ajv.getSchema(name);
-  if (!validator) throw new Error(`Contract schema was not registered: ${name}`);
-  validators.set(name, validator);
-}
+const validatorsByVersion = {
+  "2.0.0": compileSchemaPack(schemaPacks["2.0.0"]),
+} satisfies Record<
+  RegisteredContractSchemaVersion,
+  ReadonlyMap<string, ValidateFunction>
+>;
 
 function toIssues(errors: ErrorObject[] | null | undefined) {
   return (errors ?? []).map((error) => ({
@@ -94,27 +138,39 @@ function toIssues(errors: ErrorObject[] | null | undefined) {
   }));
 }
 
+export function validateContractDocumentForVersion<
+  V extends RegisteredContractSchemaVersion,
+  K extends ContractDocumentKindFor<V>,
+>(
+  version: V,
+  kind: K,
+  value: unknown,
+): ContractDocumentFor<V, K> {
+  const validator = validatorsByVersion[version].get(kind);
+  if (!validator?.(value)) {
+    throw new ContractError(
+      "CONTRACT_INVALID",
+      `Invalid ${kind} contract document for ${version}`,
+      toIssues(validator?.errors),
+    );
+  }
+
+  return value as ContractDocumentFor<V, K>;
+}
+
 export function validateContractDocument<K extends ContractDocumentKind>(
   kind: K,
   value: unknown,
-): ContractDocuments[K] {
+): ContractDocumentsV2[K] {
+  let version = SUPPORTED_CONTRACT_VERSION;
   if (
     kind === "release" &&
     typeof value === "object" &&
     value !== null &&
     "contractVersion" in value
   ) {
-    resolveSupportedContractVersion(value.contractVersion);
+    version = resolveSupportedContractVersion(value.contractVersion);
   }
 
-  const validator = validators.get(kind);
-  if (!validator?.(value)) {
-    throw new ContractError(
-      "CONTRACT_INVALID",
-      `Invalid ${kind} contract document`,
-      toIssues(validator?.errors),
-    );
-  }
-
-  return value as ContractDocuments[K];
+  return validateContractDocumentForVersion(version, kind, value);
 }
