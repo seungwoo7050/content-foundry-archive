@@ -13,6 +13,12 @@ export {
   type StaticImageAsset,
 } from "./project-static-image-asset.js";
 export {
+  projectResponsiveImageAsset,
+  RESPONSIVE_WEBP_QUALITY,
+  type ResponsiveImageAsset,
+  type ResponsiveImageDerivative,
+} from "./project-responsive-image-asset.js";
+export {
   type MediaSourceReaders,
   resolveImageSource,
 } from "./resolve-image-source.js";
