@@ -2,6 +2,7 @@ import type {
   ArticleListItemViewModel,
   LinkViewModel,
   NavigationItemViewModel,
+  PaginationViewModel,
 } from "./presentation-view-model.js";
 import type { HomeAboutTeaserViewModel } from "./content-route-view-model.js";
 import type { StateRecoveryLinkViewModel } from "./state-route-view-model.js";
@@ -167,5 +168,29 @@ export function ThemeArticleList({
         </li>
       ))}
     </List>
+  );
+}
+
+export function ThemePagination({
+  pagination,
+}: {
+  readonly pagination: PaginationViewModel;
+}) {
+  if (pagination.pageCount <= 1) return null;
+  return (
+    <nav aria-label="목록 페이지 이동">
+      <p>
+        <span aria-current="page">{pagination.currentPage}페이지</span>
+        {` / 전체 ${pagination.pageCount}페이지`}
+      </p>
+      <ul>
+        {pagination.previous ? (
+          <li><a href={pagination.previous.href} rel="prev">{pagination.previous.label}</a></li>
+        ) : null}
+        {pagination.next ? (
+          <li><a href={pagination.next.href} rel="next">{pagination.next.label}</a></li>
+        ) : null}
+      </ul>
+    </nav>
   );
 }

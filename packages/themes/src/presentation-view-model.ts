@@ -21,6 +21,13 @@ export interface EstimatedReadingTimeViewModel {
   readonly label: string;
 }
 
+export interface PaginationViewModel {
+  readonly currentPage: number;
+  readonly pageCount: number;
+  readonly previous: LinkViewModel | null;
+  readonly next: LinkViewModel | null;
+}
+
 export interface NavigationItemViewModel {
   readonly link: LinkViewModel;
   readonly children: readonly NavigationItemViewModel[];

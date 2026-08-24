@@ -8,6 +8,7 @@ import type {
   EstimatedReadingTimeViewModel,
   LinkViewModel,
   NavigationItemViewModel,
+  PaginationViewModel,
   SiteShellViewModel,
   TocItemViewModel,
 } from "./presentation-view-model.js";
@@ -48,6 +49,9 @@ describe("shared presentation facts", () => {
     >();
     expectTypeOf<ArticleListItemViewModel["topics"]>().toEqualTypeOf<
       readonly string[]
+    >();
+    expectTypeOf<PaginationViewModel["previous"]>().toEqualTypeOf<
+      LinkViewModel | null
     >();
   });
 

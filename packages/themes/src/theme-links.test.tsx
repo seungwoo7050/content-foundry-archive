@@ -8,6 +8,7 @@ import {
   ThemeFooterNavigation,
   ThemeHomeAboutTeaser,
   ThemeNavigation,
+  ThemePagination,
   ThemeRecoveryLinks,
 } from "./theme-links.js";
 
@@ -94,5 +95,25 @@ describe("shared theme link primitives", () => {
     }]} />);
     expect(html).toBe('<ol><li><article><p><a href="/category/life">생활</a> <span>업데이트</span> <time dateTime="2026-08-24T00:00:00Z">2026년 8월 24일</time> <span>예상 읽기 시간 약 3분</span></p><h3><a href="/article/start">시작 안내</a></h3><p>요약</p><ul><li>신청</li></ul></article></li></ol>');
     expect(html).not.toMatch(/badge|ranking|popular|trending/i);
+  });
+
+  it("renders accessible previous and next page anchors", () => {
+    const html = renderToStaticMarkup(<ThemePagination pagination={{
+      currentPage: 2,
+      pageCount: 3,
+      previous: { href: "/archive", label: "이전 페이지" },
+      next: { href: "/archive/page/3", label: "다음 페이지" },
+    }} />);
+
+    expect(html).toContain('<nav aria-label="목록 페이지 이동">');
+    expect(html).toContain('<span aria-current="page">2페이지</span> / 전체 3페이지');
+    expect(html).toContain('<a href="/archive" rel="prev">이전 페이지</a>');
+    expect(html).toContain('<a href="/archive/page/3" rel="next">다음 페이지</a>');
+    expect(renderToStaticMarkup(<ThemePagination pagination={{
+      currentPage: 1,
+      pageCount: 1,
+      previous: null,
+      next: null,
+    }} />)).toBe("");
   });
 });

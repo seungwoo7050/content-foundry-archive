@@ -8,6 +8,7 @@ export {
   type FaqItemViewModel,
   type LinkViewModel,
   type NavigationItemViewModel,
+  type PaginationViewModel,
   type SiteShellViewModel,
   type TocItemViewModel,
 } from "./presentation-view-model.js";
@@ -39,6 +40,7 @@ export {
   ThemeBreadcrumbs,
   ThemeFooterNavigation,
   ThemeNavigation,
+  ThemePagination,
 } from "./theme-links.js";
 export {
   getThemeAdSlot,
