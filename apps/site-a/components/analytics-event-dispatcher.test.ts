@@ -1,10 +1,12 @@
 import {
   ANALYTICS_EVENT_CONTRACT_VERSION,
   type AnalyticsEventContext,
+  type AnalyticsEventPayload,
 } from "@content-foundry/analytics";
 import { describe, expect, it, vi } from "vitest";
 
 import type { SiteAnalyticsRouteProjection } from "../lib/site-analytics-route-projection";
+import { createAnalyticsEventRuntime } from "./analytics-event-runtime";
 import {
   dispatchAnalyticsEvent,
   resolveAnalyticsEventContext,
@@ -144,5 +146,35 @@ describe("Site A analytics event dispatch", () => {
     expect(dispatchAnalyticsEvent(consent, context, detail, undefined)).toBe(false);
     expect(dispatchAnalyticsEvent(consent, context, detail, "not-a-function")).toBe(false);
     expect(gtag).not.toHaveBeenCalled();
+  });
+
+  it("flushes only consented runtime events when the provider becomes ready", () => {
+    const delivered: AnalyticsEventPayload[] = [];
+    const runtime = createAnalyticsEventRuntime((payload) => delivered.push(payload));
+    runtime.capture(context, { ...detail, articleId: "ART-BEFORE-CONSENT" });
+    runtime.updateConsent(consent);
+    runtime.capture(context, { ...detail, articleId: "ART-BOOTSTRAP" });
+    runtime.listenerReady();
+    runtime.capture(context, { ...detail, articleId: "ART-DEFERRED" });
+    expect(delivered).toEqual([]);
+
+    runtime.providerReady();
+    expect(delivered.map((payload) =>
+      "articleId" in payload ? payload.articleId : "unexpected",
+    )).toEqual([
+      "ART-BOOTSTRAP", "ART-DEFERRED",
+    ]);
+  });
+
+  it("clears deferred runtime events on consent revoke", () => {
+    const delivered: AnalyticsEventPayload[] = [];
+    const runtime = createAnalyticsEventRuntime((payload) => delivered.push(payload));
+    runtime.updateConsent(consent);
+    runtime.listenerReady();
+    runtime.capture(context, detail);
+    runtime.updateConsent({ ...consent, analyticsStoragePurposeConsentStatus: 2 });
+    runtime.updateConsent(consent);
+    runtime.providerReady();
+    expect(delivered).toEqual([]);
   });
 });
