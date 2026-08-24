@@ -8,16 +8,43 @@ import {
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
+import type { MediaManifestV3 } from "@content-foundry/content-contract";
+import type { ResponsiveImageAsset } from "@content-foundry/media";
 import { resolveBuildTargetConfig } from "@content-foundry/site-core";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { loadSiteRelease } from "./load-site-release";
+import { loadSiteRelease, loadSiteReleaseV3 } from "./load-site-release";
 
 const fixture = resolve(
   process.cwd(),
   "../../packages/content-contract/vendor/2.0.0/fixtures/bundles/valid/site-a-minimal",
 );
+const v3Fixture = resolve(
+  process.cwd(),
+  "../../packages/content-contract/vendor/3.0.0/fixtures/bundles/valid/site-a-minimal",
+);
 const temporaryRoots: string[] = [];
+
+function mediaAssets(): ResponsiveImageAsset[] {
+  const manifest = JSON.parse(
+    readFileSync(join(v3Fixture, "media/media-manifest.json"), "utf8"),
+  ) as MediaManifestV3;
+  return manifest.items.map((media) => ({
+    fallback: {
+      mediaId: media.id,
+      relativePath: `_media/${media.sha256}/source.png`,
+      publicPath: `/_media/${media.sha256}/source.png`,
+      sha256: media.sha256,
+      mimeType: media.mimeType,
+      width: media.width,
+      height: media.height,
+      alt: media.alt,
+      credit: media.credit,
+      license: media.license,
+    },
+    derivatives: [],
+  }));
+}
 
 function templateConfig(releaseDirectory = fixture) {
   return resolveBuildTargetConfig(
@@ -41,8 +68,21 @@ describe("loadSiteRelease", () => {
     const context = loadSiteRelease(templateConfig());
 
     expect(context.bundle.release.releaseId).toBe("REL-2026-000042");
+    expect(context.contractVersion).toBe("2.0.0");
     expect(context.canonicalOrigin).toBe("https://example.com");
     expect(context.config.noindex).toBe(true);
+  });
+
+  it("assembles a fully validated synchronous v3 release context", () => {
+    const context = loadSiteReleaseV3(templateConfig(v3Fixture), {
+      mediaAssets: mediaAssets(),
+    });
+
+    expect(context.contractVersion).toBe("3.0.0");
+    expect(context.bundle.release.releaseId).toBe("REL-2026-000043");
+    expect([...context.mediaAssets.keys()]).toEqual(["MED-000045", "MED-000046"]);
+    expect([...context.nicheComponents.get("site-a")!.keys()]).toEqual([]);
+    expect(context.canonicalOrigin).toBe("https://example.com");
   });
 
   it("rejects an unsupported contract before integrity validation", () => {
