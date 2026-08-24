@@ -27,6 +27,7 @@ export interface HomeRouteViewModel extends RouteBaseViewModel<"home"> {
 export interface CategoryRouteViewModel extends RouteBaseViewModel<"category"> {
   readonly articleSectionHeading: string;
   readonly articles: readonly ArticleListItemViewModel[];
+  readonly pagination: PaginationViewModel;
   readonly topicSectionHeading: string | null;
   readonly topics: readonly string[];
 }

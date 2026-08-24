@@ -31,7 +31,7 @@ function base(path: string, heading: string) {
 }
 const routes = [
   { ...base("/", "홈"), kind: "home", articleSectionHeading: "최근 글", articles: [item], categories: [{ href: "/category/life", label: "생활", description: "생활 안내 모음" }], searchLink: { href: "/search", label: "사이트 검색" } },
-  { ...base("/category/life", "생활"), kind: "category", articleSectionHeading: "최근 글", articles: [item], topicSectionHeading: "관련 주제", topics: ["신청"] },
+  { ...base("/category/life", "생활"), kind: "category", articleSectionHeading: "최근 글", articles: [item], pagination: { currentPage: 1, pageCount: 1, previous: null, next: null }, topicSectionHeading: "관련 주제", topics: ["신청"] },
   { ...base("/article/guide", "안내 글"), kind: "article", category: item.category, topics: ["신청", "생활 행정"], authorLabel: "작성자", operatorLabel: "운영자", published: item.date, updated: { dateTime: "2026-08-25T00:00:00Z", label: "2026년 8월 25일" }, trustLinks: [{ href: "/about", label: "운영 방식" }], toc: [{ id: "steps", label: "신청 단계", level: 2 }], sources: [{ label: "공식 출처", href: "https://example.org/source" }], updateTriggers: ["절차 변경"], faq: [{ question: "질문?", answer: "답변" }], relatedSectionHeading: "관련 글", relatedArticles: [item], advertisingEligible: true, readerActions: <button type="button">현재 글 저장</button>, hero: <figure>대표 이미지</figure>, body: <div><h2 id="steps">신청 단계</h2><p>본문</p></div> },
   { ...base("/about", "소개"), kind: "static-page", body: <p>소개 본문</p> },
   { ...base("/archive", "전체 글"), kind: "archive", articles: [item], pagination: { currentPage: 1, pageCount: 1, previous: null, next: null } },

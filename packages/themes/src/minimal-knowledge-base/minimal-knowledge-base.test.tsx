@@ -48,7 +48,7 @@ function base(path: string, heading: string) {
 
 const routes = [
   { ...base("/", "홈"), kind: "home", articleSectionHeading: "최근 안내", articles: [articleItem], categories: [{ href: "/category/life", label: "생활", description: "생활 안내 모음" }], searchLink: { href: "/search", label: "검색" }, aboutTeaser: { href: "/about", label: "운영 방식 보기", description: "한 명의 운영자가 공식 출처를 확인해 안내합니다." } },
-  { ...base("/category/life", "생활"), kind: "category", articleSectionHeading: "최근 안내", articles: [articleItem], topicSectionHeading: "관련 주제", topics: ["신청"] },
+  { ...base("/category/life", "생활"), kind: "category", articleSectionHeading: "최근 안내", articles: [articleItem], pagination: { currentPage: 1, pageCount: 1, previous: null, next: null }, topicSectionHeading: "관련 주제", topics: ["신청"] },
   { ...base("/article/start", "시작 안내"), kind: "article", category: articleItem.category, topics: ["정부24", "주민등록"], authorLabel: "작성자", operatorLabel: "운영자", published: articleItem.date, updated: { dateTime: "2026-08-25T00:00:00Z", label: "2026년 8월 25일" }, trustLinks: [{ href: "/about", label: "운영 방식" }], toc: [{ id: "steps", label: "신청 단계", level: 2 }], sources: [{ label: "공식 출처", href: "https://example.org/source" }], updateTriggers: ["정책 변경"], faq: [{ question: "질문?", answer: "답변" }], relatedSectionHeading: "관련 안내", relatedArticles: [articleItem], advertisingEligible: false, readerActions: <button type="button">독자 기능</button>, hero: <figure>대표 이미지</figure>, body: <p>본문 슬롯</p> },
   { ...base("/about", "소개"), kind: "static-page", body: <p>정적 본문</p> },
   { ...base("/archive", "전체 글"), kind: "archive", articles: [articleItem], pagination: { currentPage: 1, pageCount: 1, previous: null, next: null } },

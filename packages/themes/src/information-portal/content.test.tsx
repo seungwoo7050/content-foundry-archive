@@ -69,6 +69,7 @@ describe("Information Portal discovery routes", () => {
       breadcrumbs: [{ href: "/category/life", label: "생활" }],
       articleSectionHeading: "최근 안내",
       articles: [],
+      pagination: { currentPage: 1, pageCount: 1, previous: null, next: null },
       topicSectionHeading: "관련 주제",
       topics: ["신청", "발급"],
     };

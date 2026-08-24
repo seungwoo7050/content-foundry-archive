@@ -39,7 +39,7 @@ const routes: readonly HtmlRouteViewModel[] = [
   },
   {
     ...base("/category/life", "생활"), kind: "category", articleSectionHeading: "최근 안내",
-    articles: [article], topicSectionHeading: "관련 주제", topics: ["신청"],
+    articles: [article], pagination: { currentPage: 1, pageCount: 1, previous: null, next: null }, topicSectionHeading: "관련 주제", topics: ["신청"],
   },
   {
     ...base("/article/guide", "생활 안내"), kind: "article",
