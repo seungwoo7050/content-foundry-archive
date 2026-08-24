@@ -15,6 +15,10 @@
     "validate:release": "pnpm --filter @content-foundry/content-contract build && pnpm --filter @content-foundry/content-contract validate:release"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@lhci/cli": "0.15.1",
+    "@playwright/test": "1.62.1",
+    "serve": "14.2.6",
     "turbo": "2.10.11",
     "typescript": "7.0.2"
   }
