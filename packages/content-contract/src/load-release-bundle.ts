@@ -1,7 +1,9 @@
 import { ContractError, type ContractIssue } from "./errors.js";
 import {
   readReleaseBundleDocuments,
+  readReleaseBundleDocumentsForVersion,
   type ReleaseBundleDocuments,
+  type ReleaseBundleDocumentsByVersion,
 } from "./read-bundle-documents.js";
 import { validateContentReferences } from "./validate-content-references.js";
 import { validateContentSemantics } from "./validate-content-semantics.js";
@@ -16,11 +18,13 @@ export interface LoadReleaseBundleOptions {
   readonly expectedReleaseId?: string;
 }
 
-export function loadReleaseBundle(
-  root: string,
+type VersionedReleaseBundle =
+  ReleaseBundleDocumentsByVersion[keyof ReleaseBundleDocumentsByVersion];
+
+function validateLoadedReleaseBundle<T extends VersionedReleaseBundle>(
+  bundle: T,
   options: LoadReleaseBundleOptions = {},
-): LoadedReleaseBundle {
-  const bundle = readReleaseBundleDocuments(root);
+): T {
   validateReleaseIdentity(bundle);
   validatePublicKeys(bundle);
   validateContentReferences(bundle);
@@ -47,4 +51,43 @@ export function loadReleaseBundle(
     throw new ContractError("REFERENCE_INVALID", "Unexpected release identity", issues);
   }
   return bundle;
+}
+
+export function loadReleaseBundleForVersion(
+  version: "2.0.0",
+  root: string,
+  options?: LoadReleaseBundleOptions,
+): ReleaseBundleDocumentsByVersion["2.0.0"];
+export function loadReleaseBundleForVersion(
+  version: "3.0.0",
+  root: string,
+  options?: LoadReleaseBundleOptions,
+): ReleaseBundleDocumentsByVersion["3.0.0"];
+export function loadReleaseBundleForVersion(
+  version: keyof ReleaseBundleDocumentsByVersion,
+  root: string,
+  options: LoadReleaseBundleOptions = {},
+): VersionedReleaseBundle {
+  if (version === "2.0.0") {
+    return validateLoadedReleaseBundle(
+      readReleaseBundleDocumentsForVersion("2.0.0", root),
+      options,
+    );
+  }
+  if (version === "3.0.0") {
+    return validateLoadedReleaseBundle(
+      readReleaseBundleDocumentsForVersion("3.0.0", root),
+      options,
+    );
+  }
+
+  const unhandledVersion: never = version;
+  throw new Error(`Unhandled registered contract version: ${unhandledVersion}`);
+}
+
+export function loadReleaseBundle(
+  root: string,
+  options: LoadReleaseBundleOptions = {},
+): LoadedReleaseBundle {
+  return validateLoadedReleaseBundle(readReleaseBundleDocuments(root), options);
 }
