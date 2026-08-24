@@ -73,4 +73,17 @@ export const EDITORIAL_UTILITY_STYLES = `
   .editorial-article-layout { grid-template-columns: 1fr; }
   .editorial-evidence { order: 2; }
 }
+@media (prefers-reduced-motion: reduce) {
+  .editorial-utility, .editorial-utility * { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+@media print {
+  .editorial-utility { min-height: auto; background: #fff; color: #000; font-size: 11pt; line-height: 1.55; }
+  .editorial-masthead, .editorial-footer, .editorial-skip-link, .editorial-breadcrumbs, .editorial-reader-actions, .editorial-utility aside[aria-label="광고"] { display: none !important; }
+  .editorial-main { width: 100%; padding: 0; }
+  .editorial-article-header { max-width: none; margin: 0 0 1rem; }
+  .editorial-article-layout { display: block; }
+  .editorial-evidence { margin-block: 1rem; break-inside: avoid; border: 1px solid #aaa; background: #fff; }
+  .editorial-body { max-width: none; font-size: inherit; }
+  .editorial-body a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; overflow-wrap: anywhere; }
+}
 `;
