@@ -1,0 +1,10 @@
+{
+  "overlayPath": "pages/about.json",
+  "operation": "append-wrong-site-registered-niche-component",
+  "integrityMode": "recompute",
+  "validationContext": {
+    "producerPolicy": {"site-a": ["date-gap-calculator"]},
+    "consumerRegistry": {"site-b": ["date-gap-calculator"]}
+  },
+  "expectedError": "REFERENCE_INVALID"
+}

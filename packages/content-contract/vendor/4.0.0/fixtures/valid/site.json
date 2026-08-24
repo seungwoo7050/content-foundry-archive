@@ -1,0 +1,28 @@
+{
+  "id": "site-a",
+  "origin": "https://example.com",
+  "locale": "ko-KR",
+  "timeZone": "Asia/Seoul",
+  "name": "생활메모",
+  "shortName": "생활메모",
+  "description": "실생활에 도움이 되는 정보를 정리하는 1인 운영 블로그",
+  "defaultTheme": "minimal-knowledge-base",
+  "defaultSkin": "calm-blue",
+  "author": {
+    "displayName": "생활메모",
+    "profileId": "owner"
+  },
+  "analytics": {
+    "provider": "disabled",
+    "publicMeasurementId": null
+  },
+  "ads": {
+    "provider": "disabled",
+    "enabled": false,
+    "publicClientId": null
+  },
+  "search": {
+    "enabled": true
+  },
+  "featureFlags": {}
+}

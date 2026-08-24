@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "type": "redirect",
+      "fromPath": "/old-guide",
+      "toPath": "/article/government24-resident-registration-guide",
+      "status": 308
+    },
+    {"type": "gone", "path": "/expired-event", "status": 410, "replacementPath": null}
+  ]
+}

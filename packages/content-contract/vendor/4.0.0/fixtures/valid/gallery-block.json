@@ -1,0 +1,8 @@
+{
+  "type": "gallery",
+  "caption": "전입신고 화면 순서",
+  "items": [
+    {"mediaId": "MED-000045", "caption": "주소 입력"},
+    {"mediaId": "MED-000046", "caption": null}
+  ]
+}

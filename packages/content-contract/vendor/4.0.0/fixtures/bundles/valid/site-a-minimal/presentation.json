@@ -1,0 +1,18 @@
+{
+  "home": {
+    "featuredArticleIds": ["ART-000123"],
+    "currentArticleIds": [],
+    "evergreenArticleIds": []
+  },
+  "categoryHighlights": [
+    {
+      "categoryId": "daily-admin",
+      "articleIds": ["ART-000123"]
+    }
+  ],
+  "brand": {
+    "logoMediaId": null,
+    "faviconMediaId": null,
+    "socialImageMediaId": null
+  }
+}

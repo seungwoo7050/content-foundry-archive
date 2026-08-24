@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://content-foundry.example/contracts/4.0.0/release.schema.json",
+  "title": "Public Site Release Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "releaseId",
+    "siteId",
+    "createdAt",
+    "contentRevision",
+    "siteConfigRevision",
+    "articleCount",
+    "pageCount",
+    "defaultTheme",
+    "defaultSkin",
+    "bundleChecksum"
+  ],
+  "properties": {
+    "contractVersion": {"const": "4.0.0"},
+    "releaseId": {"type": "string", "pattern": "^REL-[A-Z0-9-]+$"},
+    "siteId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "createdAt": {"type": "string", "format": "date-time"},
+    "contentRevision": {"type": "integer", "minimum": 0},
+    "siteConfigRevision": {"type": "integer", "minimum": 0},
+    "articleCount": {"type": "integer", "minimum": 0},
+    "pageCount": {"type": "integer", "minimum": 0},
+    "defaultTheme": {
+      "enum": [
+        "editorial-utility",
+        "clean-personal-blog",
+        "information-portal",
+        "minimal-knowledge-base",
+        "friendly-mobile-utility"
+      ]
+    },
+    "defaultSkin": {"type": "string", "minLength": 1},
+    "bundleChecksum": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

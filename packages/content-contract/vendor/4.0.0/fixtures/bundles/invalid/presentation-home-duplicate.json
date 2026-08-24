@@ -1,0 +1,6 @@
+{
+  "overlayPath": "presentation.json",
+  "operation": "append-featured-article-to-current",
+  "integrityMode": "recompute",
+  "expectedError": "CONTRACT_INVALID"
+}

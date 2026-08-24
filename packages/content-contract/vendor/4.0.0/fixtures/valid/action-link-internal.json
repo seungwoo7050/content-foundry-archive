@@ -1,0 +1,6 @@
+{
+  "type": "action-link",
+  "kind": "internal",
+  "label": "전입신고 신청 안내 읽기",
+  "path": "/article/resident-registration-guide"
+}

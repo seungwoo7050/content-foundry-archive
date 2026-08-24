@@ -1,0 +1,23 @@
+[
+  {"type": "heading", "id": "prepare", "level": 2, "text": "준비하기"},
+  {"type": "paragraph", "markdown": "필요한 준비물을 확인합니다."},
+  {"type": "list", "ordered": true, "items": ["로그인", "신청"]},
+  {"type": "quote", "markdown": "공식 안내를 확인하세요.", "attribution": null},
+  {"type": "callout", "tone": "warning", "markdown": "마감일을 확인하세요."},
+  {"type": "image", "mediaId": "MED-000045", "caption": "신청 화면"},
+  {
+    "type": "table",
+    "caption": "준비물",
+    "columns": ["항목", "필수"],
+    "rows": [["인증 수단", "예"]]
+  },
+  {"type": "embed", "provider": "youtube", "url": "https://example.com/video"},
+  {"type": "gallery", "items": [{"mediaId": "MED-000045"}, {"mediaId": "MED-000046"}]},
+  {"type": "code", "language": "html", "code": "<button type=\"button\">저장</button>"},
+  {"type": "command", "shell": "posix-sh", "command": "git status --short"},
+  {"type": "action-link", "kind": "internal", "label": "운영자 소개 읽기", "path": "/about"},
+  {"type": "action-link", "kind": "official", "label": "공식 Example에서 확인하기", "url": "https://official.example/guide"},
+  {"type": "action-link", "kind": "affiliate", "label": "제휴 Example 요금 확인 (제휴 링크)", "url": "https://partner.example/plan"},
+  {"type": "paragraph", "markdown": "날짜 계산은 시작일을 제외하고 종료일을 포함합니다."},
+  {"type": "niche-component", "componentId": "date-gap-calculator", "label": "두 날짜 사이 일수 계산기", "fallbackText": "시작일 다음 날을 1일째로 세어 종료일까지의 달력상 일수를 계산하세요."}
+]

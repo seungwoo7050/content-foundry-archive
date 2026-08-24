@@ -1,0 +1,7 @@
+{
+  "overlayPath": "articles/ART-000123.json",
+  "operation": "set-qa-article-index-true",
+  "integrityMode": "recompute",
+  "validationContext": {"releaseMode": "qa"},
+  "expectedError": "CONTRACT_INVALID"
+}

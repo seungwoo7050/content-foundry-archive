@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://content-foundry.example/contracts/4.0.0/presentation.schema.json",
+  "title": "Public Site Presentation Projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["home", "categoryHighlights", "brand"],
+  "properties": {
+    "home": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "featuredArticleIds",
+        "currentArticleIds",
+        "evergreenArticleIds"
+      ],
+      "properties": {
+        "featuredArticleIds": {
+          "type": "array",
+          "$ref": "#/$defs/articleIds",
+          "maxItems": 3
+        },
+        "currentArticleIds": {
+          "type": "array",
+          "$ref": "#/$defs/articleIds",
+          "maxItems": 6
+        },
+        "evergreenArticleIds": {
+          "type": "array",
+          "$ref": "#/$defs/articleIds",
+          "maxItems": 8
+        }
+      }
+    },
+    "categoryHighlights": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["categoryId", "articleIds"],
+        "properties": {
+          "categoryId": {"$ref": "#/$defs/taxonId"},
+          "articleIds": {
+            "type": "array",
+            "$ref": "#/$defs/articleIds",
+            "maxItems": 3
+          }
+        }
+      }
+    },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "logoMediaId",
+        "faviconMediaId",
+        "socialImageMediaId"
+      ],
+      "properties": {
+        "logoMediaId": {"$ref": "#/$defs/mediaIdOrNull"},
+        "faviconMediaId": {"$ref": "#/$defs/mediaIdOrNull"},
+        "socialImageMediaId": {"$ref": "#/$defs/mediaIdOrNull"}
+      }
+    }
+  },
+  "$defs": {
+    "articleIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/articleId"}
+    },
+    "articleId": {
+      "type": "string",
+      "pattern": "^ART-[A-Z0-9-]+$"
+    },
+    "taxonId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "mediaIdOrNull": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^MED-[A-Z0-9-]+$"
+        },
+        {"type": "null"}
+      ]
+    }
+  }
+}

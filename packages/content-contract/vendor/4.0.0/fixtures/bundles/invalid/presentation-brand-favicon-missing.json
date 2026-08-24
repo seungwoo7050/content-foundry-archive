@@ -1,0 +1,6 @@
+{
+  "overlayPath": "presentation.json",
+  "operation": "replace-null-favicon-with-missing-media",
+  "integrityMode": "recompute",
+  "expectedError": "REFERENCE_INVALID"
+}

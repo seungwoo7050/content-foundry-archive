@@ -1,0 +1,6 @@
+{
+  "items": [
+    {"id": "MED-000045", "kind": "image", "source": "immutable-object", "path": "objects/sha256/216154d9fcffafb56f3bd8d846eebdb9ae1b5dc8aaeeea88ce621d1ceb5798e7.png", "sha256": "216154d9fcffafb56f3bd8d846eebdb9ae1b5dc8aaeeea88ce621d1ceb5798e7", "mimeType": "image/png", "width": 16, "height": 9, "bytes": 79, "alt": "파란색으로 표시된 발급 화면 순서 1단계", "credit": null, "license": null},
+    {"id": "MED-000046", "kind": "image", "source": "immutable-object", "path": "objects/sha256/6ece129d56e4d016fd870514dee9310d37dd4f504b6c145509f52b7ef315ca67.png", "sha256": "6ece129d56e4d016fd870514dee9310d37dd4f504b6c145509f52b7ef315ca67", "mimeType": "image/png", "width": 16, "height": 9, "bytes": 79, "alt": "초록색으로 표시된 발급 화면 순서 2단계", "credit": null, "license": null}
+  ]
+}

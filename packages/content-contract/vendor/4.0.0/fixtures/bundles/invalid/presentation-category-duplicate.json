@@ -1,0 +1,6 @@
+{
+  "overlayPath": "presentation.json",
+  "operation": "append-duplicate-category-highlight",
+  "integrityMode": "recompute",
+  "expectedError": "CONTRACT_INVALID"
+}

@@ -1,0 +1,13 @@
+{
+  "home": {
+    "featuredArticleIds": ["ART-1", "ART-2", "ART-3", "ART-4"],
+    "currentArticleIds": [],
+    "evergreenArticleIds": []
+  },
+  "categoryHighlights": [],
+  "brand": {
+    "logoMediaId": null,
+    "faviconMediaId": null,
+    "socialImageMediaId": null
+  }
+}

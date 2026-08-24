@@ -1,0 +1,6 @@
+{
+  "operation": "validate-qa-bundle-as-production",
+  "integrityMode": "preserve",
+  "validationContext": {"releaseMode": "production"},
+  "expectedError": "CONTRACT_INVALID"
+}

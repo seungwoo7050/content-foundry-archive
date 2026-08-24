@@ -1,0 +1,34 @@
+{
+  "home": {
+    "featuredArticleIds": ["ART-FEATURE-1", "ART-FEATURE-2", "ART-FEATURE-3"],
+    "currentArticleIds": [
+      "ART-CURRENT-1",
+      "ART-CURRENT-2",
+      "ART-CURRENT-3",
+      "ART-CURRENT-4",
+      "ART-CURRENT-5",
+      "ART-CURRENT-6"
+    ],
+    "evergreenArticleIds": [
+      "ART-EVERGREEN-1",
+      "ART-EVERGREEN-2",
+      "ART-EVERGREEN-3",
+      "ART-EVERGREEN-4",
+      "ART-EVERGREEN-5",
+      "ART-EVERGREEN-6",
+      "ART-EVERGREEN-7",
+      "ART-EVERGREEN-8"
+    ]
+  },
+  "categoryHighlights": [
+    {
+      "categoryId": "daily-admin",
+      "articleIds": ["ART-FEATURE-1", "ART-CURRENT-1", "ART-EVERGREEN-1"]
+    }
+  ],
+  "brand": {
+    "logoMediaId": "MED-LOGO",
+    "faviconMediaId": "MED-FAVICON",
+    "socialImageMediaId": "MED-SOCIAL"
+  }
+}

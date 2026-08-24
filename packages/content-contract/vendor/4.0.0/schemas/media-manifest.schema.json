@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://content-foundry.example/contracts/4.0.0/media-manifest.schema.json",
+  "title": "Media Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "items"
+  ],
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "source",
+          "path",
+          "sha256",
+          "mimeType",
+          "width",
+          "height",
+          "bytes",
+          "alt",
+          "credit",
+          "license"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "const": "image"
+          },
+          "source": {
+            "enum": [
+              "bundle",
+              "immutable-object"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "mimeType": {
+            "type": "string",
+            "pattern": "^image/"
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "alt": {
+            "type": "string"
+          },
+          "credit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "license": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

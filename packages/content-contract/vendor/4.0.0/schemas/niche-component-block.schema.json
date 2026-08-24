@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://content-foundry.example/contracts/4.0.0/niche-component-block.schema.json",
+  "title": "Published Niche Component Block",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "componentId", "label", "fallbackText"],
+  "properties": {
+    "type": {"const": "niche-component"},
+    "componentId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "fallbackText": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    }
+  }
+}

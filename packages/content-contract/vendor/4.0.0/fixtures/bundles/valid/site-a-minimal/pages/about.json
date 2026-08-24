@@ -1,0 +1,25 @@
+{
+  "id": "about",
+  "path": "/about",
+  "title": "소개",
+  "summary": "생활메모의 운영 목적과 정보 준비 방법을 안내합니다.",
+  "content": [
+    {
+      "type": "paragraph",
+      "markdown": "생활메모는 실생활 정보를 정리하는 1인 운영 블로그입니다."
+    },
+    {
+      "type": "action-link",
+      "kind": "internal",
+      "label": "정부24 주민등록등본 안내 읽기",
+      "path": "/article/government24-resident-registration-guide"
+    }
+  ],
+  "seo": {
+    "title": "생활메모 소개",
+    "description": "생활메모 운영 목적과 정보 준비 방법",
+    "canonicalPath": "/about",
+    "index": false,
+    "follow": true
+  }
+}

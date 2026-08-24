@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://content-foundry.example/contracts/4.0.0/article.schema.json",
+  "title": "Published Article Projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "revision",
+    "slug",
+    "title",
+    "summary",
+    "status",
+    "categoryId",
+    "tagIds",
+    "author",
+    "publishedAt",
+    "updatedAt",
+    "content",
+    "toc",
+    "faq",
+    "sourceDisclosures",
+    "relatedArticleIds",
+    "heroMediaId",
+    "seo",
+    "advertising",
+    "updateTriggers"
+  ],
+  "properties": {
+    "id": {"type": "string", "pattern": "^ART-[A-Z0-9-]+$"},
+    "revision": {"type": "integer", "minimum": 1},
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "title": {"type": "string", "minLength": 1},
+    "summary": {"type": "string", "minLength": 1},
+    "status": {"const": "published"},
+    "categoryId": {"type": "string", "minLength": 1},
+    "tagIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "author": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["displayName", "profileId"],
+      "properties": {
+        "displayName": {"type": "string", "minLength": 1},
+        "profileId": {"type": "string", "minLength": 1}
+      }
+    },
+    "publishedAt": {"type": "string", "format": "date-time"},
+    "updatedAt": {"type": "string", "format": "date-time"},
+    "content": {"$ref": "content.schema.json"},
+    "toc": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "text", "level"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "text": {"type": "string", "minLength": 1},
+          "level": {"type": "integer", "minimum": 2, "maximum": 6}
+        }
+      }
+    },
+    "faq": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["question", "answerMarkdown"],
+        "properties": {
+          "question": {"type": "string", "minLength": 1},
+          "answerMarkdown": {"type": "string"}
+        }
+      }
+    },
+    "sourceDisclosures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "url"],
+        "properties": {
+          "label": {"type": "string", "minLength": 1},
+          "url": {"type": "string", "format": "uri"}
+        }
+      }
+    },
+    "relatedArticleIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^ART-[A-Z0-9-]+$"}
+    },
+    "heroMediaId": {
+      "oneOf": [
+        {"type": "string", "pattern": "^MED-[A-Z0-9-]+$"},
+        {"type": "null"}
+      ]
+    },
+    "seo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description", "canonicalPath", "index", "follow"],
+      "properties": {
+        "title": {"type": "string", "minLength": 1},
+        "description": {"type": "string", "minLength": 1},
+        "canonicalPath": {
+          "type": "string",
+          "pattern": "^/article/[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "index": {"type": "boolean"},
+        "follow": {"type": "boolean"}
+      }
+    },
+    "advertising": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled"],
+      "properties": {"enabled": {"type": "boolean"}}
+    },
+    "updateTriggers": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  }
+}

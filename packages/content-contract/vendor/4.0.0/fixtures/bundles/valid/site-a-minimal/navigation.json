@@ -1,0 +1,11 @@
+{
+  "items": [
+    {"id": "home", "label": "홈", "path": "/", "children": []},
+    {
+      "id": "daily-admin",
+      "label": "생활·행정",
+      "path": "/category/daily-admin",
+      "children": []
+    }
+  ]
+}

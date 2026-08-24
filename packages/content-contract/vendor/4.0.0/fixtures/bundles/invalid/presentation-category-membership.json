@@ -1,0 +1,9 @@
+{
+  "overlayPaths": [
+    "taxonomy.json",
+    "presentation.json"
+  ],
+  "operation": "retarget-highlight-to-other-existing-category",
+  "integrityMode": "recompute",
+  "expectedError": "REFERENCE_INVALID"
+}

@@ -1,0 +1,17 @@
+{
+  "categories": [
+    {
+      "id": "daily-admin",
+      "slug": "daily-admin",
+      "label": "생활·행정",
+      "description": "생활과 행정 절차 안내"
+    },
+    {
+      "id": "daily-admin",
+      "slug": "daily-services",
+      "label": "생활 서비스",
+      "description": "중복 ID 예시"
+    }
+  ],
+  "tags": []
+}

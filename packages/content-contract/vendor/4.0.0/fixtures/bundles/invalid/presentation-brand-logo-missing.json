@@ -1,0 +1,6 @@
+{
+  "overlayPath": "presentation.json",
+  "operation": "replace-null-logo-with-missing-media",
+  "integrityMode": "recompute",
+  "expectedError": "REFERENCE_INVALID"
+}

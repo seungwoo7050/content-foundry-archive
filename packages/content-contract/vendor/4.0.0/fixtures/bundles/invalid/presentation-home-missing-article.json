@@ -1,0 +1,6 @@
+{
+  "overlayPath": "presentation.json",
+  "operation": "replace-featured-article-with-missing-value",
+  "integrityMode": "recompute",
+  "expectedError": "REFERENCE_INVALID"
+}

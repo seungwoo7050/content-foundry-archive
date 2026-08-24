@@ -1,0 +1,6 @@
+{
+  "overlayPath": "articles/ART-000123.json",
+  "operation": "replace-internal-action-with-same-origin-official-link",
+  "integrityMode": "recompute",
+  "expectedError": "CONTRACT_INVALID"
+}
