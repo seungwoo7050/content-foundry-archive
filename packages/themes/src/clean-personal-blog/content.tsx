@@ -6,6 +6,7 @@ import {
 import {
   ThemeArticleList,
   ThemeHomeAboutTeaser,
+  ThemePagination,
 } from "../theme-links.js";
 import { CleanPersonalArticle } from "./article.js";
 
@@ -59,6 +60,7 @@ export function CleanPersonalContent({
           <section aria-labelledby="personal-category-list" className="personal-article-list">
             <h2 id="personal-category-list">{route.articleSectionHeading}</h2>
             <ThemeArticleList articles={route.articles} headingLevel={3} />
+            <ThemePagination pagination={route.pagination} />
           </section>
           {route.topicSectionHeading && route.topics.length > 0 ? (
             <section aria-labelledby="personal-topics-title" className="personal-section">
@@ -77,6 +79,7 @@ export function CleanPersonalContent({
           <RouteHeader heading={route.heading} description={route.description} />
           <section aria-label={route.heading} className="personal-article-list">
             <ThemeArticleList articles={route.articles} headingLevel={2} ordered />
+            <ThemePagination pagination={route.pagination} />
           </section>
         </div>
       );
