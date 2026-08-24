@@ -49,7 +49,7 @@ function base(path: string, heading: string) {
 const routes = [
   { ...base("/", "홈"), kind: "home", articleSectionHeading: "최근 안내", articles: [articleItem], categories: [{ href: "/category/life", label: "생활", description: "생활 안내 모음" }], searchLink: { href: "/search", label: "검색" }, aboutTeaser: { href: "/about", label: "운영 방식 보기", description: "한 명의 운영자가 공식 출처를 확인해 안내합니다." } },
   { ...base("/category/life", "생활"), kind: "category", articleSectionHeading: "최근 안내", articles: [articleItem], pagination: { currentPage: 1, pageCount: 1, previous: null, next: null }, topicSectionHeading: "관련 주제", topics: ["신청"] },
-  { ...base("/article/start", "시작 안내"), kind: "article", category: articleItem.category, topics: ["정부24", "주민등록"], authorLabel: "작성자", operatorLabel: "운영자", published: articleItem.date, updated: { dateTime: "2026-08-25T00:00:00Z", label: "2026년 8월 25일" }, trustLinks: [{ href: "/about", label: "운영 방식" }], toc: [{ id: "steps", label: "신청 단계", level: 2 }], sources: [{ label: "공식 출처", href: "https://example.org/source" }], updateTriggers: ["정책 변경"], faq: [{ question: "질문?", answer: "답변" }], relatedSectionHeading: "관련 안내", relatedArticles: [articleItem], advertisingEligible: false, readerActions: <button type="button">독자 기능</button>, hero: <figure>대표 이미지</figure>, body: <p>본문 슬롯</p> },
+  { ...base("/article/start", "시작 안내"), kind: "article", category: articleItem.category, topics: ["정부24", "주민등록"], authorLabel: "작성자", operatorLabel: "운영자", published: articleItem.date, updated: { dateTime: "2026-08-25T00:00:00Z", label: "2026년 8월 25일" }, estimatedReadingTime: articleItem.estimatedReadingTime, trustLinks: [{ href: "/about", label: "운영 방식" }], toc: [{ id: "steps", label: "신청 단계", level: 2 }], sources: [{ label: "공식 출처", href: "https://example.org/source" }], updateTriggers: ["정책 변경"], faq: [{ question: "질문?", answer: "답변" }], relatedSectionHeading: "관련 안내", relatedArticles: [articleItem], advertisingEligible: false, readerActions: <button type="button">독자 기능</button>, hero: <figure>대표 이미지</figure>, body: <p>본문 슬롯</p> },
   { ...base("/about", "소개"), kind: "static-page", body: <p>정적 본문</p> },
   { ...base("/archive", "전체 글"), kind: "archive", articles: [articleItem], pagination: { currentPage: 1, pageCount: 1, previous: null, next: null } },
   { ...base("/search", "검색"), kind: "search", client: <form>검색 클라이언트</form> },
@@ -149,7 +149,7 @@ describe("Minimal Knowledge Base", () => {
     const article = routeAt(2);
     if (article.kind !== "article") throw new Error("Expected article fixture");
     const html = render(article);
-    const facts = ["시작 안내 설명", "정부24", "주민등록", "이 안내의 정보", "신청 단계", "대표 이미지", "본문 슬롯", "공개 출처", "다시 확인하는 기준", "자주 묻는 질문", "관련 안내", "독자 기능"];
+    const facts = ["예상 읽기 시간 약 2분", "시작 안내 설명", "정부24", "주민등록", "이 안내의 정보", "신청 단계", "대표 이미지", "본문 슬롯", "공개 출처", "다시 확인하는 기준", "자주 묻는 질문", "관련 안내", "독자 기능"];
     const positions = facts.map((fact) => html.indexOf(fact));
     expect(positions.every((position) => position >= 0)).toBe(true);
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
@@ -163,6 +163,21 @@ describe("Minimal Knowledge Base", () => {
     const { topics: _topics, ...withoutTopics } = article;
     expect(render({ ...article, topics: [] })).not.toContain('aria-label="관련 주제"');
     expect(render(withoutTopics)).not.toContain('aria-label="관련 주제"');
+  });
+
+  it("preserves the existing article header when reading time is absent", () => {
+    const article = routeAt(2);
+    if (article.kind !== "article") throw new Error("Expected article fixture");
+    const { estimatedReadingTime: _readingTime, ...withoutReadingTime } = article;
+    const html = render(withoutReadingTime);
+    const header = html.match(
+      /<header class="kb-answer-first">[\s\S]*?<\/header>/,
+    )?.[0];
+
+    expect(header).not.toContain("kb-article-duration");
+    expect(header).toContain(
+      "<h1>시작 안내</h1><p>시작 안내 설명</p></header>",
+    );
   });
 
   it("places only two separated article slots for eligible content", () => {

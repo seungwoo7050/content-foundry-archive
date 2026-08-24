@@ -47,6 +47,9 @@ describe("Minimal Knowledge Base styles", () => {
       ".kb-category-grid>ul>li:only-child",
     );
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      ".kb-answer-first>p.kb-article-duration{",
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
       "@media(prefers-reduced-motion:reduce)",
     );
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain("@media print");

@@ -83,6 +83,11 @@ export function MinimalKnowledgeBaseArticle({
         <header className="kb-answer-first">
           {route.category ? <p><a href={route.category.href}>{route.category.label}</a></p> : null}
           <h1>{route.heading}</h1>
+          {route.estimatedReadingTime ? (
+            <p className="kb-article-duration">
+              {route.estimatedReadingTime.label}
+            </p>
+          ) : null}
           <p>{route.description}</p>
         </header>
         <ThemeArticleTopics topics={route.topics} />

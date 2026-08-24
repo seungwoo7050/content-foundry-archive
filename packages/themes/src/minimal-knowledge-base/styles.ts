@@ -85,6 +85,7 @@ export const MINIMAL_KNOWLEDGE_BASE_STYLES = `
 .kb-answer-first{margin-bottom:1rem;padding:clamp(1.5rem,4vw,2.5rem);background:var(--color-surface);border:1px solid var(--color-border);border-top:4px solid var(--color-primary);border-radius:.9rem;box-shadow:0 .65rem 2rem rgba(19,33,58,.06)}
 .kb-answer-first>p:first-child{margin:0 0 .75rem;font-size:.86rem}
 .kb-answer-first h1{margin:0;font-size:clamp(2rem,6vw,3.45rem);line-height:1.12}
+.kb-answer-first>p.kb-article-duration{width:fit-content;margin:.85rem 0 0;padding:.22rem .6rem;color:var(--color-primary);font-size:.8rem;font-weight:750;line-height:1.5;background:var(--color-surface-muted);border:1px solid var(--color-border);border-radius:999px}
 .kb-answer-first>p:last-child{max-width:42rem;margin:1rem 0 0;color:var(--color-text-muted);font-size:1.08rem;line-height:1.7}
 .kb-article-route>article>.theme-article-topics{display:flex;flex-wrap:wrap;gap:.4rem;margin:1rem 0 1.5rem;padding:0;list-style:none}
 .kb-article-route>article>.theme-article-topics li{padding:.25rem .65rem;color:var(--color-text-muted);font-size:.82rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:999px}
