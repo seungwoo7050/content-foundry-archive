@@ -9,6 +9,7 @@ import {
 } from "@content-foundry/analytics";
 import { canLoadGoogleAnalytics } from "@content-foundry/site-core";
 
+import type { SiteAnalyticsRouteProjection } from "../lib/site-analytics-route-projection";
 import { useGoogleCmpConsent } from "../lib/use-google-cmp-consent";
 
 export const ANALYTICS_EVENT_TYPE = "content-foundry:analytics-event";
@@ -49,10 +50,20 @@ export function dispatchAnalyticsEvent(
   }
 }
 
+export function resolveAnalyticsEventContext(
+  projection: SiteAnalyticsRouteProjection,
+  pathname: string,
+): AnalyticsEventContext {
+  return {
+    ...projection.baseContext,
+    routeType: projection.routeTypesByPath[pathname] ?? "not-found",
+  };
+}
+
 export function AnalyticsEventDispatcher({
-  context,
+  projection,
 }: {
-  readonly context: AnalyticsEventContext;
+  readonly projection: SiteAnalyticsRouteProjection;
 }) {
   const consent = useRef<unknown>(undefined);
   const rememberConsent = useCallback((values: unknown) => {
@@ -65,14 +76,14 @@ export function AnalyticsEventDispatcher({
       const detail = event instanceof CustomEvent ? event.detail : undefined;
       dispatchAnalyticsEvent(
         consent.current,
-        context,
+        resolveAnalyticsEventContext(projection, window.location.pathname),
         detail,
         (window as unknown as { gtag?: unknown }).gtag,
       );
     };
     document.addEventListener(ANALYTICS_EVENT_TYPE, handleEvent);
     return () => document.removeEventListener(ANALYTICS_EVENT_TYPE, handleEvent);
-  }, [context]);
+  }, [projection]);
 
   return null;
 }

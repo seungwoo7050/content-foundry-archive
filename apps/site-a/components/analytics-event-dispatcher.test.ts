@@ -4,7 +4,11 @@ import {
 } from "@content-foundry/analytics";
 import { describe, expect, it, vi } from "vitest";
 
-import { dispatchAnalyticsEvent } from "./analytics-event-dispatcher";
+import type { SiteAnalyticsRouteProjection } from "../lib/site-analytics-route-projection";
+import {
+  dispatchAnalyticsEvent,
+  resolveAnalyticsEventContext,
+} from "./analytics-event-dispatcher";
 
 const context: AnalyticsEventContext = {
   eventContractVersion: ANALYTICS_EVENT_CONTRACT_VERSION,
@@ -21,8 +25,27 @@ const consent = {
   analyticsStoragePurposeConsentStatus: 1,
 };
 const detail = { eventName: "bookmark_local", articleId: "ART-GUIDE-1" };
+const projection: SiteAnalyticsRouteProjection = {
+  baseContext: {
+    eventContractVersion: ANALYTICS_EVENT_CONTRACT_VERSION,
+    siteId: "site-a",
+    releaseId: "REL-2026-08-25",
+    themeId: "friendly-mobile-utility",
+    skinId: "calm-blue",
+  },
+  routeTypesByPath: {
+    "/article/guide": "article",
+    "/retired-guide": "retired",
+  },
+};
 
 describe("Site A analytics event dispatch", () => {
+  it("resolves exact known paths and defaults unknown paths to not-found", () => {
+    expect(resolveAnalyticsEventContext(projection, "/article/guide").routeType).toBe("article");
+    expect(resolveAnalyticsEventContext(projection, "/retired-guide").routeType).toBe("retired");
+    expect(resolveAnalyticsEventContext(projection, "/ARTICLE/GUIDE").routeType).toBe("not-found");
+  });
+
   it("sends a validated event after analytics consent", () => {
     const gtag = vi.fn();
     expect(dispatchAnalyticsEvent(consent, context, detail, gtag)).toBe(true);
