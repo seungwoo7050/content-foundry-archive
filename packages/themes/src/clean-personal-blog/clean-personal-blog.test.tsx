@@ -98,4 +98,28 @@ describe("Clean Personal Blog", () => {
     expect(html).not.toContain("personal-reader-actions-title");
     expect(html).not.toContain("현재 글 저장");
   });
+
+  it("renders ordered status recovery once after the primary action", () => {
+    const missing = routes[6]!;
+    if (missing.kind !== "not-found") throw new Error("missing fixture is incomplete");
+    const html = render({
+      ...missing,
+      recoveryLinks: [
+        { href: "/search", label: "검색", kind: "search" },
+        { href: "/category/life", label: "생활", kind: "category" },
+        { href: "/article/guide", label: "현재 안내", kind: "replacement" },
+      ],
+    }, "warm-neutral");
+    const hrefs = ["/", "/search", "/category/life", "/article/guide"];
+    const positions = hrefs.map((href) => html.indexOf(`href="${href}"`));
+
+    expect(html.match(/aria-label="페이지 복구 경로"/g)).toHaveLength(1);
+    expect(positions.every((position) => position >= 0)).toBe(true);
+    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    expect(html).not.toContain('href="/category"');
+  });
+
+  it.each([routes[6]!, routes[7]!])("omits empty $kind recovery", (route) => {
+    expect(render(route, "forest-green")).not.toContain('aria-label="페이지 복구 경로"');
+  });
 });
