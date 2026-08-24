@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
+import { resolveConsentBuildConfig } from "@content-foundry/site-core";
+
+import { Ga4Tag } from "../components/ga4-tag";
+import { GoogleConsentDefaults } from "../components/google-consent-defaults";
 import {
   createReleaseIdentity,
   createReleaseIdentityMetadata,
 } from "../lib/release-identity";
+import { resolveSiteAnalyticsConfig } from "../lib/site-analytics-config";
 import { getVersionedSiteReleaseContext } from "../lib/site-release";
 import "./globals.css";
 
@@ -52,10 +57,16 @@ export function generateMetadata(): Metadata {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
-  const { bundle } = getVersionedSiteReleaseContext();
+  const context = getVersionedSiteReleaseContext();
+  const consent = resolveConsentBuildConfig(process.env);
+  const analytics = resolveSiteAnalyticsConfig(context, consent);
 
   return (
-    <html lang={bundle.site.locale}>
+    <html lang={context.bundle.site.locale}>
+      <head>
+        {analytics.provider === "ga4" ? <GoogleConsentDefaults /> : null}
+        <Ga4Tag config={analytics} />
+      </head>
       <body>{children}</body>
     </html>
   );

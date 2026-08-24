@@ -8,6 +8,8 @@
         "CONTENT_RELEASE_DIR",
         "SITE_ORIGIN",
         "SITE_ALLOWED_PRODUCTION_ORIGINS",
+        "CONSENT_PROVIDER",
+        "CONSENT_CONFIG_REVISION",
         "ENABLE_ANALYTICS",
         "ENABLE_ADS"
       ],
@@ -21,6 +23,8 @@
         "IMMUTABLE_MEDIA_DIR",
         "SITE_ORIGIN",
         "SITE_ALLOWED_PRODUCTION_ORIGINS",
+        "CONSENT_PROVIDER",
+        "CONSENT_CONFIG_REVISION",
         "ENABLE_ANALYTICS",
         "ENABLE_ADS"
       ],
