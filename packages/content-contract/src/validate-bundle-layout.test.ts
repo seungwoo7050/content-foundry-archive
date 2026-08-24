@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { validateBundleLayout } from "./validate-bundle-layout.js";
+import {
+  type BundleLayoutVersion,
+  validateBundleLayout,
+  validateBundleLayoutForVersion,
+} from "./validate-bundle-layout.js";
 
 const requiredPaths = [
   "media/media-manifest.json",
@@ -10,8 +14,16 @@ const requiredPaths = [
   "taxonomy.json",
 ] as const;
 
-const expectIntegrityFailure = (paths: readonly string[], message: string) => {
-  expect(() => validateBundleLayout(paths)).toThrowError(
+const expectIntegrityFailure = (
+  paths: readonly string[],
+  message: string,
+  version?: BundleLayoutVersion,
+) => {
+  expect(() =>
+    version
+      ? validateBundleLayoutForVersion(version, paths)
+      : validateBundleLayout(paths),
+  ).toThrowError(
     expect.objectContaining({ code: "INTEGRITY_FAILED", message }),
   );
 };
@@ -33,6 +45,25 @@ describe("validateBundleLayout", () => {
         "media/source/screens/MED-000046.png",
       ]),
     ).not.toThrow();
+  });
+
+  it("requires presentation.json only in the exact v4 layout", () => {
+    expect(() =>
+      validateBundleLayoutForVersion("4.0.0", [
+        ...requiredPaths,
+        "presentation.json",
+      ]),
+    ).not.toThrow();
+    expectIntegrityFailure(
+      requiredPaths,
+      "Missing required bundle path: presentation.json",
+      "4.0.0",
+    );
+    expectIntegrityFailure(
+      [...requiredPaths, "presentation.json"],
+      "Noncanonical bundle path: presentation.json",
+      "3.0.0",
+    );
   });
 
   it.each(requiredPaths)("rejects a missing required payload %s", (missing) => {

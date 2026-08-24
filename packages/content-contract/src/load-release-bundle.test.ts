@@ -21,6 +21,12 @@ const fixtureV3 = fileURLToPath(
     import.meta.url,
   ),
 );
+const fixtureV4 = fileURLToPath(
+  new URL(
+    "../vendor/4.0.0/fixtures/bundles/valid/site-a-minimal/",
+    import.meta.url,
+  ),
+);
 
 describe("loadReleaseBundle", () => {
   it("loads a fully validated release", () => {
@@ -47,6 +53,19 @@ describe("loadReleaseBundle", () => {
     expect(() => loadReleaseBundle(fixtureV3)).toThrowError(
       expect.objectContaining({ code: "CONTRACT_UNSUPPORTED" }),
     );
+  });
+
+  it("loads the exact v4 release with its required presentation", () => {
+    const bundle = loadReleaseBundleForVersion("4.0.0", fixtureV4, {
+      expectedSiteId: "site-a",
+      expectedReleaseId: "REL-2026-000044",
+    });
+
+    expectTypeOf(bundle).toEqualTypeOf<
+      ReleaseBundleDocumentsByVersion["4.0.0"]
+    >();
+    expect(bundle.release.contractVersion).toBe("4.0.0");
+    expect(bundle.presentation.home.featuredArticleIds).toEqual(["ART-000123"]);
   });
 
   it("applies expected identity options to v3", () => {

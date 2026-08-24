@@ -1,13 +1,15 @@
 import { ContractError, type ContractIssue } from "./errors.js";
 import type { ReleaseBundleDocumentsByVersion } from "./read-bundle-documents.js";
 
-type ReleaseBundleDocumentsV3 = ReleaseBundleDocumentsByVersion["3.0.0"];
-type ContentBlockV3 =
-  ReleaseBundleDocumentsV3["articles"][number]["content"][number];
+type StructuredReleaseBundle =
+  | ReleaseBundleDocumentsByVersion["3.0.0"]
+  | ReleaseBundleDocumentsByVersion["4.0.0"];
+type StructuredContentBlock =
+  StructuredReleaseBundle["articles"][number]["content"][number];
 
 function collectGalleryMediaIds(
   mediaIds: Set<string>,
-  content: readonly ContentBlockV3[],
+  content: readonly StructuredContentBlock[],
 ) {
   for (const block of content) {
     if (block.type !== "gallery") continue;
@@ -15,9 +17,9 @@ function collectGalleryMediaIds(
   }
 }
 
-export function validateGalleryAltText(
-  bundle: ReleaseBundleDocumentsV3,
-): ReleaseBundleDocumentsV3 {
+export function validateGalleryAltText<T extends StructuredReleaseBundle>(
+  bundle: T,
+): T {
   const galleryMediaIds = new Set<string>();
   for (const article of bundle.articles) {
     collectGalleryMediaIds(galleryMediaIds, article.content);

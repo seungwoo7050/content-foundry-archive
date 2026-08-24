@@ -9,7 +9,7 @@ import {
   readSupportedReleaseBundleDocuments,
 } from "./read-bundle-documents.js";
 
-const fixture = (version: "2.0.0" | "3.0.0") =>
+const fixture = (version: "2.0.0" | "3.0.0" | "4.0.0") =>
   fileURLToPath(
     new URL(
       `../vendor/${version}/fixtures/bundles/valid/site-a-minimal/`,
@@ -50,6 +50,25 @@ describe("readReleaseBundleDocuments", () => {
     const articleBlockTypes = bundle.articles[0]?.content.map(({ type }) => type);
     expect(articleBlockTypes).toEqual(["heading", "paragraph", "gallery", "action-link"]);
     expect(bundle.pages[0]?.content.at(-1)?.type).toBe("action-link");
+  });
+
+  it("requires and reads the canonical v4 presentation root", () => {
+    const bundle = readReleaseBundleDocumentsForVersion(
+      "4.0.0",
+      fixture("4.0.0"),
+    );
+
+    expectTypeOf(bundle).toEqualTypeOf<ReleaseBundleDocumentsByVersion["4.0.0"]>();
+    expect(bundle.release.releaseId).toBe("REL-2026-000044");
+    expect(bundle.presentation.home.featuredArticleIds).toEqual(["ART-000123"]);
+    expect(bundle.presentation.categoryHighlights).toEqual([
+      { categoryId: "daily-admin", articleIds: ["ART-000123"] },
+    ]);
+    expect(bundle.presentation.brand).toEqual({
+      logoMediaId: null,
+      faviconMediaId: null,
+      socialImageMediaId: null,
+    });
   });
 
   it("keeps canonical v3 unavailable through the legacy reader", () => {

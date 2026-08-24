@@ -15,8 +15,9 @@ import {
 } from "./contract-version.js";
 import { ContractError } from "./errors.js";
 import type { PublicSiteReleaseManifest as PublicSiteReleaseManifestV3 } from "./generated/3.0.0/release.js";
+import type { PublicSiteReleaseManifest as PublicSiteReleaseManifestV4 } from "./generated/4.0.0/release.js";
 import type { PublicSiteReleaseManifest } from "./generated/release.js";
-import { validateBundleLayout } from "./validate-bundle-layout.js";
+import { validateBundleLayoutForVersion } from "./validate-bundle-layout.js";
 import {
   validateContractDocumentForVersion,
 } from "./validate-document.js";
@@ -41,6 +42,7 @@ interface ParsedReleaseManifest {
 interface ReleaseManifestByVersion {
   readonly "2.0.0": PublicSiteReleaseManifest;
   readonly "3.0.0": PublicSiteReleaseManifestV3;
+  readonly "4.0.0": PublicSiteReleaseManifestV4;
 }
 
 export type SupportedReleaseManifest =
@@ -182,6 +184,7 @@ function verifyReleaseIntegrityWithManifest(
   root: string,
   release: Record<string, unknown>,
   releaseSource: string,
+  version: keyof ReleaseManifestByVersion,
 ) {
   const checksums = readIntegrityFile(root, "checksums.txt");
   const entries = parseChecksums(checksums);
@@ -206,7 +209,7 @@ function verifyReleaseIntegrityWithManifest(
     if (hash !== entry.hash) fail(`Checksum mismatch: ${entry.path}`);
   }
 
-  validateBundleLayout(listed);
+  validateBundleLayoutForVersion(version, listed);
   const checksumFieldCount = countTopLevelField(
     releaseSource,
     "bundleChecksum",
@@ -247,9 +250,13 @@ export function verifyReleaseIntegrityForVersion(
   root: string,
 ): PublicSiteReleaseManifestV3;
 export function verifyReleaseIntegrityForVersion(
+  version: "4.0.0",
+  root: string,
+): PublicSiteReleaseManifestV4;
+export function verifyReleaseIntegrityForVersion(
   version: keyof ReleaseManifestByVersion,
   root: string,
-): PublicSiteReleaseManifest | PublicSiteReleaseManifestV3 {
+): ReleaseManifestByVersion[keyof ReleaseManifestByVersion] {
   const { release, source } = readReleaseManifest(root);
   return verifyReleaseIntegrityForParsedVersion(version, root, release, source);
 }
@@ -259,7 +266,7 @@ function verifyReleaseIntegrityForParsedVersion(
   root: string,
   release: Record<string, unknown>,
   source: string,
-): PublicSiteReleaseManifest | PublicSiteReleaseManifestV3 {
+): ReleaseManifestByVersion[keyof ReleaseManifestByVersion] {
   if (release.contractVersion !== version) {
     throw new ContractError(
       "CONTRACT_INVALID",
@@ -268,12 +275,15 @@ function verifyReleaseIntegrityForParsedVersion(
     );
   }
 
-  verifyReleaseIntegrityWithManifest(root, release, source);
+  verifyReleaseIntegrityWithManifest(root, release, source, version);
   if (version === "2.0.0") {
     return validateContractDocumentForVersion("2.0.0", "release", release);
   }
   if (version === "3.0.0") {
     return validateContractDocumentForVersion("3.0.0", "release", release);
+  }
+  if (version === "4.0.0") {
+    return validateContractDocumentForVersion("4.0.0", "release", release);
   }
 
   const unhandledVersion: never = version;
@@ -306,6 +316,6 @@ export function verifyReleaseIntegrity(
       [{ path: "/contractVersion", message: "expected 2.0.0" }],
     );
   }
-  verifyReleaseIntegrityWithManifest(root, release, source);
+  verifyReleaseIntegrityWithManifest(root, release, source, "2.0.0");
   return validateContractDocumentForVersion("2.0.0", "release", release);
 }

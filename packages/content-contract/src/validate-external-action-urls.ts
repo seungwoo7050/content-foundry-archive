@@ -1,9 +1,11 @@
 import { ContractError, type ContractIssue } from "./errors.js";
 import type { ReleaseBundleDocumentsByVersion } from "./read-bundle-documents.js";
 
-type ReleaseBundleDocumentsV3 = ReleaseBundleDocumentsByVersion["3.0.0"];
-type ContentBlockV3 =
-  ReleaseBundleDocumentsV3["articles"][number]["content"][number];
+type StructuredReleaseBundle =
+  | ReleaseBundleDocumentsByVersion["3.0.0"]
+  | ReleaseBundleDocumentsByVersion["4.0.0"];
+type StructuredContentBlock =
+  StructuredReleaseBundle["articles"][number]["content"][number];
 
 function parseSiteOrigin(
   issues: ContractIssue[],
@@ -23,7 +25,7 @@ function parseSiteOrigin(
 function validateContent(
   issues: ContractIssue[],
   siteOrigin: string | undefined,
-  content: readonly ContentBlockV3[],
+  content: readonly StructuredContentBlock[],
   base: string,
 ) {
   content.forEach((block, index) => {
@@ -57,9 +59,9 @@ function validateContent(
   });
 }
 
-export function validateExternalActionUrls(
-  bundle: ReleaseBundleDocumentsV3,
-): ReleaseBundleDocumentsV3 {
+export function validateExternalActionUrls<T extends StructuredReleaseBundle>(
+  bundle: T,
+): T {
   const issues: ContractIssue[] = [];
   const siteOrigin = parseSiteOrigin(issues, bundle.site.origin);
 

@@ -25,6 +25,8 @@ import {
 
 type ContractDocumentV3<K extends ContractDocumentKindFor<"3.0.0">> =
   ContractDocumentFor<"3.0.0", K>;
+type ContractDocumentV4<K extends ContractDocumentKindFor<"4.0.0">> =
+  ContractDocumentFor<"4.0.0", K>;
 
 const JSON_DECODER = new TextDecoder("utf-8", {
   fatal: true,
@@ -53,9 +55,22 @@ export interface ReleaseBundleDocumentsV3 {
   readonly pages: readonly ContractDocumentV3<"page">[];
 }
 
+export interface ReleaseBundleDocumentsV4 {
+  readonly release: ContractDocumentV4<"release">;
+  readonly site: ContractDocumentV4<"site">;
+  readonly navigation: ContractDocumentV4<"navigation">;
+  readonly taxonomy: ContractDocumentV4<"taxonomy">;
+  readonly mediaManifest: ContractDocumentV4<"media-manifest">;
+  readonly presentation: ContractDocumentV4<"presentation">;
+  readonly redirects: ContractDocumentV4<"redirects">;
+  readonly articles: readonly ContractDocumentV4<"article">[];
+  readonly pages: readonly ContractDocumentV4<"page">[];
+}
+
 export interface ReleaseBundleDocumentsByVersion {
   "2.0.0": ReleaseBundleDocuments;
   "3.0.0": ReleaseBundleDocumentsV3;
+  "4.0.0": ReleaseBundleDocumentsV4;
 }
 
 export type SupportedReleaseBundleDocuments =
@@ -103,6 +118,14 @@ function readDocumentV3<K extends ContractDocumentKindFor<"3.0.0">>(
   kind: K,
 ) {
   return validateContractDocumentForVersion("3.0.0", kind, readJson(root, path));
+}
+
+function readDocumentV4<K extends ContractDocumentKindFor<"4.0.0">>(
+  root: string,
+  path: string,
+  kind: K,
+) {
+  return validateContractDocumentForVersion("4.0.0", kind, readJson(root, path));
 }
 
 interface RecordEntry<T> {
@@ -261,6 +284,39 @@ function assembleReleaseBundleDocumentsV3(
   };
 }
 
+function assembleReleaseBundleDocumentsV4(
+  root: string,
+  release: ContractDocumentV4<"release">,
+): ReleaseBundleDocumentsV4 {
+  const roots = {
+    site: readDocumentV4(root, "site.json", "site"),
+    navigation: readDocumentV4(root, "navigation.json", "navigation"),
+    taxonomy: readDocumentV4(root, "taxonomy.json", "taxonomy"),
+    mediaManifest: readDocumentV4(
+      root,
+      "media/media-manifest.json",
+      "media-manifest",
+    ),
+    presentation: readDocumentV4(
+      root,
+      "presentation.json",
+      "presentation",
+    ),
+    redirects: readDocumentV4(root, "redirects.json", "redirects"),
+  };
+  const records = readReleaseRecords(
+    root,
+    release,
+    (path) => readDocumentV4(root, path, "article"),
+    (path) => readDocumentV4(root, path, "page"),
+  );
+  return {
+    release,
+    ...roots,
+    ...records,
+  };
+}
+
 export function readReleaseBundleDocumentsForVersion(
   version: "2.0.0",
   root: string,
@@ -270,9 +326,13 @@ export function readReleaseBundleDocumentsForVersion(
   root: string,
 ): ReleaseBundleDocumentsByVersion["3.0.0"];
 export function readReleaseBundleDocumentsForVersion(
+  version: "4.0.0",
+  root: string,
+): ReleaseBundleDocumentsByVersion["4.0.0"];
+export function readReleaseBundleDocumentsForVersion(
   version: keyof ReleaseBundleDocumentsByVersion,
   root: string,
-): ReleaseBundleDocuments | ReleaseBundleDocumentsV3 {
+): ReleaseBundleDocumentsByVersion[keyof ReleaseBundleDocumentsByVersion] {
   if (version === "2.0.0") {
     return assembleReleaseBundleDocumentsV2(
       root,
@@ -283,6 +343,12 @@ export function readReleaseBundleDocumentsForVersion(
     return assembleReleaseBundleDocumentsV3(
       root,
       verifyReleaseIntegrityForVersion("3.0.0", root),
+    );
+  }
+  if (version === "4.0.0") {
+    return assembleReleaseBundleDocumentsV4(
+      root,
+      verifyReleaseIntegrityForVersion("4.0.0", root),
     );
   }
 

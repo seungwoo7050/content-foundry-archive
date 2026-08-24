@@ -25,6 +25,10 @@ const v3Fixture = new URL(
   "../vendor/3.0.0/fixtures/bundles/valid/site-a-minimal/",
   import.meta.url,
 );
+const v4Fixture = new URL(
+  "../vendor/4.0.0/fixtures/bundles/valid/site-a-minimal/",
+  import.meta.url,
+);
 const temporaryRoots: string[] = [];
 
 const copyFixture = (source = fixture) => {
@@ -99,6 +103,29 @@ describe("verifyReleaseIntegrity", () => {
     );
     expect(release.contractVersion).toBe("3.0.0");
     expect(release.releaseId).toBe("REL-2026-000043");
+  });
+
+  it("accepts canonical v4 integrity only through its exact boundary", () => {
+    const release = verifyReleaseIntegrityForVersion(
+      "4.0.0",
+      copyFixture(v4Fixture),
+    );
+    expect(release.contractVersion).toBe("4.0.0");
+    expect(release.releaseId).toBe("REL-2026-000044");
+  });
+
+  it("rejects a v4 bundle missing its checksummed presentation", () => {
+    const root = copyFixture(v4Fixture);
+    rmSync(join(root, "presentation.json"));
+
+    expect(() =>
+      verifyReleaseIntegrityForVersion("4.0.0", root),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "INTEGRITY_FAILED",
+        message: "Bundle file set does not match checksums.txt",
+      }),
+    );
   });
 
   it("dispatches every supported release integrity version", () => {

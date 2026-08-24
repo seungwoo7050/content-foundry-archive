@@ -82,6 +82,14 @@ export function validateV3ReleaseBundle(
   bundle: ReleaseBundleDocumentsByVersion["3.0.0"],
   options: LoadReleaseBundleOptions = {},
 ): ReleaseBundleDocumentsByVersion["3.0.0"] {
+  return validateStructuredReleaseBundle(bundle, options);
+}
+
+function validateStructuredReleaseBundle<
+  T extends
+    | ReleaseBundleDocumentsByVersion["3.0.0"]
+    | ReleaseBundleDocumentsByVersion["4.0.0"],
+>(bundle: T, options: LoadReleaseBundleOptions = {}): T {
   const validated = validateLoadedReleaseBundle(bundle, options);
   validateGalleryAltText(validated);
   validateExternalActionUrls(validated);
@@ -99,6 +107,11 @@ export function loadReleaseBundleForVersion(
   options?: LoadReleaseBundleOptions,
 ): ReleaseBundleDocumentsByVersion["3.0.0"];
 export function loadReleaseBundleForVersion(
+  version: "4.0.0",
+  root: string,
+  options?: LoadReleaseBundleOptions,
+): ReleaseBundleDocumentsByVersion["4.0.0"];
+export function loadReleaseBundleForVersion(
   version: keyof ReleaseBundleDocumentsByVersion,
   root: string,
   options: LoadReleaseBundleOptions = {},
@@ -112,6 +125,12 @@ export function loadReleaseBundleForVersion(
   if (version === "3.0.0") {
     return validateV3ReleaseBundle(
       readReleaseBundleDocumentsForVersion("3.0.0", root),
+      options,
+    );
+  }
+  if (version === "4.0.0") {
+    return validateStructuredReleaseBundle(
+      readReleaseBundleDocumentsForVersion("4.0.0", root),
       options,
     );
   }
@@ -144,9 +163,7 @@ export function loadSupportedReleaseBundle(
   options: LoadSupportedReleaseBundleOptions,
 ): LoadedSupportedReleaseBundle {
   const { resolveV3ConsumerContext, ...identityOptions } = options;
-  const bundle = readSupportedReleaseBundleDocuments(
-    root,
-  ) as VersionedReleaseBundle;
+  const bundle = readSupportedReleaseBundleDocuments(root);
   const version = bundle.release.contractVersion;
   if (version === "2.0.0") {
     return validateLoadedReleaseBundle(
