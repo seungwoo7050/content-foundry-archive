@@ -1,12 +1,14 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
 
 import { qaArticles } from "./articles";
 import { qaMediaAssets } from "./media-assets";
 import {
+  QA_CORE_HTML_ARTIFACTS,
+  verifyQaStaticHtmlCorpus,
   verifyQaStaticSiteArtifacts,
   verifyQaStaticSiteIdentity,
 } from "./verify-static-site";
@@ -28,11 +30,19 @@ function fixture() {
   const outputDirectory = mkdtempSync(join(tmpdir(), "public-sites-qa-identity-"));
   roots.push(outputDirectory);
   writeFileSync(join(outputDirectory, "_release.json"), JSON.stringify(release));
-  writeFileSync(join(outputDirectory, "index.html"), [
-    `<meta name="robots" content="noindex, nofollow">`,
-    `<meta name="content-foundry-build-config-checksum" content="${checksum}">`,
-    `<body data-theme="friendly-mobile-utility" data-skin="calm-blue">QA 비운영</body>`,
-  ].join(""));
+  for (const [path, canonicalPath] of QA_CORE_HTML_ARTIFACTS) {
+    const target = join(outputDirectory, path);
+    mkdirSync(dirname(target), { recursive: true });
+    const canonical = canonicalPath === null
+      ? ""
+      : `<link rel="canonical" href="${origin}${canonicalPath}">`;
+    writeFileSync(target, [
+      canonical,
+      `<meta name="robots" content="noindex, nofollow">`,
+      `<meta name="content-foundry-build-config-checksum" content="${checksum}">`,
+      `<body data-theme="friendly-mobile-utility" data-skin="calm-blue">QA 비운영</body>`,
+    ].join(""));
+  }
   writeFileSync(join(outputDirectory, "robots.txt"), "User-Agent: *\nDisallow: /\n\n");
   writeFileSync(join(outputDirectory, "ads.txt"), "");
   writeFileSync(join(outputDirectory, "sitemap.xml"), `<loc>${origin}/</loc>`);
@@ -86,5 +96,15 @@ describe("verifyQaStaticSiteIdentity", () => {
       entries: [],
     }));
     expect(() => verifyQaStaticSiteArtifacts(valid)).toThrow(/search index mismatch/u);
+  });
+
+  it("accepts the HTML corpus and rejects missing or operating routes", () => {
+    const valid = fixture();
+    expect(verifyQaStaticHtmlCorpus(valid)).toEqual({ htmlCount: 13 });
+    rmSync(join(valid.outputDirectory, "archive.html"));
+    expect(() => verifyQaStaticHtmlCorpus(valid)).toThrow(/missing archive\.html/u);
+    const operating = fixture();
+    writeFileSync(join(operating.outputDirectory, "index.html"), "operating");
+    expect(() => verifyQaStaticHtmlCorpus(operating)).toThrow(/canonical mismatch/u);
   });
 });

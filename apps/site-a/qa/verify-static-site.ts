@@ -9,6 +9,24 @@ type IdentityPlan = Pick<QaStaticBuildPlan, "outputDirectory" | "theme" | "skin"
 type ArtifactPlan = IdentityPlan & Pick<QaStaticBuildPlan, "origin">;
 const checksumPattern = /^sha256:(?!0{64}$)[0-9a-f]{64}$/u;
 const supportedVersions = ["2.0.0", "3.0.0", "4.0.0"];
+export const QA_CORE_HTML_ARTIFACTS = Object.freeze([
+  ["index.html", ""],
+  ["archive.html", "/archive"],
+  ["archive/page/2.html", "/archive/page/2"],
+  ["category/field-notes.html", "/category/field-notes"],
+  ["category/field-notes/page/2.html", "/category/field-notes/page/2"],
+  ["search.html", "/search"],
+  ["about.html", "/about"],
+  ["contact.html", "/contact"],
+  ["privacy.html", "/privacy"],
+  ["advertising-disclosure.html", "/advertising-disclosure"],
+  ["404.html", null],
+  ["retired/qa-old-guide.html", null],
+  [
+    "article/qa-nonproduction-very-long-korean-title-layout-table-code-command-gallery-faq-source-update-related-action.html",
+    "/article/qa-nonproduction-very-long-korean-title-layout-table-code-command-gallery-faq-source-update-related-action",
+  ],
+] as const);
 
 const reject = (message: string): never => {
   throw new Error(`Invalid QA static identity: ${message}`);
@@ -76,4 +94,26 @@ export function verifyQaStaticSiteArtifacts(plan: ArtifactPlan) {
     readArtifact(plan, `_media/${asset.sha256}/source.webp`);
   }
   return Object.freeze({ searchCount: search.entries.length, mediaCount: 5 });
+}
+
+export function verifyQaStaticHtmlCorpus(plan: ArtifactPlan) {
+  const identity = JSON.parse(readArtifact(plan, "_release.json"));
+  for (const [path, canonicalPath] of QA_CORE_HTML_ARTIFACTS) {
+    const html = readArtifact(plan, path);
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)"/iu)?.[1];
+    const expected = canonicalPath === null ? undefined : `${plan.origin}${canonicalPath}`;
+    if (canonical !== expected) return reject(`${path} canonical mismatch`);
+    if (!/<meta name="robots" content="[^"]*noindex/iu.test(html)) {
+      return reject(`${path} is indexable`);
+    }
+    for (const marker of [
+      `data-theme="${plan.theme}"`,
+      `data-skin="${plan.skin}"`,
+      "QA 비운영",
+      `<meta name="content-foundry-build-config-checksum" content="${identity.buildConfigChecksum}"`,
+    ]) {
+      if (!html.includes(marker)) return reject(`${path} is missing ${marker}`);
+    }
+  }
+  return Object.freeze({ htmlCount: QA_CORE_HTML_ARTIFACTS.length });
 }
