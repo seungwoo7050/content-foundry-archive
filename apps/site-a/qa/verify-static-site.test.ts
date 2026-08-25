@@ -5,11 +5,13 @@ import { dirname, join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { qaArticles } from "./articles";
+import { qaCorpus } from "./corpus";
 import { qaMediaAssets } from "./media-assets";
 import {
   QA_CORE_HTML_ARTIFACTS,
   QA_PAGINATION_ARTIFACTS,
   verifyQaStaticHtmlCorpus,
+  verifyQaStaticMetadata,
   verifyQaStaticPagination,
   verifyQaStaticSiteArtifacts,
   verifyQaStaticSiteIdentity,
@@ -65,6 +67,26 @@ function fixture() {
     mkdirSync(directory, { recursive: true });
     writeFileSync(join(directory, "source.webp"), "webp");
   }
+  const socialUrl = `${origin}/_media/${qaMediaAssets[0]!.sha256}/source.webp`;
+  const article = qaArticles[0]!;
+  for (const [path, title, url] of [
+    ["index.html", qaCorpus.site.name, origin],
+    [`${article.seo.canonicalPath.slice(1)}.html`, article.title, `${origin}${article.seo.canonicalPath}`],
+  ] as const) {
+    const target = join(outputDirectory, path);
+    writeFileSync(target, readFileSync(target, "utf8") + [
+      `<meta property="og:title" content="${title}">`,
+      `<meta property="og:url" content="${url}">`,
+      `<meta property="og:image" content="${socialUrl}">`,
+      `<meta name="twitter:title" content="${title}">`,
+      `<meta name="twitter:image" content="${socialUrl}">`,
+      `<script type="application/ld+json">{"@type":"Thing"}</script>`,
+    ].join(""));
+  }
+  const home = join(outputDirectory, "index.html");
+  const favicon = qaMediaAssets[4]!;
+  writeFileSync(home, readFileSync(home, "utf8")
+    + `<link rel="icon" href="${origin}/_media/${favicon.sha256}/source.webp" type="${favicon.mimeType}" sizes="${favicon.width}x${favicon.height}">`);
   return {
     outputDirectory, origin, theme: "friendly-mobile-utility", skin: "calm-blue",
   } as const;
@@ -122,5 +144,16 @@ describe("verifyQaStaticSiteIdentity", () => {
     const archive = join(valid.outputDirectory, "archive/page/2.html");
     writeFileSync(archive, readFileSync(archive, "utf8").replace(' rel="prev"', ""));
     expect(() => verifyQaStaticPagination(valid)).toThrow(/previous anchor mismatch/u);
+  });
+
+  it("accepts QA social metadata and rejects a foreign image", () => {
+    const valid = fixture();
+    expect(verifyQaStaticMetadata(valid)).toEqual({ metadataPageCount: 2 });
+    const home = join(valid.outputDirectory, "index.html");
+    writeFileSync(home, readFileSync(home, "utf8").replace(
+      `/_media/${qaMediaAssets[0]!.sha256}/`,
+      "/_media/foreign/",
+    ));
+    expect(() => verifyQaStaticMetadata(valid)).toThrow(/social metadata mismatch/u);
   });
 });

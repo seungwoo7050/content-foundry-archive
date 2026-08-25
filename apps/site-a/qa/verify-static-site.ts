@@ -3,6 +3,7 @@ import { join } from "node:path";
 
 import { qaArticles } from "./articles";
 import type { QaStaticBuildPlan } from "./build-matrix-plan";
+import { qaCorpus } from "./corpus";
 import { qaMediaAssets } from "./media-assets";
 
 type IdentityPlan = Pick<QaStaticBuildPlan, "outputDirectory" | "theme" | "skin">;
@@ -164,4 +165,58 @@ export function verifyQaStaticPagination(plan: ArtifactPlan) {
     return reject("pagination route inventory mismatch");
   }
   return Object.freeze({ paginationCount: expected.length });
+}
+
+function readMeta(html: string, attribute: "name" | "property", key: string): string {
+  const value = html.match(
+    new RegExp(`<meta ${attribute}="${key}" content="([^"]+)"`, "iu"),
+  )?.[1];
+  return value ?? reject(`missing ${key} metadata`);
+}
+
+function assertSocialMetadata(html: string, title: string, url: string, image: string) {
+  const actual = [
+    readMeta(html, "property", "og:title"),
+    readMeta(html, "property", "og:url"),
+    readMeta(html, "property", "og:image"),
+    readMeta(html, "name", "twitter:title"),
+    readMeta(html, "name", "twitter:image"),
+  ];
+  if (JSON.stringify(actual) !== JSON.stringify([title, url, image, title, image])) {
+    return reject("social metadata mismatch");
+  }
+  const jsonLd = [...html.matchAll(
+    /<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/giu,
+  )].flatMap((match) => match[1] ? [match[1]] : []);
+  if (jsonLd.length === 0) return reject("missing JSON-LD");
+  for (const source of jsonLd) JSON.parse(source);
+}
+
+export function verifyQaStaticMetadata(plan: ArtifactPlan) {
+  const home = readArtifact(plan, "index.html");
+  const articleRecord = qaArticles[0]!;
+  const article = readArtifact(plan, `${articleRecord.seo.canonicalPath.slice(1)}.html`);
+  const favicon = qaMediaAssets.find(({ id }) =>
+    id === qaCorpus.presentation.brand.faviconMediaId);
+  const social = qaMediaAssets.find(({ id }) =>
+    id === qaCorpus.presentation.brand.socialImageMediaId);
+  const hero = qaMediaAssets.find(({ id }) => id === articleRecord.heroMediaId);
+  if (!favicon || !social || !hero) return reject("brand media is missing");
+  const faviconUrl = `${plan.origin}/_media/${favicon.sha256}/source.webp`;
+  const faviconLink = home.match(
+    /<link rel="icon" href="([^"]+)" type="([^"]+)" sizes="([^"]+)"/iu,
+  )?.slice(1);
+  if (JSON.stringify(faviconLink)
+    !== JSON.stringify([faviconUrl, favicon.mimeType, `${favicon.width}x${favicon.height}`])) {
+    return reject("favicon metadata mismatch");
+  }
+  assertSocialMetadata(
+    home, qaCorpus.site.name, plan.origin,
+    `${plan.origin}/_media/${social.sha256}/source.webp`,
+  );
+  assertSocialMetadata(
+    article, articleRecord.title, `${plan.origin}${articleRecord.seo.canonicalPath}`,
+    `${plan.origin}/_media/${hero.sha256}/source.webp`,
+  );
+  return Object.freeze({ metadataPageCount: 2 });
 }
