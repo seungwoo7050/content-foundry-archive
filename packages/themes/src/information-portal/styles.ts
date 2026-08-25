@@ -92,6 +92,12 @@ export const INFORMATION_PORTAL_STYLES = `
 .ip .search-controller .search-fallback p{color:var(--color-text-muted);font-size:.85rem}
 .ip .search-controller .search-fallback ul{display:flex;flex-wrap:wrap}
 .ip .search-controller .search-fallback a{display:inline-flex;min-height:44px;align-items:center;padding:.4rem .65rem;border:1px solid var(--color-border);background:var(--color-surface-muted);text-decoration:none}
+.ip nav[aria-label="목록 페이지 이동"]{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem 1rem;margin-top:1rem;padding:.75rem;background:var(--color-surface-muted);border:1px solid var(--color-border)}
+.ip nav[aria-label="목록 페이지 이동"] p{margin:0;color:var(--color-text-muted);font-size:.82rem}
+.ip nav[aria-label="목록 페이지 이동"] span[aria-current="page"]{display:inline-flex;padding:.35rem .6rem;color:var(--color-text);background:var(--color-surface);border-left:3px solid var(--color-primary);font-weight:800}
+.ip nav[aria-label="목록 페이지 이동"] ul{display:flex;flex-wrap:wrap;gap:.45rem;margin:0;padding:0;list-style:none}
+.ip nav[aria-label="목록 페이지 이동"] a{display:inline-flex;min-height:44px;align-items:center;padding:.45rem .75rem;background:var(--color-surface);border:1px solid var(--color-border);font-weight:750;text-decoration:none}
+.ip nav[aria-label="목록 페이지 이동"] a:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
 .ip-state{max-width:46rem;margin-inline:auto;text-align:center;padding-block:2rem}.ip-code{color:var(--color-danger);font-weight:850}.ip-footer{border-top:1px solid var(--color-border);background:var(--color-surface);padding:1rem}.ip-footer p{margin:0;color:var(--color-text-muted);font-size:.9rem}
 @media (min-width:44rem){.ip-directory{grid-template-columns:repeat(3,minmax(0,1fr))}.ip-list>ul,.ip-list>ol{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (min-width:64rem){
@@ -100,12 +106,12 @@ export const INFORMATION_PORTAL_STYLES = `
   .ip-article-rail{grid-column:2;grid-row:1}
   .ip-list>ul,.ip-list>ol{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
-@media (max-width:30rem){.ip .search-controller form{grid-template-columns:minmax(0,1fr)}.ip .search-controller button{width:100%}:is(.ip-home-featured,.ip-home-current,.ip-home-reference,.ip-home-latest,.ip-home-category-highlight)>ul{grid-template-columns:1fr;gap:.4rem}:is(.ip-home-featured,.ip-home-current,.ip-home-reference,.ip-home-latest,.ip-home-category-highlight) article{padding:.65rem}.ip-home-category-highlight{padding:.7rem}}
+@media (max-width:30rem){.ip .search-controller form{grid-template-columns:minmax(0,1fr)}.ip .search-controller button{width:100%}.ip nav[aria-label="목록 페이지 이동"]{align-items:stretch;flex-direction:column}.ip nav[aria-label="목록 페이지 이동"] ul{display:grid;grid-template-columns:minmax(0,1fr)}.ip nav[aria-label="목록 페이지 이동"] a{justify-content:center;width:100%}:is(.ip-home-featured,.ip-home-current,.ip-home-reference,.ip-home-latest,.ip-home-category-highlight)>ul{grid-template-columns:1fr;gap:.4rem}:is(.ip-home-featured,.ip-home-current,.ip-home-reference,.ip-home-latest,.ip-home-category-highlight) article{padding:.65rem}.ip-home-category-highlight{padding:.7rem}}
 @media (min-width:64rem){.ip-home-featured>ul{grid-template-columns:repeat(2,minmax(0,1fr))}.ip-home-featured>ul>li:first-child{grid-column:1/-1}.ip-home-reference>ul{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (prefers-reduced-motion:reduce){.ip,.ip *{scroll-behavior:auto!important;animation-name:none!important;transition-duration:.01ms!important}}
 @media print{
   .ip{min-height:auto;background:#fff;color:#000;font-family:ui-serif,Georgia,serif;font-size:11pt;line-height:1.55}
-  .ip-masthead,.ip-footer,.ip-skip,.ip-breadcrumbs,.ip .search-controller form,.ip aside[aria-label="광고"],.ip button{display:none!important}
+  .ip-masthead,.ip-footer,.ip-skip,.ip-breadcrumbs,.ip .search-controller form,.ip aside[aria-label="광고"],.ip nav[aria-label="목록 페이지 이동"],.ip button{display:none!important}
   .ip-main{display:block;width:100%;padding:0}.ip-article-layout,.ip-article-main{display:block}
   .ip-panel,.ip-list article{break-inside:avoid;border:1px solid #aaa;background:#fff}
   .ip-article-rail{display:block;margin-block:1rem;padding:.8rem;break-inside:avoid;border:1px solid #aaa;background:#fff}

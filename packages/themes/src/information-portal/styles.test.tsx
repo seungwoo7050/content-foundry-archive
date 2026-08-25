@@ -48,6 +48,20 @@ describe("Information Portal styles", () => {
     }
   });
 
+  it("presents pagination as responsive portal navigation", () => {
+    for (const rule of [
+      '.ip nav[aria-label="목록 페이지 이동"]{display:flex;flex-wrap:wrap;',
+      '.ip nav[aria-label="목록 페이지 이동"] span[aria-current="page"]{display:inline-flex;',
+      '.ip nav[aria-label="목록 페이지 이동"] a{display:inline-flex;min-height:44px;',
+      '.ip nav[aria-label="목록 페이지 이동"] a:focus-visible{outline:3px solid var(--focus-ring);',
+      '.ip nav[aria-label="목록 페이지 이동"]{align-items:stretch;flex-direction:column}',
+      '.ip nav[aria-label="목록 페이지 이동"] ul{display:grid;grid-template-columns:minmax(0,1fr)}',
+      '.ip nav[aria-label="목록 페이지 이동"],.ip button{display:none!important}',
+    ]) {
+      expect(INFORMATION_PORTAL_STYLES).toContain(rule);
+    }
+  });
+
   it("pins both article tracks to the first desktop grid row", () => {
     const desktopArticleStyles = INFORMATION_PORTAL_STYLES.slice(
       INFORMATION_PORTAL_STYLES.indexOf("@media (min-width:64rem){"),
