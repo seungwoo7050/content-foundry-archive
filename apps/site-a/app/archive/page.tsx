@@ -8,6 +8,7 @@ export function generateMetadata() {
 }
 
 export default function ArchivePage() {
-  const { bundle } = getVersionedSiteReleaseContext();
-  return renderThemePage(bundle, createArchiveThemeViewModel(bundle));
+  const { bundle, mediaAssets } = getVersionedSiteReleaseContext();
+  const routeSource = { ...bundle, mediaAssets };
+  return renderThemePage(bundle, createArchiveThemeViewModel(routeSource));
 }

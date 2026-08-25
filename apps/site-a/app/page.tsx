@@ -7,8 +7,9 @@ import { createWebsiteStructuredData } from "../lib/website-structured-data";
 
 export default function HomePage() {
   const context = getVersionedSiteReleaseContext();
-  const { bundle, canonicalOrigin } = context;
-  const route = createHomeThemeViewModel(bundle);
+  const { bundle, canonicalOrigin, mediaAssets } = context;
+  const routeSource = { ...bundle, mediaAssets };
+  const route = createHomeThemeViewModel(routeSource);
 
   return (
     <>
