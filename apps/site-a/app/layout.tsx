@@ -38,9 +38,6 @@ export function generateMetadata(): Metadata {
     },
     description: bundle.site.description,
     alternates: { canonical: "/" },
-    ...(brand.favicon
-      ? { icons: { icon: [brand.favicon] } }
-      : {}),
     robots: {
       index: !noindex,
       follow: !noindex,
@@ -69,10 +66,22 @@ export function generateMetadata(): Metadata {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const context = getVersionedSiteReleaseContext();
   const launch = resolveSiteLaunchConfig(context, process.env);
+  const brand = createSiteBrandMetadata(
+    context.canonicalOrigin,
+    resolveBrandMediaAssets(context.bundle, context.mediaAssets),
+  );
 
   return (
     <html lang={context.bundle.site.locale}>
       <head>
+        {brand.favicon ? (
+          <link
+            href={new URL(brand.favicon.url).pathname}
+            rel="icon"
+            sizes={brand.favicon.sizes}
+            type={brand.favicon.type}
+          />
+        ) : null}
         <GoogleProviderHead
           analytics={launch.analytics}
           cmp={launch.cmp}
