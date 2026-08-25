@@ -70,6 +70,29 @@ describe("Editorial Utility output styles", () => {
     );
   });
 
+  it("keeps mobile masthead navigation compact without hiding links", () => {
+    for (const rule of [
+      ".editorial-masthead .editorial-masthead__identity { gap: .2rem; padding-block: 1rem .7rem; }",
+      ".editorial-category-strip { display: grid; grid-template-columns: minmax(0, 1fr) auto;",
+      ".editorial-category-strip > nav { min-width: 0; margin: -.25rem; padding: .25rem; overflow-x: auto;",
+      ".editorial-category-strip ul { width: max-content; flex-wrap: nowrap;",
+      ".editorial-category-strip nav a { display: inline-flex; min-height: 44px;",
+      ".editorial-article-header h1 { font-size: clamp(2.2rem, 6vw, 4.25rem); }",
+      ".editorial-article-header h1 { font-size: clamp(2rem, 9vw, 2.25rem); }",
+      ".editorial-home-tools ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));",
+      ".editorial-home-tools li { min-width: 0; overflow-wrap: anywhere; }",
+      ".editorial-home-tools > a { display: inline-flex; min-height: 44px;",
+    ]) {
+      expect(EDITORIAL_UTILITY_STYLES).toContain(rule);
+    }
+
+    const mobileStyles = EDITORIAL_UTILITY_STYLES.slice(
+      EDITORIAL_UTILITY_STYLES.indexOf("@media (max-width: 30rem)"),
+      EDITORIAL_UTILITY_STYLES.indexOf("@media (min-width: 52rem)"),
+    );
+    expect(mobileStyles).not.toMatch(/\.editorial-category-strip[^{}]*\{[^}]*display:\s*none/);
+  });
+
   it("presents pagination as responsive editorial navigation", () => {
     for (const rule of [
       '.editorial-utility nav[aria-label="목록 페이지 이동"] { display: grid; grid-template-columns: auto minmax(0, 1fr);',
