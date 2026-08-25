@@ -216,10 +216,10 @@ export function verifyQaStaticMetadata(plan: ArtifactPlan) {
     id === qaCorpus.presentation.brand.socialImageMediaId);
   const hero = qaMediaAssets.find(({ id }) => id === articleRecord.heroMediaId);
   if (!favicon || !social || !hero) return reject("brand media is missing");
-  const faviconUrl = `${plan.origin}/_media/${favicon.sha256}/source.webp`;
-  const faviconLink = home.match(
-    /<link rel="icon" href="([^"]+)" type="([^"]+)" sizes="([^"]+)"/iu,
-  )?.slice(1);
+  const faviconUrl = `/_media/${favicon.sha256}/source.webp`;
+  const faviconTag = home.match(/<link\b(?=[^>]*\brel="icon")([^>]*)>/iu)?.[1];
+  const faviconLink = ["href", "type", "sizes"].map((name) =>
+    faviconTag?.match(new RegExp(`\\b${name}="([^"]+)"`, "iu"))?.[1]);
   if (JSON.stringify(faviconLink)
     !== JSON.stringify([faviconUrl, favicon.mimeType, `${favicon.width}x${favicon.height}`])) {
     return reject("favicon metadata mismatch");
@@ -250,12 +250,18 @@ function readSiteCode(root: string, directory = ""): SiteCodeFile[] {
 }
 
 function externalAutoLoads(html: string): string[] {
-  return [...html.matchAll(/<(?:script|iframe|img|source)\b([^>]*)>/giu)].flatMap((tag) =>
+  const resourceTags = [
+    ...html.matchAll(/<(?:script|iframe|img|source)\b([^>]*)>/giu),
+    ...html.matchAll(
+      /<link\b(?=[^>]*\brel\s*=\s*["'][^"']*\b(?:stylesheet|preload|modulepreload|icon)\b)([^>]*)>/giu,
+    ),
+  ];
+  return resourceTags.flatMap((tag) =>
     [...(tag[1] ?? "").matchAll(
-      /\b(src|srcset)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/giu,
+      /\b(href|src|(?:image)?srcset)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/giu,
     )].flatMap((attribute) => {
       const value = attribute[2] ?? attribute[3] ?? attribute[4] ?? "";
-      const urls = attribute[1]?.toLowerCase() === "srcset"
+      const urls = attribute[1]?.toLowerCase().endsWith("srcset")
         ? value.split(",").map((candidate) => candidate.trim().split(/\s+/u)[0] ?? "")
         : [value];
       return urls.filter((url) => /^(?:https?:)?\/\//iu.test(url));

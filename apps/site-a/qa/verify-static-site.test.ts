@@ -91,7 +91,7 @@ function fixture() {
   const home = join(outputDirectory, "index.html");
   const favicon = qaMediaAssets[4]!;
   writeFileSync(home, readFileSync(home, "utf8")
-    + `<link rel="icon" href="${origin}/_media/${favicon.sha256}/source.webp" type="${favicon.mimeType}" sizes="${favicon.width}x${favicon.height}">`
+    + `<link href="/_media/${favicon.sha256}/source.webp" rel="icon" sizes="${favicon.width}x${favicon.height}" type="${favicon.mimeType}">`
     + `<a href="https://source.qa.public-sites.example/synthetic-reference">QA source</a>`);
   const dormant = join(outputDirectory, "_next/static/chunks/dormant.js");
   mkdirSync(dirname(dormant), { recursive: true });
@@ -171,11 +171,18 @@ describe("verifyQaStaticSiteIdentity", () => {
     expect(verifyQaStaticSecurity(valid)).toEqual({
       htmlCount: 13, jsCount: 1, dormantEndpointCount: 2,
     });
-    const external = fixture();
-    const home = join(external.outputDirectory, "index.html");
-    writeFileSync(home, readFileSync(home, "utf8")
-      + '<iframe src="https://external.invalid/embed"></iframe>');
-    expect(() => verifyQaStaticSecurity(external)).toThrow(/external auto-load/u);
+    for (const tag of [
+      '<iframe src="https://external.invalid/embed"></iframe>',
+      '<link rel="stylesheet" href="https://external.invalid/site.css">',
+      '<link rel="preload" href="//external.invalid/font.woff2">',
+      '<link rel="modulepreload" href="https://external.invalid/chunk.js">',
+      '<link rel="icon" href="https://external.invalid/favicon.webp">',
+    ]) {
+      const external = fixture();
+      const home = join(external.outputDirectory, "index.html");
+      writeFileSync(home, readFileSync(home, "utf8") + tag);
+      expect(() => verifyQaStaticSecurity(external)).toThrow(/external auto-load/u);
+    }
     const provider = fixture();
     writeFileSync(join(provider.outputDirectory, "index.html"), '<ins class="adsbygoogle"></ins>');
     expect(() => verifyQaStaticSecurity(provider)).toThrow(/provider DOM payload/u);
