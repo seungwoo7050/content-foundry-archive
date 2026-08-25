@@ -65,7 +65,6 @@ export function FriendlyArticle({
       ) : null}
       {route.category ? <p className="fmu-eyebrow"><a href={route.category.href}>{route.category.label}</a></p> : null}
       <ThemeArticleTopics topics={route.topics} />
-      {route.hero ? <div className="fmu-panel fmu-body">{route.hero}</div> : null}
       <section aria-labelledby="fmu-summary" className="fmu-panel fmu-summary">
         <h2 id="fmu-summary">이 글에서 확인할 내용</h2>
         <p>{route.description}</p>
@@ -80,6 +79,7 @@ export function FriendlyArticle({
           <ol>{route.toc.map((item) => <li data-level={item.level} key={item.id}><a href={`#${item.id}`}>{item.label}</a></li>)}</ol>
         </nav>
       ) : null}
+      {route.hero ? <div className="fmu-panel fmu-body">{route.hero}</div> : null}
       <div className="fmu-panel fmu-body">{route.body}</div>
       <ArticleEvidence route={route} />
       {route.readerActions !== null && route.readerActions !== undefined ? (

@@ -47,6 +47,11 @@ describe("Friendly Mobile Utility article", () => {
     expect(html).not.toMatch(/href="\/tag\//);
     expect(html).toContain('<time dateTime="2026-08-20T00:00:00Z">2026년 8월 20일</time>');
     expect(html).toContain('href="#step">신청 단계</a>');
+    expect(html.indexOf("이 글에서 확인할 내용")).toBeLessThan(
+      html.indexOf("대표 이미지"),
+    );
+    expect(html.indexOf("안내 정보")).toBeLessThan(html.indexOf("대표 이미지"));
+    expect(html.indexOf("목차")).toBeLessThan(html.indexOf("대표 이미지"));
     expect(html).toContain("신청 본문");
     expect(html).toContain("공식 안내");
     expect(html).toContain("공식 절차 변경");
