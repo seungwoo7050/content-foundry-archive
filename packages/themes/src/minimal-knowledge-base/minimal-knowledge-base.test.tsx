@@ -120,7 +120,7 @@ describe("Minimal Knowledge Base", () => {
     expect(html).toContain("--color-surface:#FFFFFF");
     expect(html).toContain("--color-surface-muted:#EAF3FF");
     expect(html).toContain("--color-text:#13213A");
-    expect(html).toContain("--color-text-muted:#65738B");
+    expect(html).toContain("--color-text-muted:#5F6D84");
     expect(html).toContain("--color-primary:#245BCC");
     expect(html).toContain("--color-on-primary:#FFFFFF");
     expect(html).toContain("--color-border:#CBD8EB");
