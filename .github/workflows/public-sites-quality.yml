@@ -38,7 +38,9 @@ jobs:
       - name: Run uncached workspace gates
         run: pnpm exec turbo run test typecheck lint build --force
 
-      - name: Validate the supported release contract
+      - name: Validate the vendored v2 release contract
+        env:
+          CONTENT_RELEASE_DIR: packages/content-contract/vendor/2.0.0/fixtures/bundles/valid/site-a-minimal
         run: pnpm validate:release
 
       - name: Generate the non-operational QA matrix
