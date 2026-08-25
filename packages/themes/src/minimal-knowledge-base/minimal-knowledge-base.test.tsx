@@ -238,7 +238,7 @@ describe("Minimal Knowledge Base", () => {
   it.each(["category", "archive"] as const)(
     "omits pagination markup from a one-page %s list",
     (kind) => {
-      expect(render(getListRoute(kind)))
+      expect(mainMarkup(render(getListRoute(kind))))
         .not.toContain('aria-label="목록 페이지 이동"');
     },
   );
@@ -250,7 +250,7 @@ describe("Minimal Knowledge Base", () => {
     "renders real pagination anchors after the %s article list",
     (kind, path, previousHref, nextHref) => {
       const route = getListRoute(kind);
-      const html = render({
+      const html = mainMarkup(render({
         ...route,
         path,
         breadcrumbs: [{ href: path, label: route.heading }],
@@ -260,7 +260,7 @@ describe("Minimal Knowledge Base", () => {
           previous: { href: previousHref, label: "이전 페이지" },
           next: { href: nextHref, label: "다음 페이지" },
         },
-      });
+      }));
 
       expect(html.indexOf('href="/article/start"')).toBeLessThan(
         html.indexOf('aria-label="목록 페이지 이동"'),
