@@ -31,6 +31,8 @@ const base = (path: string, heading: string) => ({
   description: `${heading} 설명`,
   breadcrumbs: [{ href: path, label: heading }],
 });
+const withoutInlineStyles = (html: string): string =>
+  html.replace(/<style(?:\s[^>]*)?>[\s\S]*?<\/style>/giu, "");
 const routes: readonly HtmlRouteViewModel[] = [
   {
     ...base("/", "홈"), kind: "home", articleSectionHeading: "최근 안내",
@@ -70,12 +72,12 @@ describe("Friendly Mobile Utility route matrix", () => {
 
   for (const route of routes) {
     it(`renders the complete ${route.kind} route as static markup`, () => {
-      const html = renderToStaticMarkup(
+      const html = withoutInlineStyles(renderToStaticMarkup(
         friendlyMobileUtilityTheme.renderRoute(
           { shell, route },
           { skinId: "calm-blue", colors: SKIN_TOKENS["calm-blue"] },
         ),
-      );
+      ));
 
       expect(html).toContain(`data-route-kind="${route.kind}"`);
       expect(html).toContain(`<h1>${route.heading}</h1>`);
@@ -103,12 +105,12 @@ describe("Friendly Mobile Utility route matrix", () => {
       "article-end": <aside data-test-slot="article-end">글 끝 슬롯</aside>,
       "desktop-sidebar": <aside data-test-slot="desktop-sidebar">미지원 슬롯</aside>,
     } as const;
-    const render = (route: HtmlRouteViewModel) => renderToStaticMarkup(
+    const render = (route: HtmlRouteViewModel) => withoutInlineStyles(renderToStaticMarkup(
       friendlyMobileUtilityTheme.renderRoute(
         { shell, route },
         { skinId: "calm-blue", colors: SKIN_TOKENS["calm-blue"], adSlots },
       ),
-    );
+    ));
     const home = routes.find((route) => route.kind === "home");
     const eligibleArticle = routes.find((route) => route.kind === "article");
 
