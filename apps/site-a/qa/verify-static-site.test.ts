@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -8,7 +8,9 @@ import { qaArticles } from "./articles";
 import { qaMediaAssets } from "./media-assets";
 import {
   QA_CORE_HTML_ARTIFACTS,
+  QA_PAGINATION_ARTIFACTS,
   verifyQaStaticHtmlCorpus,
+  verifyQaStaticPagination,
   verifyQaStaticSiteArtifacts,
   verifyQaStaticSiteIdentity,
 } from "./verify-static-site";
@@ -36,16 +38,22 @@ function fixture() {
     const canonical = canonicalPath === null
       ? ""
       : `<link rel="canonical" href="${origin}${canonicalPath}">`;
+    const previous = QA_PAGINATION_ARTIFACTS.find(([artifact]) => artifact === path)?.[2];
     writeFileSync(target, [
+      `<title>${previous ? "QA 2페이지" : "QA"}</title>`,
       canonical,
       `<meta name="robots" content="noindex, nofollow">`,
       `<meta name="content-foundry-build-config-checksum" content="${checksum}">`,
       `<body data-theme="friendly-mobile-utility" data-skin="calm-blue">QA 비운영</body>`,
+      previous ? `<a href="${previous}" rel="prev">이전 페이지</a>` : "",
     ].join(""));
   }
   writeFileSync(join(outputDirectory, "robots.txt"), "User-Agent: *\nDisallow: /\n\n");
   writeFileSync(join(outputDirectory, "ads.txt"), "");
-  writeFileSync(join(outputDirectory, "sitemap.xml"), `<loc>${origin}/</loc>`);
+  writeFileSync(join(outputDirectory, "sitemap.xml"), [
+    `<loc>${origin}/</loc>`,
+    ...QA_PAGINATION_ARTIFACTS.map(([, route]) => `<loc>${origin}${route}</loc>`),
+  ].join(""));
   writeFileSync(join(outputDirectory, "search-index.json"), JSON.stringify({
     schemaVersion: "1.0.0",
     locale: "ko-KR",
@@ -106,5 +114,13 @@ describe("verifyQaStaticSiteIdentity", () => {
     const operating = fixture();
     writeFileSync(join(operating.outputDirectory, "index.html"), "operating");
     expect(() => verifyQaStaticHtmlCorpus(operating)).toThrow(/canonical mismatch/u);
+  });
+
+  it("accepts pagination identity and rejects a non-anchor previous link", () => {
+    const valid = fixture();
+    expect(verifyQaStaticPagination(valid)).toEqual({ paginationCount: 2 });
+    const archive = join(valid.outputDirectory, "archive/page/2.html");
+    writeFileSync(archive, readFileSync(archive, "utf8").replace(' rel="prev"', ""));
+    expect(() => verifyQaStaticPagination(valid)).toThrow(/previous anchor mismatch/u);
   });
 });

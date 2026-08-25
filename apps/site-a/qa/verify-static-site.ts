@@ -1,4 +1,4 @@
-import { existsSync, lstatSync, readFileSync } from "node:fs";
+import { existsSync, lstatSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 import { qaArticles } from "./articles";
@@ -26,6 +26,10 @@ export const QA_CORE_HTML_ARTIFACTS = Object.freeze([
     "article/qa-nonproduction-very-long-korean-title-layout-table-code-command-gallery-faq-source-update-related-action.html",
     "/article/qa-nonproduction-very-long-korean-title-layout-table-code-command-gallery-faq-source-update-related-action",
   ],
+] as const);
+export const QA_PAGINATION_ARTIFACTS = Object.freeze([
+  ["archive/page/2.html", "/archive/page/2", "/archive"],
+  ["category/field-notes/page/2.html", "/category/field-notes/page/2", "/category/field-notes"],
 ] as const);
 
 const reject = (message: string): never => {
@@ -116,4 +120,48 @@ export function verifyQaStaticHtmlCorpus(plan: ArtifactPlan) {
     }
   }
   return Object.freeze({ htmlCount: QA_CORE_HTML_ARTIFACTS.length });
+}
+
+function relAnchorHrefs(html: string, rel: "prev" | "next"): string[] {
+  return [...html.matchAll(/<a\b([^>]*)>/giu)].flatMap((match) => {
+    const attributes = match[1] ?? "";
+    if (!attributes.includes(`rel="${rel}"`)) return [];
+    const href = attributes.match(/\bhref="([^"]+)"/iu)?.[1];
+    return href ? [href] : [];
+  });
+}
+
+function listPaginationRoutes(root: string, directory = ""): string[] {
+  return readdirSync(join(root, directory), { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) return listPaginationRoutes(root, path);
+    return /^(?:archive|category\/[^/]+)\/page\/(?:[2-9]|[1-9][0-9]+)\.html$/u.test(path)
+      ? [`/${path.slice(0, -5)}`]
+      : [];
+  });
+}
+
+export function verifyQaStaticPagination(plan: ArtifactPlan) {
+  for (const [path, route, previous] of QA_PAGINATION_ARTIFACTS) {
+    const html = readArtifact(plan, path);
+    if (!/<title>[^<]*2페이지/iu.test(html)) return reject(`${path} title mismatch`);
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)"/iu)?.[1];
+    if (canonical !== `${plan.origin}${route}`) return reject(`${path} canonical mismatch`);
+    if (JSON.stringify(relAnchorHrefs(html, "prev")) !== JSON.stringify([previous])) {
+      return reject(`${path} previous anchor mismatch`);
+    }
+    if (relAnchorHrefs(html, "next").length > 0) return reject(`${path} has a next anchor`);
+  }
+  const expected = QA_PAGINATION_ARTIFACTS.map(([, route]) => route).sort();
+  const exported = listPaginationRoutes(plan.outputDirectory).sort();
+  const sitemap = readArtifact(plan, "sitemap.xml");
+  const indexed = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/gu)]
+    .flatMap((match) => match[1] ? [new URL(match[1]).pathname] : [])
+    .filter((route) => /\/page\/(?:[2-9]|[1-9][0-9]+)$/u.test(route))
+    .sort();
+  if (JSON.stringify(exported) !== JSON.stringify(expected)
+    || JSON.stringify(indexed) !== JSON.stringify(expected)) {
+    return reject("pagination route inventory mismatch");
+  }
+  return Object.freeze({ paginationCount: expected.length });
 }
