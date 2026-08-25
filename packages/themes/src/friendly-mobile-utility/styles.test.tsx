@@ -149,6 +149,23 @@ describe("Friendly Mobile Utility styles", () => {
     );
   });
 
+  it("finishes footer policy navigation across desktop and mobile", () => {
+    for (const rule of [
+      ".fmu-footer-inner{display:grid;gap:.75rem}",
+      ".fmu-footer p{margin:0;color:var(--color-text-muted);font-size:.9rem}",
+      ".fmu-footer nav ul{display:flex;flex-wrap:wrap;gap:.5rem .75rem;margin:0;padding:0;list-style:none}",
+      ".fmu-footer nav a{display:inline-flex;min-height:44px;max-width:100%;align-items:center;",
+      "overflow-wrap:anywhere;border:1px solid var(--color-border);",
+      ".fmu-footer nav a:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px}",
+      ".fmu-footer-inner{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:1rem}",
+      ".fmu-footer nav ul{display:grid;grid-template-columns:1fr}",
+      ".fmu-footer nav a{width:100%}",
+      ".fmu-header,.fmu-footer,.fmu-skip",
+    ]) {
+      expect(FRIENDLY_MOBILE_STYLES).toContain(rule);
+    }
+  });
+
   it("uses a broad desktop shell while protecting the article reading measure", () => {
     expect(FRIENDLY_MOBILE_STYLES).toContain(
       ".fmu-header-inner,.fmu-main,.fmu-footer-inner{width:min(100%,48rem)",
