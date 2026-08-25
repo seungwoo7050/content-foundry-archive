@@ -28,7 +28,7 @@ export const SKIN_TOKENS: Readonly<Record<SkinId, SemanticColorTokens>> =
       surface: "#FFFFFF",
       surfaceMuted: "#EAF3FF",
       text: "#13213A",
-      textMuted: "#65738B",
+      textMuted: "#5F6D84",
       primary: "#245BCC",
       onPrimary: "#FFFFFF",
       border: "#CBD8EB",
