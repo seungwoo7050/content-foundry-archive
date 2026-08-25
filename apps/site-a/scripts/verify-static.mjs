@@ -388,7 +388,7 @@ assert.ok(!Object.hasOwn(homeStructuredData[0], "potentialAction"));
 assert.match(home, /<h2><a href="\/search">사이트 검색<\/a><\/h2>/);
 assert.match(
   home,
-  /<nav aria-label="생활메모"><ul><li><a href="\/">홈<\/a><\/li><li><a href="\/category\/daily-admin">생활·행정<\/a><\/li><\/ul><\/nav>/,
+  /<nav aria-label="생활메모"><ul><li><a aria-current="page" href="\/">홈<\/a><\/li><li><a href="\/category\/daily-admin">생활·행정<\/a><\/li><\/ul><\/nav>/,
 );
 assert.match(article, /<h1>정부24 주민등록등본 발급 방법<\/h1>/);
 assert.match(
