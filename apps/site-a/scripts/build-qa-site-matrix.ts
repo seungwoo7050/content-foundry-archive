@@ -7,6 +7,7 @@ import { BuildTargetConfigError } from "@content-foundry/site-core";
 
 import { createQaBuildEnvironment } from "../qa/build-environment";
 import { planQaStaticBuilds } from "../qa/build-matrix-plan";
+import { verifyQaStaticBuild } from "../qa/verify-static-build";
 
 const appDirectory = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 if (resolve(process.cwd()) !== appDirectory) {
@@ -75,6 +76,7 @@ try {
       force: false,
       errorOnExist: true,
     });
+    verifyQaStaticBuild(plan);
   }
   process.stdout.write(`${sitesDirectory}\n`);
 } catch (error) {
