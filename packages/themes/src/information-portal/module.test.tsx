@@ -9,6 +9,24 @@ import type {
 import { SKIN_IDS, SKIN_TOKENS } from "../skin.js";
 import { informationPortalTheme } from "./module.js";
 
+const FORBIDDEN_VISITOR_MEANING =
+  /\b(?:rankings?|trending|popular(?:ity)?|(?:view)?counts?|verified(?:badge)?|newsletter(?:signup)?)\b|순위|인기|조회|검증됨|뉴스레터/iu;
+const SAVED_ROUTE_LINK = /\bhref=(["'])\/saved(?:[/?#][^"']*)?\1/iu;
+
+const visitorText = (html: string): string => {
+  const withoutStyles = html.replace(/<style\b[^>]*>[\s\S]*?<\/style>/giu, " ");
+  const accessibleAttributes = [
+    ...withoutStyles.matchAll(
+      /\b(?:aria-label|aria-description|alt|title|placeholder)=(["'])(.*?)\1/giu,
+    ),
+  ].map((match) => match[2] ?? "");
+
+  return `${accessibleAttributes.join(" ")} ${withoutStyles}`
+    .replace(/<[^>]+>/gu, " ")
+    .replace(/\s+/gu, " ")
+    .trim();
+};
+
 const shell: SiteShellViewModel = {
   locale: "ko-KR",
   skipLink: { href: "#main-content", label: "본문으로 바로가기" },
@@ -80,7 +98,8 @@ describe("Information Portal route and skin matrix", () => {
         expect(html).toContain(`data-route-kind="${route.kind}"`);
         expect(html).toContain(`<h1>${route.heading}</h1>`);
         expect(html).toContain('<main class="ip-main"');
-        expect(html).not.toMatch(/ranking|trending|popular|count|verified|newsletter|bookmark|saved|순위|인기|조회|검증됨|뉴스레터|저장/i);
+        expect(visitorText(html)).not.toMatch(FORBIDDEN_VISITOR_MEANING);
+        expect(html).not.toMatch(SAVED_ROUTE_LINK);
         if (route.kind === "home") {
           expect(html).toContain('<a aria-current="page" href="/">홈</a>');
         } else {
@@ -90,6 +109,23 @@ describe("Information Portal route and skin matrix", () => {
       });
     }
   }
+
+  it("separates approved bookmark language from forbidden portal meaning", () => {
+    const bookmarkMarkup =
+      '<style>.article-bookmark { color: inherit; }</style><button>이 기기에 저장</button>';
+
+    expect(visitorText(bookmarkMarkup)).not.toMatch(FORBIDDEN_VISITOR_MEANING);
+    expect(bookmarkMarkup).not.toMatch(SAVED_ROUTE_LINK);
+    for (const forbiddenMarkup of [
+      '<img alt="Newsletter signup" src="/media/example.webp"/>',
+      '<button aria-label="Verified badge"></button>',
+      '<span title="Popularity rankings">안내</span>',
+      "<p>viewCount 인기 순위</p>",
+    ]) {
+      expect(visitorText(forbiddenMarkup)).toMatch(FORBIDDEN_VISITOR_MEANING);
+    }
+    expect('<a href="/saved">저장된 글</a>').toMatch(SAVED_ROUTE_LINK);
+  });
 
   it("places only the four declared manual slots on eligible routes", () => {
     const adSlots = {
