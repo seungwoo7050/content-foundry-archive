@@ -157,9 +157,13 @@ describe("Editorial Utility", () => {
   it("renders release-provided editorial groups as distinct factual sections", () => {
     const home = routes[0]!;
     if (home.kind !== "home") throw new Error("Expected home fixture");
+    const featuredArticle = {
+      ...articles[0]!,
+      artwork: <figure aria-label="선정 안내 이미지" />,
+    };
     const html = render({
       ...home,
-      featuredArticles: [articles[0]!],
+      featuredArticles: [featuredArticle],
       currentArticles: [articles[1]!],
       evergreenArticles: [articles[2]!],
       latestArticles: [articles[3]!],
@@ -169,7 +173,11 @@ describe("Editorial Utility", () => {
       new RegExp(`<section class="${className} editorial-section">[\\s\\S]*?<\\/section>`),
     )?.[0];
 
-    expect(section("editorial-home-featured")).toContain("<h2>선정 안내</h2>");
+    const featured = section("editorial-home-featured");
+    expect(featured).toContain("<h2>선정 안내</h2>");
+    expect(featured!.indexOf("안내 1</a></h3>")).toBeLessThan(
+      featured!.indexOf('<figure aria-label="선정 안내 이미지">'),
+    );
     expect(section("editorial-home-current")).toContain("<h2>지금 확인할 안내</h2>");
     expect(section("editorial-home-reference")).toContain("<h2>기본 안내</h2>");
     expect(section("editorial-home-latest")).toContain("<h2>최근 안내</h2>");

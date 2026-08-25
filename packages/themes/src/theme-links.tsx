@@ -143,10 +143,12 @@ export function ThemeBreadcrumbs({
 
 export function ThemeArticleList({
   articles,
+  artworkPlacement = "before",
   ordered = false,
   headingLevel,
 }: {
   readonly articles: readonly ArticleListItemViewModel[];
+  readonly artworkPlacement?: "before" | "after";
   readonly ordered?: boolean;
   readonly headingLevel: 2 | 3;
 }) {
@@ -169,7 +171,7 @@ export function ThemeArticleList({
       }) => (
         <li key={link.href}>
           <article>
-            {artwork ?? null}
+            {artworkPlacement === "before" ? artwork ?? null : null}
             <p>
               {category ? <><a href={category.href}>{category.label}</a>{" "}</> : null}
               <span>{date.kind === "published" ? "게시" : "업데이트"}</span>{" "}
@@ -181,6 +183,7 @@ export function ThemeArticleList({
             {topics.length > 0 ? (
               <ul>{topics.map((topic, index) => <li key={`${topic}:${index}`}>{topic}</li>)}</ul>
             ) : null}
+            {artworkPlacement === "after" ? artwork ?? null : null}
           </article>
         </li>
       ))}

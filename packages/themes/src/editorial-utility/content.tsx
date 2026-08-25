@@ -28,17 +28,23 @@ function RouteHeader({
 
 function HomeArticleGroup({
   articles,
+  artworkPlacement,
   className,
   heading,
 }: {
   readonly articles: HomeRouteViewModel["articles"] | undefined;
+  readonly artworkPlacement?: "before" | "after";
   readonly className: string;
   readonly heading: string;
 }) {
   return articles && articles.length > 0 ? (
     <section className={`${className} editorial-section`}>
       <h2>{heading}</h2>
-      <ThemeArticleList articles={articles} headingLevel={3} />
+      <ThemeArticleList
+        articles={articles}
+        headingLevel={3}
+        {...(artworkPlacement ? { artworkPlacement } : {})}
+      />
     </section>
   ) : null;
 }
@@ -75,7 +81,7 @@ function Home({
         </div>
       ) : null}
       {hasEditorialGroups ? <>
-        <HomeArticleGroup articles={route.featuredArticles} className="editorial-home-featured" heading="선정 안내" />
+        <HomeArticleGroup articles={route.featuredArticles} artworkPlacement="after" className="editorial-home-featured" heading="선정 안내" />
         <HomeArticleGroup articles={route.currentArticles} className="editorial-home-current" heading="지금 확인할 안내" />
         <HomeArticleGroup articles={route.evergreenArticles} className="editorial-home-reference" heading="기본 안내" />
         <HomeArticleGroup articles={route.latestArticles} className="editorial-home-latest" heading={route.articleSectionHeading} />
