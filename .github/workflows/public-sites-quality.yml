@@ -1,0 +1,54 @@
+name: Public Sites deterministic quality
+
+on:
+  pull_request:
+    branches: [public-sites]
+  push:
+    branches: [public-sites]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-sites-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Check out the exact commit
+        uses: actions/checkout@v4
+
+      - name: Use the pinned Node runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.19.0
+
+      - name: Enable the pinned package manager
+        run: corepack enable
+
+      - name: Install the locked workspace
+        run: pnpm install --frozen-lockfile
+
+      - name: Install the pinned browser engines
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+
+      - name: Run uncached workspace gates
+        run: pnpm exec turbo run test typecheck lint build --force
+
+      - name: Validate the supported release contract
+        run: pnpm validate:release
+
+      - name: Generate the non-operational QA matrix
+        run: pnpm quality:release
+
+      - name: Build and verify all static variants
+        run: pnpm quality:sites
+
+      - name: Run the browser matrix gates
+        run: pnpm quality:browser:matrix
+
+      - name: Run three-sample Lighthouse gates
+        run: pnpm quality:lighthouse:matrix
