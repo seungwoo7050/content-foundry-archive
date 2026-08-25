@@ -42,10 +42,8 @@ describe("QA media asset catalog", () => {
     for (const asset of qaMediaAssets) {
       expect(asset.alt).toMatch(/^QA 비운영 검증용/u);
       expect(asset.alt).not.toMatch(prohibitedClaims);
-      expect(asset.credit).toContain("synthetic QA fixture");
-      expect(asset.license).toBe(
-        "QA-only repository use; production and redistribution not approved",
-      );
+      expect(asset.credit).toBe("OpenAI 내장 이미지 생성·합성 QA 검증 자산");
+      expect(asset.license).toBe("QA 전용·운영/재배포 미승인");
     }
   });
 });

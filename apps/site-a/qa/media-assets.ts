@@ -21,9 +21,8 @@ export type QaMediaAsset = {
   readonly license: string;
 };
 
-const QA_CREDIT = "OpenAI built-in image generation; synthetic QA fixture";
-const QA_LICENSE =
-  "QA-only repository use; production and redistribution not approved";
+const QA_CREDIT = "OpenAI 내장 이미지 생성·합성 QA 검증 자산";
+const QA_LICENSE = "QA 전용·운영/재배포 미승인";
 
 export const qaMediaAssets = [
   {
