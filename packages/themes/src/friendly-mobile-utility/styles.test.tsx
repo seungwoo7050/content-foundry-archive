@@ -149,6 +149,24 @@ describe("Friendly Mobile Utility styles", () => {
     );
   });
 
+  it("uses a broad desktop shell while protecting the article reading measure", () => {
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      ".fmu-header-inner,.fmu-main,.fmu-footer-inner{width:min(100%,48rem)",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      "@media screen and (min-width:64rem)",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      ".fmu-header-inner,.fmu-footer-inner{width:min(100%,72rem)}",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      '.fmu-main:is([data-route-kind="home"],[data-route-kind="category"],[data-route-kind="archive"],[data-route-kind="search"],[data-route-kind="static-page"]){width:min(100%,72rem)}',
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      '.fmu-main[data-route-kind="article"]{width:min(100%,52rem)}',
+    );
+  });
+
   it("preserves readable content for print and reduced-motion readers", () => {
     expect(FRIENDLY_MOBILE_STYLES).toContain("prefers-reduced-motion:reduce");
     expect(FRIENDLY_MOBILE_STYLES).toContain(

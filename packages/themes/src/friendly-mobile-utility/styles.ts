@@ -91,6 +91,11 @@ export const FRIENDLY_MOBILE_STYLES = `
 .fmu :is(.article-bookmark,.article-share-action,.article-feedback) :is([role="status"],[aria-live="polite"]){display:block;min-width:0;min-height:1.5em;margin:0;color:var(--color-text-muted);font-size:.9rem;overflow-wrap:anywhere}
 .fmu-status{text-align:center;padding-block:2rem}.fmu-status-code{font-size:1rem;font-weight:800;color:var(--color-danger)}.fmu-footer{margin-top:1rem;border-top:1px solid var(--color-border);background:var(--color-surface);padding:1.25rem}.fmu-footer p{margin:0;color:var(--color-text-muted)}
 @media (min-width:42rem){.fmu-header,.fmu-main{padding-inline:1.5rem}.fmu-menu{display:none}.fmu-nav-wide{display:block;grid-column:1/-1;margin-top:.65rem}.fmu-nav a{min-height:40px;padding:.45rem .7rem;font-size:.9rem}.fmu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.fmu-panel{padding:1.35rem}:is(.fmu-list:has(>:is(#fmu-home-current,#fmu-home-evergreen,#fmu-home-latest)),.fmu-list:has(>h2>a[href^="/category/"]))>ul{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media screen and (min-width:64rem){
+  .fmu-header-inner,.fmu-footer-inner{width:min(100%,72rem)}
+  .fmu-main:is([data-route-kind="home"],[data-route-kind="category"],[data-route-kind="archive"],[data-route-kind="search"],[data-route-kind="static-page"]){width:min(100%,72rem)}
+  .fmu-main[data-route-kind="article"]{width:min(100%,52rem)}
+}
 @media (max-width:30rem){:is(.fmu-list:has(>:is(#fmu-home-featured,#fmu-home-current,#fmu-home-evergreen,#fmu-home-latest)),.fmu-list:has(>h2>a[href^="/category/"])){padding:.8rem}:is(#fmu-home-featured,#fmu-home-current,#fmu-home-evergreen,#fmu-home-latest){font-size:1.25rem;overflow-wrap:anywhere}}
 @media (max-width:30rem){.fmu .search-controller form{grid-template-columns:1fr}.fmu .search-controller button{width:100%}}
 @media (max-width:30rem){.fmu nav[aria-label="목록 페이지 이동"]{display:grid;align-items:stretch}.fmu nav[aria-label="목록 페이지 이동"] ul{display:grid;grid-template-columns:1fr;width:100%}.fmu nav[aria-label="목록 페이지 이동"] a{width:100%}}
