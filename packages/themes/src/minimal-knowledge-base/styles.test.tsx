@@ -92,8 +92,29 @@ describe("Minimal Knowledge Base styles", () => {
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
       ".kb-home-current>ul{grid-template-columns:minmax(0,1fr)}",
     );
+    for (const rule of [
+      ".kb-home-featured>ul>li:only-child,.kb-home-category-highlight>ul>li:only-child{grid-column:1/-1}",
+      ":is(.kb-home-featured,.kb-home-category-highlight)>ul>li:only-child article:has(>figure)>figure{float:left;width:min(42%,20rem);",
+      ":is(.kb-home-featured,.kb-home-category-highlight)>ul>li:only-child article:has(>figure)::after{display:block;clear:both;content:\"\"}",
+      ".kb-home-current>ul{grid-template-columns:repeat(2,minmax(0,1fr))}",
+      ".kb-home-category-highlight{display:grid;grid-template-columns:minmax(13rem,.55fr) minmax(0,1.45fr);",
+      ".kb-home-category-highlight>ul{grid-column:2;grid-row:1/span 2}",
+      ".kb-home-category-highlight>ul:has(>li:only-child){grid-template-columns:minmax(0,1fr)}",
+    ]) {
+      expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(rule);
+    }
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).not.toContain("grid-row:1/span 5");
     expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
       ".kb-home-article-group>ul>li{margin-bottom:1rem;break-inside:avoid}",
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      ".kb-home-category-highlight{display:block;margin-block:2.5rem;",
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      "article:has(>figure)>figure{float:none;width:auto;margin:0 0 1rem}",
+    );
+    expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(
+      "article:has(>figure)::after{content:none}",
     );
   });
 
