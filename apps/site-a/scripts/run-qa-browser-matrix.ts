@@ -26,7 +26,7 @@ const serveConfig = join(repositoryDirectory, "serve.json");
 const serveCommand = join(repositoryDirectory, "node_modules/.bin/serve");
 const playwrightCommand = join(repositoryDirectory, "node_modules/.bin/playwright");
 const origin = "http://127.0.0.1:4174";
-const specs = ["qa-static", "qa-accessibility", "qa-interactions"]
+const specs = ["qa-static", "qa-accessibility", "qa-interactions", "qa-visual"]
   .map((name) => `apps/site-a/e2e/${name}.spec.ts`);
 
 for (const path of [serveConfig, serveCommand, playwrightCommand]) {
