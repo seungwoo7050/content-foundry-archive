@@ -62,6 +62,22 @@ describe("Information Portal styles", () => {
     }
   });
 
+  it("presents reader actions as stateful touch controls that do not print", () => {
+    for (const rule of [
+      'section[aria-labelledby="ip-reader-actions"] button{display:inline-flex;min-height:44px;',
+      'button:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}',
+      'button[aria-pressed="true"]{color:var(--color-on-primary);background:var(--color-primary)}',
+      "button:disabled{cursor:not-allowed;opacity:.58}",
+      ':is([role="status"],[aria-live="polite"]){display:block;min-width:0;min-height:1.5em;',
+      'article-feedback [role="group"]{display:flex;flex-wrap:wrap;',
+      '@media (max-width:30rem){.ip section[aria-labelledby="ip-reader-actions"] button{width:100%}',
+      'article-feedback [role="group"]{display:grid;grid-template-columns:minmax(0,1fr)}',
+      '.ip section[aria-labelledby="ip-reader-actions"],.ip nav[aria-label="목록 페이지 이동"],.ip button{display:none!important}',
+    ]) {
+      expect(INFORMATION_PORTAL_STYLES).toContain(rule);
+    }
+  });
+
   it("pins both article tracks to the first desktop grid row", () => {
     const desktopArticleStyles = INFORMATION_PORTAL_STYLES.slice(
       INFORMATION_PORTAL_STYLES.indexOf("@media (min-width:64rem){"),
