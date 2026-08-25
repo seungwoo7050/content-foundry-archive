@@ -12,6 +12,9 @@ describe("Editorial Utility output styles", () => {
     );
     expect(EDITORIAL_UTILITY_STYLES).toContain('.editorial-body a[href^="http"]::after');
     expect(EDITORIAL_UTILITY_STYLES).not.toMatch(/data-ad-|adsbygoogle/i);
+    expect(EDITORIAL_UTILITY_STYLES).not.toContain(
+      ".editorial-evidence { order: 2; }",
+    );
   });
 
   it("gives editorial home groups responsive hierarchy without cropping artwork", () => {

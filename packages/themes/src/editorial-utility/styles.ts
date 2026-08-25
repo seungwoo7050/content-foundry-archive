@@ -113,7 +113,6 @@ export const EDITORIAL_UTILITY_STYLES = `
   .editorial-masthead__identity p { text-align: left; }
   .editorial-home-secondary > ul, .editorial-latest > ul { grid-template-columns: 1fr; }
   .editorial-article-layout { grid-template-columns: 1fr; }
-  .editorial-evidence { order: 2; }
 }
 @media (prefers-reduced-motion: reduce) {
   .editorial-utility, .editorial-utility * { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
