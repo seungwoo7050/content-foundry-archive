@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { cpSync, lstatSync, mkdirSync, rmSync } from "node:fs";
+import { cpSync, existsSync, lstatSync, mkdirSync, rmSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -8,6 +8,7 @@ import { BuildTargetConfigError } from "@content-foundry/site-core";
 import { createQaBuildEnvironment } from "../qa/build-environment";
 import { planQaStaticBuilds } from "../qa/build-matrix-plan";
 import { verifyQaStaticBuild } from "../qa/verify-static-build";
+import { writeQaPreviewGallery } from "../qa/write-preview-gallery";
 
 const appDirectory = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 if (resolve(process.cwd()) !== appDirectory) {
@@ -25,8 +26,12 @@ const qualityDirectory = args[0]
   ? resolve(args[0])
   : resolve(repositoryDirectory, "output/quality-release");
 const sitesDirectory = resolve(qualityDirectory, "sites");
+const galleryTarget = resolve(qualityDirectory, "preview-gallery.html");
 if (dirname(sitesDirectory) !== qualityDirectory) {
   throw new BuildTargetConfigError("QA sites target must be a direct child");
+}
+if (existsSync(galleryTarget)) {
+  throw new BuildTargetConfigError("QA preview gallery target already exists");
 }
 const plans = planQaStaticBuilds({
   matrixDirectory: join(qualityDirectory, "releases"),
@@ -34,6 +39,7 @@ const plans = planQaStaticBuilds({
 });
 const appOutputDirectory = join(appDirectory, "out");
 let owned = false;
+let galleryOwned = false;
 
 try {
   mkdirSync(sitesDirectory);
@@ -78,8 +84,11 @@ try {
     });
     verifyQaStaticBuild(plan);
   }
+  writeQaPreviewGallery({ plans, qualityDirectory, repositoryDirectory });
+  galleryOwned = true;
   process.stdout.write(`${sitesDirectory}\n`);
 } catch (error) {
+  if (galleryOwned) rmSync(galleryTarget, { force: true });
   if (owned) rmSync(sitesDirectory, { recursive: true, force: true });
   throw error;
 }
