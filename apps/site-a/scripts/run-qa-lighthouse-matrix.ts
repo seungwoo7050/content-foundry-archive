@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { lstatSync, mkdirSync, rmSync } from "node:fs";
+import { lstatSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -54,10 +54,8 @@ for (const plan of selectedPlans) {
   }
 }
 
-let owned = false;
+mkdirSync(reportsDirectory);
 try {
-  mkdirSync(reportsDirectory);
-  owned = true;
   for (const [index, plan] of selectedPlans.entries()) {
     const reportDirectory = join(reportsDirectory, plan.id);
     if (dirname(reportDirectory) !== reportsDirectory) {
@@ -89,6 +87,6 @@ try {
   }
   process.stdout.write(`QA Lighthouse matrix passed ${selectedPlans.length} variant(s).\n`);
 } catch (error) {
-  if (owned) rmSync(reportsDirectory, { recursive: true, force: true });
+  process.stderr.write(`QA Lighthouse reports preserved at ${reportsDirectory}\n`);
   throw error;
 }

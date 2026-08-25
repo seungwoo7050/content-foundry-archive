@@ -88,3 +88,12 @@ jobs:
 
       - name: Run three-sample Lighthouse gates
         run: pnpm quality:lighthouse:matrix
+
+      - name: Preserve Lighthouse reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-sites-lighthouse-${{ github.run_id }}-${{ github.run_attempt }}
+          path: output/quality-release/lighthouse
+          if-no-files-found: warn
+          retention-days: 7
