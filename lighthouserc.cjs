@@ -1,18 +1,48 @@
 const { chromium } = require("@playwright/test");
+const { isAbsolute } = require("node:path");
+
+const directorySetting = (name, fallback) => {
+  const value = process.env[name];
+  if (value === undefined) return fallback;
+  if (value.length === 0 || value !== value.trim() || !isAbsolute(value)) {
+    throw new Error(`${name} must be an exact absolute directory path`);
+  }
+  return value;
+};
 
 module.exports = {
   ci: {
     collect: {
       chromePath: chromium.executablePath(),
-      staticDistDir: "./apps/site-a/out",
+      staticDistDir: directorySetting(
+        "QA_LIGHTHOUSE_STATIC_DIST_DIR",
+        "./apps/site-a/out",
+      ),
       url: [
         "http://localhost/",
-        "http://localhost/article/government24-resident-registration-guide.html",
+        "http://localhost/article/qa-nonproduction-very-long-korean-title-layout-table-code-command-gallery-faq-source-update-related-action.html",
         "http://localhost/search.html",
       ],
       numberOfRuns: 3,
       settings: {
         chromeFlags: "--headless --no-sandbox --disable-gpu",
+        formFactor: "mobile",
+        throttlingMethod: "simulate",
+        throttling: {
+          rttMs: 150,
+          throughputKbps: 1_638.4,
+          requestLatencyMs: 562.5,
+          downloadThroughputKbps: 1_474.56,
+          uploadThroughputKbps: 675,
+          cpuSlowdownMultiplier: 4,
+        },
+        screenEmulation: {
+          mobile: true,
+          width: 412,
+          height: 823,
+          deviceScaleFactor: 1.75,
+          disabled: false,
+        },
       },
     },
     assert: {
@@ -35,7 +65,10 @@ module.exports = {
     },
     upload: {
       target: "filesystem",
-      outputDir: "./output/lighthouse",
+      outputDir: directorySetting(
+        "QA_LIGHTHOUSE_OUTPUT_DIR",
+        "./output/lighthouse",
+      ),
     },
   },
 };
