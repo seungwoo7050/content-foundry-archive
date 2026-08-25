@@ -43,6 +43,9 @@ jobs:
           CONTENT_RELEASE_DIR: packages/content-contract/vendor/2.0.0/fixtures/bundles/valid/site-a-minimal
         run: pnpm validate:release
 
+      - name: Verify v4 v3 v2 static exports
+        run: pnpm --filter @content-foundry/site-a verify:static:paired
+
       - name: Generate the non-operational QA matrix
         run: pnpm quality:release
 
