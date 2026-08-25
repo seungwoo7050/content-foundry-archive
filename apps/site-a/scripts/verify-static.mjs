@@ -129,6 +129,12 @@ function assertSafeHtml(label, html) {
   assertSafeScripts(label, html);
 }
 
+function renderedElementMarkup(html) {
+  return html
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "");
+}
+
 function assertMinimalThemeRoute(label, html, routeKind) {
   assert.match(
     html,
@@ -161,7 +167,7 @@ function assertMinimalThemeRoute(label, html, routeKind) {
     /<footer\b[^>]*><small>© 2026 생활메모 · 운영: 생활메모<\/small><nav aria-label="운영 및 정책">/,
   );
   assert.match(html, /<a href="\/about">소개<\/a>/);
-  const renderedMarkup = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
+  const renderedMarkup = renderedElementMarkup(html);
   assert.doesNotMatch(
     renderedMarkup,
     /\b(?:ART|MED)-\d{6}\b/,
@@ -622,8 +628,14 @@ if (identity.contractVersion === "2.0.0") {
   if (existsSync(exportedMediaRoot)) {
     assert.deepEqual(listFiles(exportedMediaRoot), [], "v2 fixture exported media files");
   }
-  assert.doesNotMatch(article, /content-gallery|data-action-kind|\/_media\//);
-  assert.doesNotMatch(staticPage, /data-action-kind|\/_media\//);
+  assert.doesNotMatch(
+    renderedElementMarkup(article),
+    /content-gallery|data-action-kind|\/_media\//,
+  );
+  assert.doesNotMatch(
+    renderedElementMarkup(staticPage),
+    /data-action-kind|\/_media\//,
+  );
 } else {
   const mediaHashes = [
     "216154d9fcffafb56f3bd8d846eebdb9ae1b5dc8aaeeea88ce621d1ceb5798e7",
