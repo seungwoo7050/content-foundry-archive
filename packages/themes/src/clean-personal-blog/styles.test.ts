@@ -65,4 +65,21 @@ describe("Clean Personal Blog output styles", () => {
       expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(rule);
     }
   });
+
+  it("presents pagination as warm navigation that reflows and does not print", () => {
+    for (const rule of [
+      '.personal-blog nav[aria-label="목록 페이지 이동"] { display: flex; min-width: 0; flex-wrap: wrap;',
+      'nav[aria-label="목록 페이지 이동"] p { min-width: 0; flex: 1 1 12rem;',
+      '[aria-current="page"] { display: inline-block; padding: .25rem .6rem;',
+      'nav[aria-label="목록 페이지 이동"] ul { display: flex; flex: 1 1 auto; flex-wrap: wrap;',
+      'nav[aria-label="목록 페이지 이동"] a { display: inline-flex; min-height: 44px; max-width: 100%;',
+      'padding: .5rem .8rem; overflow-wrap: anywhere;',
+      'nav[aria-label="목록 페이지 이동"] a:focus-visible { outline: 3px solid var(--personal-focus-ring);',
+      'nav[aria-label="목록 페이지 이동"] { display: grid; align-items: stretch; }',
+      'nav[aria-label="목록 페이지 이동"] ul { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; }',
+      'nav[aria-label="목록 페이지 이동"] { display: none !important; }',
+    ]) {
+      expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(rule);
+    }
+  });
 });

@@ -32,6 +32,13 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
 .personal-article-list article, .personal-related article { padding-bottom: 1.2rem; border-bottom: 1px solid var(--personal-border); }
 .personal-article-list article > p:first-child, .personal-related article > p:first-child { color: var(--personal-text-muted); font-size: .85rem; }
 .personal-article-list h2, .personal-article-list h3, .personal-related h3 { margin-block: .25rem; font-family: ui-serif, Georgia, serif; }
+.personal-blog nav[aria-label="목록 페이지 이동"] { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .8rem; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--personal-border); }
+.personal-blog nav[aria-label="목록 페이지 이동"] p { min-width: 0; flex: 1 1 12rem; margin: 0; color: var(--personal-text-muted); overflow-wrap: anywhere; }
+.personal-blog nav[aria-label="목록 페이지 이동"] [aria-current="page"] { display: inline-block; padding: .25rem .6rem; color: var(--personal-text); background: var(--personal-surface-muted); border-radius: 999px; font-family: ui-serif, Georgia, serif; font-weight: 700; }
+.personal-blog nav[aria-label="목록 페이지 이동"] ul { display: flex; flex: 1 1 auto; flex-wrap: wrap; justify-content: flex-end; gap: .55rem; margin: 0; padding: 0; list-style: none; }
+.personal-blog nav[aria-label="목록 페이지 이동"] li { min-width: 0; }
+.personal-blog nav[aria-label="목록 페이지 이동"] a { display: inline-flex; min-height: 44px; max-width: 100%; align-items: center; justify-content: center; padding: .5rem .8rem; overflow-wrap: anywhere; color: var(--personal-text); background: var(--personal-surface); border: 1px solid var(--personal-border); border-radius: .4rem; font-family: ui-serif, Georgia, serif; font-weight: 700; text-decoration: none; }
+.personal-blog nav[aria-label="목록 페이지 이동"] a:focus-visible { outline: 3px solid var(--personal-focus-ring); outline-offset: 3px; }
 :is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) > ul { margin: 0; }
 :is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) article { min-width: 0; overflow-wrap: anywhere; }
 :is(.personal-home-featured, .personal-home-current, .personal-home-reference, .personal-home-latest, .personal-home-category-highlight) article > p:first-of-type { margin: 0 0 .45rem; color: var(--personal-text-muted); font-size: .8rem; }
@@ -103,6 +110,9 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
 @media (max-width: 30rem) {
   .personal-search-client .search-controller form { grid-template-columns: minmax(0, 1fr); }
   .personal-search-client .search-controller button { width: 100%; }
+  .personal-blog nav[aria-label="목록 페이지 이동"] { display: grid; align-items: stretch; }
+  .personal-blog nav[aria-label="목록 페이지 이동"] ul { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; }
+  .personal-blog nav[aria-label="목록 페이지 이동"] a { width: 100%; }
   .personal-home-featured article, .personal-home-current article, .personal-home-category-highlight article { padding: .9rem; }
   .personal-home-category-highlight { padding: .9rem; }
 }
@@ -121,6 +131,7 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
   .personal-search-client .search-results { display: block; }
   .personal-search-client .search-results > li + li { margin-top: .8rem; }
   .personal-search-client .search-results article { break-inside: avoid; border-radius: 0; background: #fff; }
+  .personal-blog nav[aria-label="목록 페이지 이동"] { display: none !important; }
   .personal-article-meta, .personal-toc, .personal-evidence { break-inside: avoid; border: 1px solid #aaa; border-radius: 0; background: #fff; }
   .personal-body { font-size: inherit; }
   .personal-body a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; overflow-wrap: anywhere; }
