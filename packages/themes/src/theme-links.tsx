@@ -150,6 +150,10 @@ export function ThemeArticleList({
   readonly ordered?: boolean;
   readonly headingLevel: 2 | 3;
 }) {
+  if (articles.length === 0) {
+    return <p className="theme-article-list-empty">표시할 글이 없습니다.</p>;
+  }
+
   const List = ordered ? "ol" : "ul";
   const Heading = headingLevel === 2 ? "h2" : "h3";
   return (

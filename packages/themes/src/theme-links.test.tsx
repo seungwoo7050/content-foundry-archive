@@ -98,6 +98,20 @@ describe("shared theme link primitives", () => {
     expect(html).not.toMatch(/badge|ranking|popular|trending/i);
   });
 
+  it("renders a factual empty state instead of an empty article list", () => {
+    const unordered = renderToStaticMarkup(
+      <ThemeArticleList articles={[]} headingLevel={3} />,
+    );
+    const ordered = renderToStaticMarkup(
+      <ThemeArticleList articles={[]} headingLevel={2} ordered />,
+    );
+
+    expect(unordered).toBe(
+      '<p class="theme-article-list-empty">표시할 글이 없습니다.</p>',
+    );
+    expect(ordered).toBe(unordered);
+  });
+
   it("renders accessible previous and next page anchors", () => {
     const html = renderToStaticMarkup(<ThemePagination pagination={{
       currentPage: 2,
