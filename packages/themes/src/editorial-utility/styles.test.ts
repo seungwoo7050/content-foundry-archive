@@ -39,6 +39,30 @@ describe("Editorial Utility output styles", () => {
     expect(EDITORIAL_UTILITY_STYLES).toContain(
       ".editorial-home-reference > ul { grid-template-columns: repeat(4, minmax(0, 1fr)); }",
     );
+    expect(EDITORIAL_UTILITY_STYLES).toContain(
+      ".editorial-home-category-highlight { display: grid; grid-template-columns: minmax(12rem, .6fr) minmax(0, 1.4fr);",
+    );
+    expect(EDITORIAL_UTILITY_STYLES).toContain(
+      ".editorial-home-category-highlight > ul { grid-column: 2; grid-row: 1 / span 2; grid-template-columns: minmax(0, 1fr); }",
+    );
+    expect(EDITORIAL_UTILITY_STYLES).toContain(
+      ".editorial-home-category-highlight > ul:has(> li:only-child) { grid-template-columns: minmax(0, 1fr); }",
+    );
+    expect(EDITORIAL_UTILITY_STYLES).toContain(
+      ".editorial-home-category-highlight > ul:has(> li:nth-child(2):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); }",
+    );
+    expect(EDITORIAL_UTILITY_STYLES).toContain(
+      ".editorial-home-category-highlight > ul:has(> li:nth-child(3):last-child) { grid-template-columns: repeat(3, minmax(0, 1fr)); }",
+    );
+    expect(EDITORIAL_UTILITY_STYLES).toContain(
+      ".editorial-home-category-highlight > ul > li:only-child article:has(> .content-image) { display: grid;",
+    );
+    expect(EDITORIAL_UTILITY_STYLES).toContain(
+      ".editorial-home-featured article:has(> .content-image), .editorial-home-category-highlight > ul > li:only-child article:has(> .content-image) { display: block; }",
+    );
+    expect(EDITORIAL_UTILITY_STYLES).toContain(
+      ".editorial-home-category-highlight { display: block; }",
+    );
     expect(EDITORIAL_UTILITY_STYLES).toContain("@media (max-width: 30rem)");
     expect(EDITORIAL_UTILITY_STYLES).toContain("break-inside: avoid");
     expect(EDITORIAL_UTILITY_STYLES).not.toMatch(/object-fit\s*:\s*cover/i);
