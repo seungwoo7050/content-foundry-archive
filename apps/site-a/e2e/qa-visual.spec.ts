@@ -31,6 +31,22 @@ const routes = [
 ] as const;
 
 async function settleVisualPage(page: Page): Promise<void> {
+  const { height, viewportHeight } = await page.evaluate(() => ({
+    height: document.documentElement.scrollHeight,
+    viewportHeight: window.innerHeight,
+  }));
+  for (let top = 0; top < height; top += viewportHeight) {
+    await page.evaluate((scrollTop) => new Promise<void>((resolveFrame) => {
+      window.scrollTo(0, scrollTop);
+      requestAnimationFrame(() => requestAnimationFrame(() => resolveFrame()));
+    }), top);
+  }
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect.poll(() => page.evaluate(() => Array.from(document.images)
+    .every((image) => image.complete && image.naturalWidth > 0)), {
+    message: "all QA images should load before visual capture",
+    timeout: 10_000,
+  }).toBe(true);
   await page.evaluate(async () => {
     await document.fonts.ready;
     await Promise.all(Array.from(document.images, (image) => image.decode()));
