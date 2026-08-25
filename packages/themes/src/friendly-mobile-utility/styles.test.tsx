@@ -59,6 +59,15 @@ describe("Friendly Mobile Utility styles", () => {
     );
   });
 
+  it("contains long unbroken text in every article list card", () => {
+    const cardRule = FRIENDLY_MOBILE_STYLES.match(
+      /\.fmu-list article\{([^}]*)\}/,
+    )?.[1];
+
+    expect(cardRule).toContain("min-width:0");
+    expect(cardRule).toContain("overflow-wrap:anywhere");
+  });
+
   it("preserves readable content for print and reduced-motion readers", () => {
     expect(FRIENDLY_MOBILE_STYLES).toContain("prefers-reduced-motion:reduce");
     expect(FRIENDLY_MOBILE_STYLES).toContain(
