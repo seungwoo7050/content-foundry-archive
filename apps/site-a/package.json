@@ -9,6 +9,7 @@
     "lint": "eslint . && stylelint \"app/**/*.css\" --allow-empty-input",
     "prepare:release": "tsx scripts/prepare-site-release.ts",
     "quality:release": "tsx scripts/generate-qa-release-matrix.ts",
+    "quality:sites": "tsx scripts/build-qa-site-matrix.ts",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json",
     "verify:static": "node scripts/verify-static.mjs",

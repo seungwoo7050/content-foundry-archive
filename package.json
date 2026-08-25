@@ -14,6 +14,7 @@
     "quality:browser": "playwright test",
     "quality:lighthouse": "pnpm build && lhci autorun --config=lighthouserc.cjs",
     "quality:release": "pnpm --filter @content-foundry/site-a quality:release",
+    "quality:sites": "pnpm --filter @content-foundry/site-a quality:sites",
     "verify:static": "turbo run verify:static",
     "validate:release": "pnpm --filter @content-foundry/content-contract build && pnpm --filter @content-foundry/content-contract validate:release"
   },
