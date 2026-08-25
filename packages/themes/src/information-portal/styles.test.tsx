@@ -133,6 +133,15 @@ describe("Information Portal styles", () => {
     expect(INFORMATION_PORTAL_STYLES).toContain(
       ".ip-home-reference>ul{grid-template-columns:repeat(4,minmax(0,1fr))}",
     );
+    expect(INFORMATION_PORTAL_STYLES).toContain(
+      ".ip-home-category-highlight>ul:has(>li:only-child){grid-template-columns:minmax(0,1fr)}",
+    );
+    expect(INFORMATION_PORTAL_STYLES).toContain(
+      ".ip-home-category-highlight>ul>li:only-child article:has(>.content-image){display:grid;",
+    );
+    expect(INFORMATION_PORTAL_STYLES).toContain(
+      ".ip-home-category-highlight>ul>li:only-child article:has(>.content-image){display:block}",
+    );
     expect(INFORMATION_PORTAL_STYLES).toContain("@media (max-width:30rem)");
     expect(INFORMATION_PORTAL_STYLES).toContain("break-inside:avoid");
     expect(INFORMATION_PORTAL_STYLES).not.toMatch(/object-fit\s*:\s*cover/i);
