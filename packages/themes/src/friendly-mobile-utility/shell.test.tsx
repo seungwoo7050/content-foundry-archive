@@ -51,6 +51,10 @@ describe("Friendly Mobile Utility shell", () => {
     expect(html).toContain(
       '<a class="fmu-header-search" href="/search">사이트 검색</a>',
     );
+    expect(html).toContain(
+      '<details class="fmu-menu"><summary>메뉴</summary><div class="fmu-nav">',
+    );
+    expect(html).toContain('<div class="fmu-nav fmu-nav-wide">');
     expect(html).toContain('<main class="fmu-main" data-route-kind="static-page" id="main-content" tabindex="-1">');
     expect(html).toContain(
       '<a aria-current="page" href="/guide/start">시작</a>',

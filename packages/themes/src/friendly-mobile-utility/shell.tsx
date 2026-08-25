@@ -76,13 +76,27 @@ export function FriendlyMobileShell({
               {shell.searchLink.label}
             </a>
           ) : null}
-          <div className="fmu-nav">
-            <ThemeNavigation
-              ariaLabel="주요 메뉴"
-              currentPath={routePath}
-              items={shell.primaryNavigation}
-            />
-          </div>
+          {shell.primaryNavigation.length > 0 ? (
+            <>
+              <div className="fmu-nav fmu-nav-wide">
+                <ThemeNavigation
+                  ariaLabel="주요 메뉴"
+                  currentPath={routePath}
+                  items={shell.primaryNavigation}
+                />
+              </div>
+              <details className="fmu-menu">
+                <summary>메뉴</summary>
+                <div className="fmu-nav">
+                  <ThemeNavigation
+                    ariaLabel="주요 메뉴"
+                    currentPath={routePath}
+                    items={shell.primaryNavigation}
+                  />
+                </div>
+              </details>
+            </>
+          ) : null}
         </div>
       </header>
       <main
