@@ -69,4 +69,19 @@ describe("Editorial Utility output styles", () => {
       ".editorial-search-client form, .editorial-utility aside",
     );
   });
+
+  it("presents pagination as responsive editorial navigation", () => {
+    for (const rule of [
+      '.editorial-utility nav[aria-label="목록 페이지 이동"] { display: grid; grid-template-columns: auto minmax(0, 1fr);',
+      '.editorial-utility nav[aria-label="목록 페이지 이동"] span[aria-current="page"] { display: inline-flex;',
+      '.editorial-utility nav[aria-label="목록 페이지 이동"] a { display: inline-flex; min-height: 44px;',
+      'overflow-wrap: anywhere; color: var(--editorial-text);',
+      '.editorial-utility nav[aria-label="목록 페이지 이동"] a:focus-visible { outline: 3px solid var(--editorial-focus-ring);',
+      '.editorial-utility nav[aria-label="목록 페이지 이동"] { grid-template-columns: minmax(0, 1fr); gap: .6rem; }',
+      '.editorial-utility nav[aria-label="목록 페이지 이동"] ul { display: grid; grid-template-columns: minmax(0, 1fr); }',
+      '.editorial-utility nav[aria-label="목록 페이지 이동"] { display: none !important; }',
+    ]) {
+      expect(EDITORIAL_UTILITY_STYLES).toContain(rule);
+    }
+  });
 });

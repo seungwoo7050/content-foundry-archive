@@ -101,6 +101,12 @@ export const EDITORIAL_UTILITY_STYLES = `
 .editorial-search-client .search-results p:last-child { margin-bottom: 0; color: var(--editorial-text-muted); font-size: .85rem; }
 .editorial-search-client .search-fallback ul { display: flex; flex-wrap: wrap; }
 .editorial-search-client .search-fallback a { display: inline-flex; min-height: 44px; align-items: center; padding: .45rem .7rem; border: 1px solid var(--editorial-border); text-decoration: none; }
+.editorial-utility nav[aria-label="목록 페이지 이동"] { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 1rem; margin-block: 2rem; padding-block: .9rem; border-block: 1px solid var(--editorial-border); }
+.editorial-utility nav[aria-label="목록 페이지 이동"] p { margin: 0; color: var(--editorial-text-muted); font-size: .85rem; }
+.editorial-utility nav[aria-label="목록 페이지 이동"] span[aria-current="page"] { display: inline-flex; padding: .35rem .6rem; overflow-wrap: anywhere; background: var(--editorial-surface-muted); border-bottom: .2rem solid var(--editorial-primary); font-family: ui-serif, Georgia, serif; font-weight: 800; }
+.editorial-utility nav[aria-label="목록 페이지 이동"] ul { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; margin: 0; padding: 0; list-style: none; }
+.editorial-utility nav[aria-label="목록 페이지 이동"] a { display: inline-flex; min-height: 44px; align-items: center; padding: .45rem .75rem; overflow-wrap: anywhere; color: var(--editorial-text); background: var(--editorial-surface); border: 1px solid var(--editorial-border); font-weight: 750; text-decoration: none; }
+.editorial-utility nav[aria-label="목록 페이지 이동"] a:focus-visible { outline: 3px solid var(--editorial-focus-ring); outline-offset: 3px; }
 .editorial-state { max-width: 38rem; margin: 5rem auto; padding: clamp(1.5rem, 5vw, 3rem); background: var(--editorial-surface); border-top: .4rem solid var(--editorial-primary); text-align: center; }
 .editorial-state__code { color: var(--editorial-text-muted); font-size: .85rem; letter-spacing: .12em; }
 .editorial-state h1 { font-family: ui-serif, Georgia, serif; font-size: clamp(2rem, 6vw, 3.4rem); }
@@ -110,6 +116,9 @@ export const EDITORIAL_UTILITY_STYLES = `
 @media (max-width: 30rem) {
   .editorial-search-client .search-controller form { grid-template-columns: minmax(0, 1fr); }
   .editorial-search-client .search-controller button { width: 100%; }
+  .editorial-utility nav[aria-label="목록 페이지 이동"] { grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+  .editorial-utility nav[aria-label="목록 페이지 이동"] ul { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .editorial-utility nav[aria-label="목록 페이지 이동"] a { justify-content: center; width: 100%; }
   :is(.editorial-home-featured, .editorial-home-current, .editorial-home-reference, .editorial-home-latest, .editorial-home-category-highlight) > ul { gap: .75rem; }
   :is(.editorial-home-featured, .editorial-home-current, .editorial-home-reference, .editorial-home-latest) article { padding: .9rem; }
   .editorial-home-category-highlight { padding: .9rem; }
@@ -133,7 +142,7 @@ export const EDITORIAL_UTILITY_STYLES = `
 }
 @media print {
   .editorial-utility { min-height: auto; background: #fff; color: #000; font-size: 11pt; line-height: 1.55; }
-  .editorial-masthead, .editorial-footer, .editorial-skip-link, .editorial-breadcrumbs, .editorial-reader-actions, .editorial-search-client form, .editorial-utility aside[aria-label="광고"] { display: none !important; }
+  .editorial-masthead, .editorial-footer, .editorial-skip-link, .editorial-breadcrumbs, .editorial-reader-actions, .editorial-search-client form, .editorial-utility aside[aria-label="광고"], .editorial-utility nav[aria-label="목록 페이지 이동"] { display: none !important; }
   .editorial-main { width: 100%; padding: 0; }
   .editorial-article-header { max-width: none; margin: 0 0 1rem; }
   .editorial-article-layout { display: block; }
