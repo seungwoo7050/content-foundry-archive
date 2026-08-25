@@ -28,7 +28,7 @@ describe("Friendly Mobile Utility styles", () => {
     expect(FRIENDLY_MOBILE_STYLES).toContain(
       ".fmu-article-reading-time{width:max-content;max-width:100%",
     );
-    expect(FRIENDLY_MOBILE_STYLES).not.toMatch(/saved|bookmark|popular|ranking/i);
+    expect(FRIENDLY_MOBILE_STYLES).not.toMatch(/saved|popular|ranking/i);
   });
 
   it("gives every factual home group a distinct hierarchy", () => {
@@ -119,6 +119,33 @@ describe("Friendly Mobile Utility styles", () => {
     );
     expect(FRIENDLY_MOBILE_STYLES).toContain(
       '.fmu nav[aria-label="목록 페이지 이동"]{display:none!important}',
+    );
+  });
+
+  it("presents reader actions as stateful touch controls that do not print", () => {
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      ":is(.article-bookmark,.article-share-action,.article-feedback){min-width:0",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      ":is(.article-bookmark,.article-share-action,.article-feedback) button{display:inline-flex;min-height:44px",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      "button:focus-visible{outline:3px solid var(--focus-ring)",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      "button:disabled{cursor:not-allowed;opacity:.58}",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      'button[aria-pressed="true"]{color:var(--color-primary);background:var(--color-surface)',
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      ':is([role="status"],[aria-live="polite"]){display:block;min-width:0;min-height:1.5em',
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      '@media (max-width:30rem){.fmu :is(.article-bookmark,.article-share-action){grid-template-columns:1fr}',
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      'section[aria-labelledby="fmu-reader-actions"]{display:none!important}',
     );
   });
 
