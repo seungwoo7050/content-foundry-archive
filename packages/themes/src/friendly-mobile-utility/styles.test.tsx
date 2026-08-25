@@ -68,6 +68,33 @@ describe("Friendly Mobile Utility styles", () => {
     expect(cardRule).toContain("overflow-wrap:anywhere");
   });
 
+  it("presents search controls, results, and fallback links as a responsive utility", () => {
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      ".fmu .search-controller form{display:grid;grid-template-columns:minmax(0,1fr) auto",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      ".fmu .search-controller input{width:100%;min-width:0;min-height:48px",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      ".fmu .search-controller button{min-height:48px",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      ".fmu .search-controller button:disabled{cursor:wait;opacity:.58}",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      ".fmu .search-results,.fmu .search-fallback ul{display:grid",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      ".fmu .search-results article{min-width:0;padding:1rem;overflow-wrap:anywhere",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      "@media (max-width:30rem){.fmu .search-controller form{grid-template-columns:1fr}",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      ".fmu .search-controller form,.fmu .search-fallback{display:none!important}",
+    );
+  });
+
   it("preserves readable content for print and reduced-motion readers", () => {
     expect(FRIENDLY_MOBILE_STYLES).toContain("prefers-reduced-motion:reduce");
     expect(FRIENDLY_MOBILE_STYLES).toContain(
