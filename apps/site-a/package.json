@@ -8,6 +8,7 @@
     "dev": "pnpm run prepare:release && next dev",
     "lint": "eslint . && stylelint \"app/**/*.css\" --allow-empty-input",
     "prepare:release": "tsx scripts/prepare-site-release.ts",
+    "quality:release": "tsx scripts/generate-qa-release-matrix.ts",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json",
     "verify:static": "node scripts/verify-static.mjs",
