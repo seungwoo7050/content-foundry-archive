@@ -20,7 +20,11 @@ export function createSiteBrandMetadata(
   canonicalOrigin: string,
   assets: BrandMediaAssets,
 ): SiteBrandMetadata {
-  const favicon = assets.favicon?.fallback;
+  const favicon = assets.favicon
+    ? [assets.favicon.fallback, ...assets.favicon.derivatives].reduce(
+        (smallest, candidate) => candidate.width < smallest.width ? candidate : smallest,
+      )
+    : undefined;
   const socialImage = assets.socialImage?.fallback;
   return {
     favicon: favicon

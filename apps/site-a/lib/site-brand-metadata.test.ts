@@ -16,7 +16,22 @@ const asset: ResponsiveImageAsset = {
     credit: null,
     license: "QA only",
   },
-  derivatives: [],
+  derivatives: [
+    {
+      relativePath: "_media/brand/webp-q82/960w.webp",
+      publicPath: "/_media/brand/webp-q82/960w.webp",
+      mimeType: "image/webp",
+      width: 960,
+      height: 504,
+    },
+    {
+      relativePath: "_media/brand/webp-q82/480w.webp",
+      publicPath: "/_media/brand/webp-q82/480w.webp",
+      mimeType: "image/webp",
+      width: 480,
+      height: 252,
+    },
+  ],
 };
 
 describe("site brand metadata", () => {
@@ -35,9 +50,9 @@ describe("site brand metadata", () => {
       socialImage: asset,
     })).toEqual({
       favicon: {
-        url: "https://site.example/_media/brand/source.webp",
+        url: "https://site.example/_media/brand/webp-q82/480w.webp",
         type: "image/webp",
-        sizes: "1200x630",
+        sizes: "480x252",
       },
       socialImage: {
         url: "https://site.example/_media/brand/source.webp",

@@ -2,6 +2,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
+import { RESPONSIVE_WEBP_QUALITY } from "@content-foundry/media";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { qaArticles } from "./articles";
@@ -90,8 +91,16 @@ function fixture() {
   }
   const home = join(outputDirectory, "index.html");
   const favicon = qaMediaAssets[4]!;
+  const faviconWidth = Math.min(favicon.width, 480);
+  const faviconHeight = Math.max(1, Math.round(
+    (favicon.height * faviconWidth) / favicon.width,
+  ));
+  const faviconDerivative = join(outputDirectory, "_media", favicon.sha256,
+    `webp-q${RESPONSIVE_WEBP_QUALITY}`, `${faviconWidth}w.webp`);
+  mkdirSync(dirname(faviconDerivative), { recursive: true });
+  writeFileSync(faviconDerivative, "webp");
   writeFileSync(home, readFileSync(home, "utf8")
-    + `<link href="/_media/${favicon.sha256}/source.webp" rel="icon" sizes="${favicon.width}x${favicon.height}" type="${favicon.mimeType}">`
+    + `<link href="/_media/${favicon.sha256}/webp-q${RESPONSIVE_WEBP_QUALITY}/${faviconWidth}w.webp" rel="icon" sizes="${faviconWidth}x${faviconHeight}" type="${favicon.mimeType}">`
     + `<a href="https://source.qa.public-sites.example/synthetic-reference">QA source</a>`);
   const dormant = join(outputDirectory, "_next/static/chunks/dormant.js");
   mkdirSync(dirname(dormant), { recursive: true });
@@ -158,6 +167,10 @@ describe("verifyQaStaticSiteIdentity", () => {
   it("accepts QA social metadata and rejects a foreign image", () => {
     const valid = fixture();
     expect(verifyQaStaticMetadata(valid)).toEqual({ metadataPageCount: 2 });
+    const missingFavicon = fixture();
+    rmSync(join(missingFavicon.outputDirectory, "_media", qaMediaAssets[4]!.sha256,
+      `webp-q${RESPONSIVE_WEBP_QUALITY}`, "480w.webp"));
+    expect(() => verifyQaStaticMetadata(missingFavicon)).toThrow(/missing .*480w\.webp/u);
     const home = join(valid.outputDirectory, "index.html");
     writeFileSync(home, readFileSync(home, "utf8").replace(
       `/_media/${qaMediaAssets[0]!.sha256}/`,

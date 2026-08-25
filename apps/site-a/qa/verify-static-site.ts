@@ -1,6 +1,8 @@
 import { existsSync, lstatSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
+import { RESPONSIVE_WEBP_QUALITY } from "@content-foundry/media";
+
 import { qaArticles } from "./articles";
 import type { QaStaticBuildPlan } from "./build-matrix-plan";
 import { qaCorpus } from "./corpus";
@@ -216,12 +218,17 @@ export function verifyQaStaticMetadata(plan: ArtifactPlan) {
     id === qaCorpus.presentation.brand.socialImageMediaId);
   const hero = qaMediaAssets.find(({ id }) => id === articleRecord.heroMediaId);
   if (!favicon || !social || !hero) return reject("brand media is missing");
-  const faviconUrl = `/_media/${favicon.sha256}/source.webp`;
+  const faviconWidth = Math.min(favicon.width, 480);
+  const faviconHeight = Math.max(1, Math.round(
+    (favicon.height * faviconWidth) / favicon.width,
+  ));
+  const faviconUrl = `/_media/${favicon.sha256}/webp-q${RESPONSIVE_WEBP_QUALITY}/${faviconWidth}w.webp`;
+  readArtifact(plan, faviconUrl.slice(1));
   const faviconTag = home.match(/<link\b(?=[^>]*\brel="icon")([^>]*)>/iu)?.[1];
   const faviconLink = ["href", "type", "sizes"].map((name) =>
     faviconTag?.match(new RegExp(`\\b${name}="([^"]+)"`, "iu"))?.[1]);
   if (JSON.stringify(faviconLink)
-    !== JSON.stringify([faviconUrl, favicon.mimeType, `${favicon.width}x${favicon.height}`])) {
+    !== JSON.stringify([faviconUrl, favicon.mimeType, `${faviconWidth}x${faviconHeight}`])) {
     return reject("favicon metadata mismatch");
   }
   assertSocialMetadata(
