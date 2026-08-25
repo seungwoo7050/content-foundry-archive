@@ -10,6 +10,20 @@ type IdentityPlan = Pick<QaStaticBuildPlan, "outputDirectory" | "theme" | "skin"
 type ArtifactPlan = IdentityPlan & Pick<QaStaticBuildPlan, "origin">;
 const checksumPattern = /^sha256:(?!0{64}$)[0-9a-f]{64}$/u;
 const supportedVersions = ["2.0.0", "3.0.0", "4.0.0"];
+const actualProviderId = /\bG-[A-Z0-9]{10}\b|\bca-pub-[0-9]{16}\b/u;
+const providerDomMarkers = Object.freeze([
+  "adsbygoogle",
+  "data-ad-client",
+  "google-adsense-account",
+  "data-content-foundry-provider",
+  "googletagmanager.com",
+  "google-analytics.com",
+  "doubleclick.net",
+]);
+const dormantProviderEndpoints = Object.freeze([
+  "https://www.googletagmanager.com/gtag/js",
+  "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js",
+]);
 export const QA_CORE_HTML_ARTIFACTS = Object.freeze([
   ["index.html", ""],
   ["archive.html", "/archive"],
@@ -219,4 +233,54 @@ export function verifyQaStaticMetadata(plan: ArtifactPlan) {
     `${plan.origin}/_media/${hero.sha256}/source.webp`,
   );
   return Object.freeze({ metadataPageCount: 2 });
+}
+
+type SiteCodeFile = Readonly<{ path: string; source: string; kind: "html" | "js" }>;
+
+function readSiteCode(root: string, directory = ""): SiteCodeFile[] {
+  return readdirSync(join(root, directory), { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) return readSiteCode(root, path);
+    const kind = entry.name.endsWith(".html") ? "html"
+      : entry.name.endsWith(".js") ? "js" : undefined;
+    return entry.isFile() && kind
+      ? [{ path, source: readFileSync(join(root, path), "utf8"), kind }]
+      : [];
+  });
+}
+
+function externalAutoLoads(html: string): string[] {
+  return [...html.matchAll(/<(?:script|iframe|img|source)\b([^>]*)>/giu)].flatMap((tag) =>
+    [...(tag[1] ?? "").matchAll(
+      /\b(src|srcset)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/giu,
+    )].flatMap((attribute) => {
+      const value = attribute[2] ?? attribute[3] ?? attribute[4] ?? "";
+      const urls = attribute[1]?.toLowerCase() === "srcset"
+        ? value.split(",").map((candidate) => candidate.trim().split(/\s+/u)[0] ?? "")
+        : [value];
+      return urls.filter((url) => /^(?:https?:)?\/\//iu.test(url));
+    }));
+}
+
+export function verifyQaStaticSecurity(plan: IdentityPlan) {
+  if (readArtifact(plan, "ads.txt") !== "") return reject("ads.txt is not empty");
+  const files = readSiteCode(plan.outputDirectory);
+  for (const file of files) {
+    if (actualProviderId.test(file.source)) return reject(`actual provider ID in ${file.path}`);
+    if (file.kind === "html" && externalAutoLoads(file.source).length > 0) {
+      return reject(`external auto-load in ${file.path}`);
+    }
+    if (file.kind === "html" && providerDomMarkers.some((marker) =>
+      file.source.toLowerCase().includes(marker))) {
+      return reject(`provider DOM payload in ${file.path}`);
+    }
+  }
+  const javascript = files.filter(({ kind }) => kind === "js");
+  const dormantEndpointCount = dormantProviderEndpoints.filter((endpoint) =>
+    javascript.some(({ source }) => source.includes(endpoint))).length;
+  return Object.freeze({
+    htmlCount: files.length - javascript.length,
+    jsCount: javascript.length,
+    dormantEndpointCount,
+  });
 }

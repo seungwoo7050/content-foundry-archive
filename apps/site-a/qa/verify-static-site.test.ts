@@ -13,6 +13,7 @@ import {
   verifyQaStaticHtmlCorpus,
   verifyQaStaticMetadata,
   verifyQaStaticPagination,
+  verifyQaStaticSecurity,
   verifyQaStaticSiteArtifacts,
   verifyQaStaticSiteIdentity,
 } from "./verify-static-site";
@@ -20,6 +21,10 @@ import {
 const roots: string[] = [];
 const checksum = `sha256:${"1".repeat(64)}`;
 const origin = "https://friendly-mobile-utility-calm-blue.qa.public-sites.example";
+const dormantProviderSource = [
+  '"https://www.googletagmanager.com/gtag/js"',
+  '"https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"',
+].join("\n");
 const release = {
   releaseId: "REL-QA-20260825-000001",
   siteId: "site-a",
@@ -86,7 +91,11 @@ function fixture() {
   const home = join(outputDirectory, "index.html");
   const favicon = qaMediaAssets[4]!;
   writeFileSync(home, readFileSync(home, "utf8")
-    + `<link rel="icon" href="${origin}/_media/${favicon.sha256}/source.webp" type="${favicon.mimeType}" sizes="${favicon.width}x${favicon.height}">`);
+    + `<link rel="icon" href="${origin}/_media/${favicon.sha256}/source.webp" type="${favicon.mimeType}" sizes="${favicon.width}x${favicon.height}">`
+    + `<a href="https://source.qa.public-sites.example/synthetic-reference">QA source</a>`);
+  const dormant = join(outputDirectory, "_next/static/chunks/dormant.js");
+  mkdirSync(dirname(dormant), { recursive: true });
+  writeFileSync(dormant, dormantProviderSource);
   return {
     outputDirectory, origin, theme: "friendly-mobile-utility", skin: "calm-blue",
   } as const;
@@ -155,5 +164,24 @@ describe("verifyQaStaticSiteIdentity", () => {
       "/_media/foreign/",
     ));
     expect(() => verifyQaStaticMetadata(valid)).toThrow(/social metadata mismatch/u);
+  });
+
+  it("rejects active external and provider payloads but reports dormant endpoints", () => {
+    const valid = fixture();
+    expect(verifyQaStaticSecurity(valid)).toEqual({
+      htmlCount: 13, jsCount: 1, dormantEndpointCount: 2,
+    });
+    const external = fixture();
+    const home = join(external.outputDirectory, "index.html");
+    writeFileSync(home, readFileSync(home, "utf8")
+      + '<iframe src="https://external.invalid/embed"></iframe>');
+    expect(() => verifyQaStaticSecurity(external)).toThrow(/external auto-load/u);
+    const provider = fixture();
+    writeFileSync(join(provider.outputDirectory, "index.html"), '<ins class="adsbygoogle"></ins>');
+    expect(() => verifyQaStaticSecurity(provider)).toThrow(/provider DOM payload/u);
+    const configured = fixture();
+    writeFileSync(join(configured.outputDirectory, "_next/static/chunks/dormant.js"),
+      `${dormantProviderSource}\n"G-ABCDE12345"`);
+    expect(() => verifyQaStaticSecurity(configured)).toThrow(/actual provider ID/u);
   });
 });
