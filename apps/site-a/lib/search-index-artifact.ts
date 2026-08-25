@@ -23,6 +23,10 @@ export interface SearchIndexArtifact {
   readonly entries: readonly SearchIndexEntry[];
 }
 
+export interface SearchIndexArtifactOptions {
+  readonly includeNonIndexable?: boolean;
+}
+
 function compareEntryPath(left: SearchIndexEntry, right: SearchIndexEntry) {
   if (left.path < right.path) return -1;
   if (left.path > right.path) return 1;
@@ -31,10 +35,11 @@ function compareEntryPath(left: SearchIndexEntry, right: SearchIndexEntry) {
 
 export function createSearchIndexArtifact(
   bundle: SearchIndexArtifactSource,
+  { includeNonIndexable = false }: SearchIndexArtifactOptions = {},
 ): SearchIndexArtifact {
   const entries = bundle.articles
     .flatMap((article, index) =>
-      article.seo.index
+      includeNonIndexable || article.seo.index
         ? [createSearchIndexEntry(article, index, bundle.taxonomy, bundle.site.locale)]
         : [],
     )
