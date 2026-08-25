@@ -95,6 +95,33 @@ describe("Friendly Mobile Utility styles", () => {
     );
   });
 
+  it("presents pagination as touch-friendly navigation that reflows and does not print", () => {
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      '.fmu nav[aria-label="목록 페이지 이동"]{display:flex;min-width:0;flex-wrap:wrap',
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      '[aria-current="page"]{display:inline-block;padding:.25rem .55rem;',
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      'nav[aria-label="목록 페이지 이동"] ul{display:flex;flex:1 1 auto;flex-wrap:wrap;',
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      'nav[aria-label="목록 페이지 이동"] a{display:inline-flex;min-height:44px;max-width:100%;',
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      "padding:.55rem .85rem;overflow-wrap:anywhere;",
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      'nav[aria-label="목록 페이지 이동"] a:focus-visible{outline:3px solid var(--focus-ring)',
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      '@media (max-width:30rem){.fmu nav[aria-label="목록 페이지 이동"]{display:grid;',
+    );
+    expect(FRIENDLY_MOBILE_STYLES).toContain(
+      '.fmu nav[aria-label="목록 페이지 이동"]{display:none!important}',
+    );
+  });
+
   it("preserves readable content for print and reduced-motion readers", () => {
     expect(FRIENDLY_MOBILE_STYLES).toContain("prefers-reduced-motion:reduce");
     expect(FRIENDLY_MOBILE_STYLES).toContain(

@@ -64,6 +64,13 @@ export const FRIENDLY_MOBILE_STYLES = `
 .fmu-eyebrow{margin:0;color:var(--color-primary);font-weight:800}.fmu-article-reading-time{width:max-content;max-width:100%;margin:0;padding:.4rem .7rem;border:1px solid var(--color-border);border-radius:999px;background:var(--color-surface-muted);color:var(--color-text);font-size:.9rem;font-weight:800}.fmu-intro h1{margin:.25rem 0;font-size:clamp(1.8rem,8vw,2.6rem);line-height:1.2}.fmu-intro>p:last-child{margin-bottom:0;color:var(--color-text-muted)}
 .fmu-breadcrumbs ol{display:flex;flex-wrap:wrap;gap:.35rem;margin:0;padding:0;list-style:none;font-size:.9rem}.fmu-breadcrumbs li+li:before{content:"/";margin-right:.35rem;color:var(--color-text-muted)}
 .fmu-list>ul,.fmu-list>ol{display:grid;gap:.75rem;margin:0;padding:0;list-style:none}.fmu-list article{min-width:0;padding:1rem;overflow-wrap:anywhere;border:1px solid var(--color-border);border-radius:.9rem;background:var(--color-surface)}.fmu-list article>p:first-child{color:var(--color-text-muted);font-size:.9rem}.fmu-list h2,.fmu-list h3{margin:.3rem 0}
+.fmu nav[aria-label="목록 페이지 이동"]{display:flex;min-width:0;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem;margin-top:1rem;padding:.75rem;border:1px solid var(--color-border);border-radius:.9rem;background:var(--color-surface-muted)}
+.fmu nav[aria-label="목록 페이지 이동"] p{min-width:0;flex:1 1 12rem;margin:0;color:var(--color-text-muted);overflow-wrap:anywhere}
+.fmu nav[aria-label="목록 페이지 이동"] [aria-current="page"]{display:inline-block;padding:.25rem .55rem;border-radius:999px;background:var(--color-surface);color:var(--color-primary);font-weight:800}
+.fmu nav[aria-label="목록 페이지 이동"] ul{display:flex;flex:1 1 auto;flex-wrap:wrap;justify-content:flex-end;gap:.5rem;margin:0;padding:0;list-style:none}
+.fmu nav[aria-label="목록 페이지 이동"] li{min-width:0}
+.fmu nav[aria-label="목록 페이지 이동"] a{display:inline-flex;min-height:44px;max-width:100%;align-items:center;justify-content:center;padding:.55rem .85rem;overflow-wrap:anywhere;border:1px solid var(--color-border);border-radius:.75rem;background:var(--color-surface);font-weight:800;text-decoration:none}
+.fmu nav[aria-label="목록 페이지 이동"] a:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px}
 .fmu-list .content-image{min-width:0;margin:0 0 1rem}.fmu-list .content-image picture{display:block}.fmu-list .content-image img{display:block;width:100%;max-width:100%;height:auto}.fmu-list .content-image figcaption{margin-top:.4rem;color:var(--color-text-muted);font-size:.78rem}
 :is(.fmu-list:has(>:is(#fmu-home-featured,#fmu-home-current,#fmu-home-evergreen,#fmu-home-latest)),.fmu-list:has(>h2>a[href^="/category/"])){min-width:0;padding:clamp(1rem,3vw,1.4rem);border:1px solid var(--color-border);border-radius:1rem}
 :is(.fmu-list:has(>:is(#fmu-home-featured,#fmu-home-current,#fmu-home-evergreen,#fmu-home-latest)),.fmu-list:has(>h2>a[href^="/category/"])) article{min-width:0;overflow-wrap:anywhere}
@@ -77,6 +84,7 @@ export const FRIENDLY_MOBILE_STYLES = `
 @media (min-width:42rem){.fmu-header,.fmu-main{padding-inline:1.5rem}.fmu-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.fmu-panel{padding:1.35rem}:is(.fmu-list:has(>:is(#fmu-home-current,#fmu-home-evergreen,#fmu-home-latest)),.fmu-list:has(>h2>a[href^="/category/"]))>ul{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:30rem){:is(.fmu-list:has(>:is(#fmu-home-featured,#fmu-home-current,#fmu-home-evergreen,#fmu-home-latest)),.fmu-list:has(>h2>a[href^="/category/"])){padding:.8rem}:is(#fmu-home-featured,#fmu-home-current,#fmu-home-evergreen,#fmu-home-latest){font-size:1.25rem;overflow-wrap:anywhere}}
 @media (max-width:30rem){.fmu .search-controller form{grid-template-columns:1fr}.fmu .search-controller button{width:100%}}
+@media (max-width:30rem){.fmu nav[aria-label="목록 페이지 이동"]{display:grid;align-items:stretch}.fmu nav[aria-label="목록 페이지 이동"] ul{display:grid;grid-template-columns:1fr;width:100%}.fmu nav[aria-label="목록 페이지 이동"] a{width:100%}}
 @media (prefers-reduced-motion:reduce){.fmu,.fmu *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 @media print{
   .fmu{min-height:auto;background:#fff;color:#000;font-family:ui-serif,Georgia,serif;font-size:11pt;line-height:1.55}
@@ -90,6 +98,7 @@ export const FRIENDLY_MOBILE_STYLES = `
   .fmu .search-controller form,.fmu .search-fallback{display:none!important}
   .fmu .search-results{display:block}.fmu .search-results>li+li{margin-top:.8rem}
   .fmu .search-results article{break-inside:avoid;border:1px solid #aaa;border-radius:0;background:#fff}
+  .fmu nav[aria-label="목록 페이지 이동"]{display:none!important}
   .fmu a{color:inherit;text-decoration:underline}
   .fmu-body a[href^="http"]::after{content:" (" attr(href) ")";font-size:.8em;overflow-wrap:anywhere}
 }
