@@ -1,0 +1,66 @@
+import { spawnSync } from "node:child_process";
+import { cpSync, lstatSync, mkdirSync, rmSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { BuildTargetConfigError } from "@content-foundry/site-core";
+
+import { createQaBuildEnvironment } from "../qa/build-environment";
+import { planQaStaticBuilds } from "../qa/build-matrix-plan";
+
+const appDirectory = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+if (resolve(process.cwd()) !== appDirectory) {
+  throw new BuildTargetConfigError(
+    "QA site matrix builds must run from the Site A application directory",
+  );
+}
+
+const args = process.argv.slice(2);
+if (args.length > 1) {
+  throw new BuildTargetConfigError("QA site matrix builds accept at most one quality path");
+}
+const repositoryDirectory = resolve(appDirectory, "../..");
+const qualityDirectory = args[0]
+  ? resolve(args[0])
+  : resolve(repositoryDirectory, "output/quality-release");
+const sitesDirectory = resolve(qualityDirectory, "sites");
+if (dirname(sitesDirectory) !== qualityDirectory) {
+  throw new BuildTargetConfigError("QA sites target must be a direct child");
+}
+const plans = planQaStaticBuilds({
+  matrixDirectory: join(qualityDirectory, "releases"),
+  qualityDirectory,
+});
+const appOutputDirectory = join(appDirectory, "out");
+let owned = false;
+
+try {
+  mkdirSync(sitesDirectory);
+  owned = true;
+  for (const plan of plans) {
+    const result = spawnSync("pnpm", ["run", "build"], {
+      cwd: appDirectory,
+      env: createQaBuildEnvironment(
+        process.env,
+        plan.environment,
+      ) as NodeJS.ProcessEnv,
+      stdio: "inherit",
+    });
+    if (result.error) throw result.error;
+    if (result.status !== 0) {
+      throw new Error(`QA site build failed for ${plan.id}`);
+    }
+    if (!lstatSync(appOutputDirectory).isDirectory()) {
+      throw new Error(`QA site build did not create out for ${plan.id}`);
+    }
+    cpSync(appOutputDirectory, plan.outputDirectory, {
+      recursive: true,
+      force: false,
+      errorOnExist: true,
+    });
+  }
+  process.stdout.write(`${sitesDirectory}\n`);
+} catch (error) {
+  if (owned) rmSync(sitesDirectory, { recursive: true, force: true });
+  throw error;
+}
