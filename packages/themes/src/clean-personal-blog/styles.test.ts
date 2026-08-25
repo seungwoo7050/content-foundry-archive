@@ -39,6 +39,30 @@ describe("Clean Personal Blog output styles", () => {
     expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(
       ".personal-categories, .personal-home-reference > ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }",
     );
+    expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(
+      '.personal-main[data-route="home"] .personal-reading-column { width: min(72rem, calc(100% - 2rem)); }',
+    );
+    expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(
+      ".personal-home { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));",
+    );
+    expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(
+      ".personal-home > :not(.personal-home-category-highlight) { grid-column: 1 / -1; }",
+    );
+    expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(
+      ".personal-home-featured article:has(> .content-image) { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(18rem, .8fr);",
+    );
+    expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(
+      ".personal-home-current > ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }",
+    );
+    expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(
+      ".personal-home-latest > ul { grid-template-columns: repeat(3, minmax(0, 1fr));",
+    );
+    expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(
+      '.personal-main[data-route="home"] .personal-reading-column { width: 100%; }',
+    );
+    expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(
+      ".personal-home, .personal-home-featured article:has(> .content-image) { display: block; }",
+    );
     expect(CLEAN_PERSONAL_BLOG_STYLES).toContain("@media (max-width: 30rem)");
     expect(CLEAN_PERSONAL_BLOG_STYLES).toContain("break-inside: avoid");
     expect(CLEAN_PERSONAL_BLOG_STYLES).not.toMatch(/object-fit\s*:\s*cover/i);
