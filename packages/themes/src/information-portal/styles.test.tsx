@@ -45,10 +45,24 @@ describe("Information Portal styles", () => {
     );
   });
 
-  it("supports reduced motion and a main-first print layout", () => {
+  it("preserves provenance while suppressing ads in print", () => {
+    const printStyles = INFORMATION_PORTAL_STYLES.slice(
+      INFORMATION_PORTAL_STYLES.indexOf("@media print"),
+    );
+    const hiddenSelectors = printStyles.match(
+      /([^{}]+)\{display:none!important\}/,
+    )?.[1] ?? "";
+
     expect(INFORMATION_PORTAL_STYLES).toContain("prefers-reduced-motion:reduce");
     expect(INFORMATION_PORTAL_STYLES).toContain("@media print");
-    expect(INFORMATION_PORTAL_STYLES).toContain(".ip-article-rail");
+    expect(hiddenSelectors).not.toContain(".ip-article-rail");
+    expect(hiddenSelectors).toContain('.ip aside[aria-label="광고"]');
+    expect(printStyles).toContain(
+      ".ip-article-rail{display:block;margin-block:1rem;padding:.8rem;break-inside:avoid;border:1px solid #aaa;background:#fff}",
+    );
+    expect(printStyles).toContain(
+      ".ip-article-rail>.ip-panel{margin:0;border:0;background:#fff}",
+    );
     expect(INFORMATION_PORTAL_STYLES).toContain('.ip-body a[href^="http"]::after');
     expect(INFORMATION_PORTAL_STYLES).not.toMatch(/data-ad-|adsbygoogle/i);
   });

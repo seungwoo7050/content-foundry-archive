@@ -88,9 +88,12 @@ export const INFORMATION_PORTAL_STYLES = `
 @media (prefers-reduced-motion:reduce){.ip,.ip *{scroll-behavior:auto!important;animation-name:none!important;transition-duration:.01ms!important}}
 @media print{
   .ip{min-height:auto;background:#fff;color:#000;font-family:ui-serif,Georgia,serif;font-size:11pt;line-height:1.55}
-  .ip-masthead,.ip-footer,.ip-skip,.ip-breadcrumbs,.ip-article-rail,.ip aside[aria-label="광고"],.ip button{display:none!important}
+  .ip-masthead,.ip-footer,.ip-skip,.ip-breadcrumbs,.ip aside[aria-label="광고"],.ip button{display:none!important}
   .ip-main{display:block;width:100%;padding:0}.ip-article-layout,.ip-article-main{display:block}
   .ip-panel,.ip-list article{break-inside:avoid;border:1px solid #aaa;background:#fff}
+  .ip-article-rail{display:block;margin-block:1rem;padding:.8rem;break-inside:avoid;border:1px solid #aaa;background:#fff}
+  .ip-article-rail>.ip-panel{margin:0;border:0;background:#fff}
+  .ip-article-rail>.ip-panel+.ip-panel{margin-top:.75rem;padding-top:.75rem;border-top:1px solid #aaa}
   .ip-body a[href^="http"]::after{content:" (" attr(href) ")";font-size:.8em;overflow-wrap:anywhere}
   :is(.ip-home-featured,.ip-home-current,.ip-home-reference,.ip-home-latest,.ip-home-category-highlight)>ul{display:block}
   :is(.ip-home-featured,.ip-home-current,.ip-home-reference,.ip-home-latest,.ip-home-category-highlight)>ul>li{margin-bottom:.8rem;break-inside:avoid}
