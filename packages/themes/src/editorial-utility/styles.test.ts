@@ -49,4 +49,24 @@ describe("Editorial Utility output styles", () => {
     );
     expect(groupStyles).not.toMatch(/#[0-9a-f]{3,8}|rgba?\(|hsla?\(/i);
   });
+
+  it("presents search as a responsive editorial utility", () => {
+    expect(EDITORIAL_UTILITY_STYLES).toContain(
+      ".editorial-search-client .search-controller form { display: grid; grid-template-columns: minmax(0, 1fr) auto;",
+    );
+    expect(EDITORIAL_UTILITY_STYLES).toContain("min-height: 48px");
+    expect(EDITORIAL_UTILITY_STYLES).toContain(
+      ".editorial-search-client .search-results article { min-width: 0;",
+    );
+    expect(EDITORIAL_UTILITY_STYLES).toContain("overflow-wrap: anywhere");
+    expect(EDITORIAL_UTILITY_STYLES).toContain(
+      ".editorial-search-client .search-fallback a { display: inline-flex; min-height: 44px;",
+    );
+    expect(EDITORIAL_UTILITY_STYLES).toContain(
+      ".editorial-search-client .search-controller form { grid-template-columns: minmax(0, 1fr); }",
+    );
+    expect(EDITORIAL_UTILITY_STYLES).toContain(
+      ".editorial-search-client form, .editorial-utility aside",
+    );
+  });
 });

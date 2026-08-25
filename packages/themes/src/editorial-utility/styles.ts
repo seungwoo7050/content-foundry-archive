@@ -88,7 +88,19 @@ export const EDITORIAL_UTILITY_STYLES = `
 .editorial-list-section > :is(ul, ol) { display: grid; gap: 1px; margin: 0; padding: 1px; background: var(--editorial-border); list-style-position: inside; }
 .editorial-list-section article { padding: 1.25rem; background: var(--editorial-surface); }
 .editorial-static-body { max-width: 46rem; }
-.editorial-search-client { padding: 1.25rem; background: var(--editorial-surface); border: 1px solid var(--editorial-border); }
+.editorial-search-client { padding: clamp(1rem, 3vw, 1.75rem); background: var(--editorial-surface); border: 1px solid var(--editorial-border); }
+.editorial-search-client .search-controller form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: .65rem; }
+.editorial-search-client .search-controller label { grid-column: 1 / -1; font-weight: 750; }
+.editorial-search-client .search-controller input { min-width: 0; min-height: 48px; padding: .7rem .85rem; color: var(--editorial-text); background: var(--editorial-canvas); border: 1px solid var(--editorial-border); }
+.editorial-search-client .search-controller input:focus { border-color: var(--editorial-primary); }
+.editorial-search-client .search-controller button { min-height: 48px; padding: .65rem 1rem; color: var(--editorial-on-primary); background: var(--editorial-primary); border: 1px solid var(--editorial-primary); font-weight: 750; }
+.editorial-search-client .search-controller button:disabled { cursor: wait; opacity: .58; }
+.editorial-search-client :is(.search-results, .search-fallback ul) { display: grid; gap: .75rem; margin: 1rem 0 0; padding: 0; list-style: none; }
+.editorial-search-client .search-results article { min-width: 0; padding: 1rem; overflow-wrap: anywhere; border-top: .25rem solid var(--editorial-primary); background: var(--editorial-canvas); }
+.editorial-search-client .search-results h3 { margin: 0; font-family: ui-serif, Georgia, serif; }
+.editorial-search-client .search-results p:last-child { margin-bottom: 0; color: var(--editorial-text-muted); font-size: .85rem; }
+.editorial-search-client .search-fallback ul { display: flex; flex-wrap: wrap; }
+.editorial-search-client .search-fallback a { display: inline-flex; min-height: 44px; align-items: center; padding: .45rem .7rem; border: 1px solid var(--editorial-border); text-decoration: none; }
 .editorial-state { max-width: 38rem; margin: 5rem auto; padding: clamp(1.5rem, 5vw, 3rem); background: var(--editorial-surface); border-top: .4rem solid var(--editorial-primary); text-align: center; }
 .editorial-state__code { color: var(--editorial-text-muted); font-size: .85rem; letter-spacing: .12em; }
 .editorial-state h1 { font-family: ui-serif, Georgia, serif; font-size: clamp(2rem, 6vw, 3.4rem); }
@@ -96,6 +108,8 @@ export const EDITORIAL_UTILITY_STYLES = `
 .editorial-footer { border-top: 1px solid var(--editorial-border); background: var(--editorial-surface); color: var(--editorial-text-muted); }
 .editorial-footer__inner { padding-block: 2rem; }
 @media (max-width: 30rem) {
+  .editorial-search-client .search-controller form { grid-template-columns: minmax(0, 1fr); }
+  .editorial-search-client .search-controller button { width: 100%; }
   :is(.editorial-home-featured, .editorial-home-current, .editorial-home-reference, .editorial-home-latest, .editorial-home-category-highlight) > ul { gap: .75rem; }
   :is(.editorial-home-featured, .editorial-home-current, .editorial-home-reference, .editorial-home-latest) article { padding: .9rem; }
   .editorial-home-category-highlight { padding: .9rem; }
@@ -119,7 +133,7 @@ export const EDITORIAL_UTILITY_STYLES = `
 }
 @media print {
   .editorial-utility { min-height: auto; background: #fff; color: #000; font-size: 11pt; line-height: 1.55; }
-  .editorial-masthead, .editorial-footer, .editorial-skip-link, .editorial-breadcrumbs, .editorial-reader-actions, .editorial-utility aside[aria-label="광고"] { display: none !important; }
+  .editorial-masthead, .editorial-footer, .editorial-skip-link, .editorial-breadcrumbs, .editorial-reader-actions, .editorial-search-client form, .editorial-utility aside[aria-label="광고"] { display: none !important; }
   .editorial-main { width: 100%; padding: 0; }
   .editorial-article-header { max-width: none; margin: 0 0 1rem; }
   .editorial-article-layout { display: block; }
