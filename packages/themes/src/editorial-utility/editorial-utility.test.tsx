@@ -103,6 +103,12 @@ function getListRoute(kind: "archive" | "category") {
   return route;
 }
 
+function getMainMarkup(html: string) {
+  const main = html.match(/<main\b[\s\S]*?<\/main>/)?.[0];
+  if (!main) throw new Error("Rendered route is missing its main landmark.");
+  return main;
+}
+
 const matrix = SKIN_IDS.flatMap((skinId) =>
   routes.map((route) => ({ route, skinId })),
 );
@@ -242,7 +248,7 @@ describe("Editorial Utility", () => {
   it.each(["category", "archive"] as const)(
     "omits pagination markup from a one-page %s list",
     (kind) => {
-      expect(render(getListRoute(kind)))
+      expect(getMainMarkup(render(getListRoute(kind))))
         .not.toContain('aria-label="목록 페이지 이동"');
     },
   );
@@ -254,7 +260,7 @@ describe("Editorial Utility", () => {
     "renders real pagination anchors after the %s article list",
     (kind, path, previousHref, nextHref) => {
       const route = getListRoute(kind);
-      const html = render({
+      const main = getMainMarkup(render({
         ...route,
         path,
         breadcrumbs: [{ href: path, label: route.heading }],
@@ -264,15 +270,15 @@ describe("Editorial Utility", () => {
           previous: { href: previousHref, label: "이전 페이지" },
           next: { href: nextHref, label: "다음 페이지" },
         },
-      });
+      }));
 
-      expect(html.indexOf('href="/article/1"')).toBeLessThan(
-        html.indexOf('aria-label="목록 페이지 이동"'),
+      expect(main.indexOf('href="/article/1"')).toBeLessThan(
+        main.indexOf('aria-label="목록 페이지 이동"'),
       );
-      expect(html).toContain(
+      expect(main).toContain(
         `<a href="${previousHref}" rel="prev">이전 페이지</a>`,
       );
-      expect(html).toContain(
+      expect(main).toContain(
         `<a href="${nextHref}" rel="next">다음 페이지</a>`,
       );
     },
