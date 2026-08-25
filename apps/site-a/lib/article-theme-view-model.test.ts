@@ -7,7 +7,9 @@ import {
   type LoadedReleaseBundle,
   type LoadedReleaseBundleV3,
 } from "@content-foundry/content-contract";
+import { projectResponsiveImageAsset } from "@content-foundry/media";
 import type { ArticleRouteViewModel } from "@content-foundry/themes";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
 import { getGeneratedRoutes } from "./generated-routes";
@@ -20,6 +22,7 @@ import type {
   SiteReleaseContext,
   SiteReleaseContextV3,
 } from "./load-site-release";
+import { createResponsiveImageAssetRegistry } from "./responsive-image-asset-registry";
 
 const fixture = resolve(
   process.cwd(),
@@ -143,6 +146,53 @@ describe("article theme view model", () => {
     expect(model).not.toHaveProperty("readingTime");
     expect(model.readerActions).toBe(readerActions);
     expect(JSON.stringify(model.sources)).not.toContain("mailto:");
+  });
+
+  it("binds prepared responsive artwork to related articles and otherwise fails closed", () => {
+    const article = firstArticle(v3Bundle);
+    const media = v3Bundle.mediaManifest.items[0]!;
+    const related = {
+      ...article,
+      id: "ART-000999",
+      title: "이미지 관련 글",
+      heroMediaId: media.id,
+      seo: { ...article.seo, canonicalPath: "/article/related-with-artwork" },
+    };
+    const owner = { ...article, relatedArticleIds: [related.id] };
+    const relatedBundle = { ...v3Bundle, articles: [owner, related] };
+    const project = (mediaAssets?: ArticleThemeContext["mediaAssets"]) =>
+      createArticleThemeViewModel(
+        {
+          config: { adsEnabled: false },
+          bundle: relatedBundle,
+          ...(mediaAssets === undefined ? {} : { mediaAssets }),
+        },
+        owner,
+        categoryFor(v3Bundle, article.categoryId),
+        { hero: null, body: "body" },
+      );
+
+    expect(() => project()).toThrow(`Article card media registry is missing: ${media.id}`);
+
+    const assets = v3Bundle.mediaManifest.items.map((item, index) =>
+      projectResponsiveImageAsset(
+        { media: item, mimeType: item.mimeType, width: item.width, height: item.height },
+        `/media/items/${index}`,
+      ),
+    );
+    const mediaAssets = createResponsiveImageAssetRegistry(
+      v3Bundle.mediaManifest,
+      assets,
+    );
+    const artwork = project(mediaAssets).relatedArticles[0]?.artwork;
+    if (artwork === undefined) throw new Error("Missing related article artwork");
+    const html = renderToStaticMarkup(artwork);
+
+    expect(html).toContain('loading="lazy"');
+    expect(html).toContain(`src="${mediaAssets.get(media.id)!.fallback.publicPath}"`);
+    expect(html).toContain(`width="${media.width}"`);
+    expect(html).toContain(`height="${media.height}"`);
+    expect(html).not.toMatch(/object-fit|object-position/);
   });
 
   it("projects a display-ready reading time from visible article text", () => {

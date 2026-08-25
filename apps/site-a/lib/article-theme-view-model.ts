@@ -30,6 +30,7 @@ import {
 
 export interface ArticleThemeContext {
   readonly config: ArticleAdEligibilityContext["config"];
+  readonly mediaAssets?: RelatedThemeArticleSource["mediaAssets"];
   readonly bundle: ArticleTrustSource &
     RelatedThemeArticleSource & {
       readonly site: ArticleTrustSource["site"] &
@@ -102,8 +103,14 @@ export function createArticleThemeViewModel(
   slots: ArticleThemeSlots,
 ): ArticleRouteViewModel {
   const trust = createArticleTrustViewModel(context.bundle, article);
+  const relatedSource: RelatedThemeArticleSource = {
+    ...context.bundle,
+    ...(context.mediaAssets === undefined
+      ? {}
+      : { mediaAssets: context.mediaAssets }),
+  };
   const relatedArticles = createRelatedThemeArticleItems(
-    context.bundle,
+    relatedSource,
     article,
   );
   const estimatedReadingTimeMinutes = getEstimatedReadingTimeMinutes(
