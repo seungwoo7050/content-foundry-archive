@@ -68,12 +68,7 @@ export function InformationPortalArticle({
       {route.advertisingEligible
         ? getThemeAdSlot(context, "article-after-summary")
         : null}
-      {route.hero ? <div className="ip-panel ip-body">{route.hero}</div> : null}
       <div className="ip-article-layout">
-        <div className="ip-article-main">
-          <div className="ip-panel ip-body">{route.body}</div>
-          <PortalEvidence route={route} />
-        </div>
         <aside aria-label="글 탐색과 안내 정보" className="ip-article-rail">
           {route.topics && route.topics.length > 0 ? (
             <section aria-labelledby="ip-article-topics" className="ip-panel ip-article-topics">
@@ -92,6 +87,11 @@ export function InformationPortalArticle({
             ? getThemeAdSlot(context, "desktop-sidebar")
             : null}
         </aside>
+        <div className="ip-article-main">
+          {route.hero ? <div className="ip-panel ip-body">{route.hero}</div> : null}
+          <div className="ip-panel ip-body">{route.body}</div>
+          <PortalEvidence route={route} />
+        </div>
       </div>
       {route.relatedSectionHeading && route.relatedArticles.length > 0 ? (
         <section aria-labelledby="ip-related" className="ip-list">

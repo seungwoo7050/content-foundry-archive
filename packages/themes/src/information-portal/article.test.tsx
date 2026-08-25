@@ -29,7 +29,7 @@ const route: ArticleRouteViewModel = {
 };
 
 describe("Information Portal article", () => {
-  it("places primary content before the trust rail and preserves evidence", () => {
+  it("places the trust rail before hero and body without duplicating facts", () => {
     const html = renderToStaticMarkup(
       <InformationPortalArticle
         context={{ adSlots: { "article-end": <aside data-slot="article-end" /> } }}
@@ -51,7 +51,25 @@ describe("Information Portal article", () => {
       '<ul aria-label="관련 주제" class="theme-article-topics"><li>신청</li><li>생활 행정</li></ul>',
     );
     expect(html).not.toMatch(/href="\/tag\//);
-    expect(html.indexOf("신청 본문")).toBeLessThan(html.indexOf("글 탐색과 안내 정보"));
+    const readingOrder = [
+      'aria-label="글 탐색과 안내 정보"',
+      '<h2 id="ip-trust">안내 정보</h2>',
+      'href="#step">신청 단계</a>',
+      "<figure>대표 이미지</figure>",
+      '<section id="step">신청 본문</section>',
+    ];
+    const positions = readingOrder.map((fact) => html.indexOf(fact));
+    expect(positions).toEqual([...positions].sort((left, right) => left - right));
+    for (const fact of [
+      ...readingOrder,
+      'href="https://official.example/guide">공식 안내</a>',
+      "공식 절차 변경",
+      "신분증입니다.",
+      'href="/article/next">다음 안내</a>',
+      "현재 기사 저장",
+    ]) {
+      expect(html.split(fact)).toHaveLength(2);
+    }
     expect(html).toContain('href="#step">신청 단계</a>');
     expect(html).toContain("2026년 8월 24일");
     expect(html).toContain('href="https://official.example/guide">공식 안내</a>');
@@ -59,7 +77,6 @@ describe("Information Portal article", () => {
     expect(html).toContain("신분증입니다.");
     expect(html).toContain('href="/article/next">다음 안내</a>');
     expect(html).toContain('<section aria-labelledby="ip-reader-actions"');
-    expect(html.match(/현재 기사 저장/g)).toHaveLength(1);
     expect(html.indexOf("관련 안내")).toBeLessThan(html.indexOf("독자 도구"));
     expect(html.indexOf("독자 도구")).toBeLessThan(
       html.indexOf('data-slot="article-end"'),
