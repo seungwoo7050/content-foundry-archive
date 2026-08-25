@@ -85,6 +85,19 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
 .personal-faq > div { padding-block: .75rem; border-bottom: 1px solid var(--personal-border); }
 .personal-faq dt { font-weight: 700; }
 .personal-faq dd { margin: .25rem 0 0; }
+.personal-blog section[aria-labelledby="personal-reader-actions-title"] { margin-block: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--personal-border); }
+.personal-blog section[aria-labelledby="personal-reader-actions-title"] > h2 { font-family: ui-serif, Georgia, serif; font-size: 1.4rem; }
+.personal-blog section[aria-labelledby="personal-reader-actions-title"] > section { display: grid; gap: .85rem; }
+.personal-blog :is(.article-bookmark, .article-share-action, .article-feedback) { min-width: 0; margin: 0; padding: 1rem 1.1rem; background: var(--personal-surface); border: 1px solid var(--personal-border); border-radius: .5rem; }
+.personal-blog :is(.article-bookmark, .article-share-action) { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: center; gap: .5rem .8rem; }
+.personal-blog .article-feedback { display: grid; gap: .75rem; }
+.personal-blog .article-feedback h2 { margin: 0; font-family: ui-serif, Georgia, serif; font-size: 1.05rem; }
+.personal-blog .article-feedback [role="group"] { display: flex; flex-wrap: wrap; gap: .55rem; }
+.personal-blog :is(.article-bookmark, .article-share-action, .article-feedback) button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; padding: .55rem .9rem; color: var(--personal-on-primary); background: var(--personal-primary); border: 1px solid var(--personal-primary); border-radius: .4rem; font: inherit; font-weight: 700; cursor: pointer; }
+.personal-blog :is(.article-bookmark, .article-share-action, .article-feedback) button:focus-visible { outline: 3px solid var(--personal-focus-ring); outline-offset: 3px; }
+.personal-blog :is(.article-bookmark, .article-share-action, .article-feedback) button:disabled { cursor: not-allowed; opacity: .55; }
+.personal-blog :is(.article-bookmark, .article-share-action, .article-feedback) button[aria-pressed="true"] { color: var(--personal-primary); background: var(--personal-surface-muted); box-shadow: inset 0 0 0 2px var(--personal-primary); }
+.personal-blog :is(.article-bookmark, .article-share-action, .article-feedback) :is([role="status"], [aria-live="polite"]) { min-width: 0; min-height: 1.5em; margin: 0; color: var(--personal-text-muted); font-size: .85rem; overflow-wrap: anywhere; }
 .personal-search-client { padding: 1.2rem; background: var(--personal-surface); border: 1px solid var(--personal-border); border-radius: .5rem; }
 .personal-search-client .search-controller { min-width: 0; }
 .personal-search-client .search-controller form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: .7rem; }
@@ -115,6 +128,9 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
   .personal-blog nav[aria-label="목록 페이지 이동"] a { width: 100%; }
   .personal-home-featured article, .personal-home-current article, .personal-home-category-highlight article { padding: .9rem; }
   .personal-home-category-highlight { padding: .9rem; }
+  .personal-blog :is(.article-bookmark, .article-share-action) { grid-template-columns: minmax(0, 1fr); }
+  .personal-blog :is(.article-bookmark, .article-share-action) > button, .personal-blog .article-feedback button { width: 100%; }
+  .personal-blog .article-feedback [role="group"] { display: grid; grid-template-columns: minmax(0, 1fr); }
 }
 @media (min-width: 44rem) {
   .personal-categories, .personal-home-reference > ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -132,6 +148,7 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
   .personal-search-client .search-results > li + li { margin-top: .8rem; }
   .personal-search-client .search-results article { break-inside: avoid; border-radius: 0; background: #fff; }
   .personal-blog nav[aria-label="목록 페이지 이동"] { display: none !important; }
+  .personal-blog section[aria-labelledby="personal-reader-actions-title"] { display: none !important; }
   .personal-article-meta, .personal-toc, .personal-evidence { break-inside: avoid; border: 1px solid #aaa; border-radius: 0; background: #fff; }
   .personal-body { font-size: inherit; }
   .personal-body a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; overflow-wrap: anywhere; }

@@ -82,4 +82,21 @@ describe("Clean Personal Blog output styles", () => {
       expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(rule);
     }
   });
+
+  it("presents reader actions as warm stateful controls that do not print", () => {
+    for (const rule of [
+      'section[aria-labelledby="personal-reader-actions-title"] { margin-block: 3.5rem;',
+      ":is(.article-bookmark, .article-share-action, .article-feedback) { min-width: 0; margin: 0; padding: 1rem 1.1rem;",
+      ":is(.article-bookmark, .article-share-action, .article-feedback) button { display: inline-flex; min-height: 44px;",
+      "button:focus-visible { outline: 3px solid var(--personal-focus-ring);",
+      "button:disabled { cursor: not-allowed; opacity: .55; }",
+      'button[aria-pressed="true"] { color: var(--personal-primary); background: var(--personal-surface-muted);',
+      ':is([role="status"], [aria-live="polite"]) { min-width: 0; min-height: 1.5em;',
+      ":is(.article-bookmark, .article-share-action) { grid-template-columns: minmax(0, 1fr); }",
+      '.article-feedback [role="group"] { display: grid; grid-template-columns: minmax(0, 1fr); }',
+      'section[aria-labelledby="personal-reader-actions-title"] { display: none !important; }',
+    ]) {
+      expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(rule);
+    }
+  });
 });
