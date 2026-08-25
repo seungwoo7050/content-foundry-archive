@@ -31,6 +31,23 @@ describe("Information Portal styles", () => {
     expect(INFORMATION_PORTAL_STYLES).not.toMatch(/ranking|trending|popular/i);
   });
 
+  it("presents search as a dense responsive portal utility", () => {
+    for (const rule of [
+      ".ip .search-controller form{display:grid;grid-template-columns:minmax(0,1fr) auto;",
+      ".ip .search-controller input{min-width:0;min-height:48px;",
+      ".ip .search-controller button{min-height:48px;",
+      ".ip .search-controller button:disabled{cursor:wait;opacity:.58}",
+      ".ip .search-controller .search-results article{min-width:0;padding:.75rem;overflow-wrap:anywhere;",
+      ".ip .search-controller .search-results p:last-child{color:var(--color-text-muted);font-size:.78rem}",
+      ".ip .search-controller .search-fallback a{display:inline-flex;min-height:44px;",
+      ".ip .search-controller form{grid-template-columns:minmax(0,1fr)}",
+      ".ip .search-controller form,.ip aside",
+      ".ip .search-controller .search-fallback li{display:inline}",
+    ]) {
+      expect(INFORMATION_PORTAL_STYLES).toContain(rule);
+    }
+  });
+
   it("pins both article tracks to the first desktop grid row", () => {
     const desktopArticleStyles = INFORMATION_PORTAL_STYLES.slice(
       INFORMATION_PORTAL_STYLES.indexOf("@media (min-width:64rem){"),
