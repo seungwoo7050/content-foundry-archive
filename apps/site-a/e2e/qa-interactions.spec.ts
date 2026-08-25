@@ -88,4 +88,12 @@ test.describe("QA deterministic interactions", () => {
     await previous.click();
     await expect(page).toHaveURL(/\/archive\/?$/u);
   });
+
+  test("archive first page links forward to page two", async ({ page }) => {
+    await openQaRoute(page, "/archive");
+    const next = page.getByRole("link", { name: "다음 페이지", exact: true });
+    await expect(next).toHaveAttribute("href", "/archive/page/2");
+    await next.click();
+    await expect(page).toHaveURL(/\/archive\/page\/2\/?$/u);
+  });
 });
