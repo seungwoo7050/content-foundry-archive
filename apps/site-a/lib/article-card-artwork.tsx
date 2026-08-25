@@ -9,7 +9,6 @@ const articleCardSizes =
 export function renderArticleCardArtwork(
   mediaId: string | null,
   mediaAssets: ResponsiveImageAssetRegistry | undefined,
-  priority = false,
 ): ReactNode | null {
   if (mediaId === null) return null;
   if (mediaAssets === undefined) {
@@ -19,7 +18,6 @@ export function renderArticleCardArtwork(
     <ImageBlock
       assets={mediaAssets}
       block={{ type: "image", mediaId }}
-      priority={priority}
       sizes={articleCardSizes}
     />
   );

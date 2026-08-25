@@ -2,7 +2,6 @@ import type {
   ArticleListItemViewModel,
   CategoryLinkViewModel,
   HomeRouteViewModel,
-  ThemeId,
 } from "@content-foundry/themes";
 
 import {
@@ -30,7 +29,6 @@ export interface HomeThemeSource
   extends HomePresentationSource<HomeThemeArticleRecord> {
   readonly mediaAssets?: NonNullable<ThemeArticleListSource["mediaAssets"]>;
   readonly site: ThemeArticleListSource["site"] & {
-    readonly defaultTheme: ThemeId;
     readonly name: string;
     readonly description: string;
     readonly search: { readonly enabled: boolean };
@@ -75,34 +73,9 @@ export function createHomeThemeViewModel(
 ): HomeThemeViewModel {
   const aboutPage = bundle.pages.find(({ path }) => path === "/about");
   const presentation = createHomePresentationViewModel(bundle);
-  const isEditorialHome = bundle.site.defaultTheme === "editorial-utility";
-  const prioritizeFeaturedArtwork =
-    isEditorialHome && presentation.featuredArticles.length > 0;
-  const prioritizeCurrentArtwork =
-    isEditorialHome
-    && presentation.featuredArticles.length === 0
-    && presentation.currentArticles.length > 0;
   const projectArticles = (
     articles: readonly HomeThemeArticleRecord[],
-    prioritizeFirstArtwork = false,
-  ) => articles.map((article, index) => {
-    const item = createThemeArticleListItem(bundle, article);
-    if (
-      !prioritizeFirstArtwork
-      || index !== 0
-      || article.heroMediaId === null
-    ) {
-      return item;
-    }
-    return {
-      ...item,
-      artwork: renderArticleCardArtwork(
-        article.heroMediaId,
-        bundle.mediaAssets,
-        true,
-      ),
-    };
-  });
+  ) => articles.map((article) => createThemeArticleListItem(bundle, article));
   return {
     kind: "home",
     path: "/",
@@ -113,14 +86,8 @@ export function createHomeThemeViewModel(
     articles: [...bundle.articles]
       .sort(compareRecentArticles)
       .map((article) => createThemeArticleListItem(bundle, article)),
-    featuredArticles: projectArticles(
-      presentation.featuredArticles,
-      prioritizeFeaturedArtwork,
-    ),
-    currentArticles: projectArticles(
-      presentation.currentArticles,
-      prioritizeCurrentArtwork,
-    ),
+    featuredArticles: projectArticles(presentation.featuredArticles),
+    currentArticles: projectArticles(presentation.currentArticles),
     evergreenArticles: projectArticles(presentation.evergreenArticles),
     latestArticles: projectArticles(presentation.latestArticles),
     categoryHighlights: presentation.categoryHighlights.map(

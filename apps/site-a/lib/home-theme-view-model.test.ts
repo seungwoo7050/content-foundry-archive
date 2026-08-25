@@ -128,7 +128,7 @@ describe("home theme view model", () => {
     expect(model.articles).toHaveLength(1);
   });
 
-  it("prioritizes only the Editorial lead artwork", () => {
+  it("keeps home-group artwork lazy across primary and repeated placements", () => {
     const config = resolveBuildTargetConfig(
       { CONTENT_RELEASE_DIR: v4Fixture },
       {
@@ -144,11 +144,7 @@ describe("home theme view model", () => {
       articles: [{ ...article, heroMediaId: "MED-000045" }],
       mediaAssets: new Map(),
     };
-    const model = createHomeThemeViewModel({
-      ...source,
-      site: { ...source.site, defaultTheme: "editorial-utility" },
-    });
-    const nonEditorialModel = createHomeThemeViewModel(source);
+    const model = createHomeThemeViewModel(source);
     const currentLeadModel = createHomeThemeViewModel({
       ...source,
       presentation: {
@@ -159,14 +155,12 @@ describe("home theme view model", () => {
           evergreenArticleIds: [],
         },
       },
-      site: { ...source.site, defaultTheme: "editorial-utility" },
     });
     expect([
       hasPriority(model.featuredArticles[0]!.artwork),
       hasPriority(model.categoryHighlights[0]!.articles[0]!.artwork),
-    ]).toEqual([true, false]);
-    expect(hasPriority(nonEditorialModel.featuredArticles[0]!.artwork)).toBe(false);
-    expect(hasPriority(currentLeadModel.currentArticles[0]!.artwork)).toBe(true);
+    ]).toEqual([false, false]);
+    expect(hasPriority(currentLeadModel.currentArticles[0]!.artwork)).toBe(false);
   });
 
   it("sorts by material update and omits a disabled search action", () => {
