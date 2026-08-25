@@ -45,14 +45,17 @@ const markers: Readonly<Record<HtmlRouteViewModel["kind"], string>> = {
   "static-page": "소개 본문", archive: "안내 글", search: "검색 폼",
   "not-found": ">404<", retired: ">410<",
 };
+function withoutEmbeddedStyles(markup: string) {
+  return markup.replace(/<style>[\s\S]*?<\/style>/g, "");
+}
 function render(route: HtmlRouteViewModel, skinId: SkinId, adSlots?: ThemeAdSlots) {
-  return renderToStaticMarkup(cleanPersonalBlogTheme.renderRoute(
+  return withoutEmbeddedStyles(renderToStaticMarkup(cleanPersonalBlogTheme.renderRoute(
     { shell, route }, {
       skinId,
       colors: SKIN_TOKENS[skinId],
       ...(adSlots ? { adSlots } : {}),
     },
-  ));
+  )));
 }
 function getListRoute(kind: "archive" | "category") {
   const route = routes.find((candidate) => candidate.kind === kind);
