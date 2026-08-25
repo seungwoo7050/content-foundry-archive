@@ -31,12 +31,22 @@ export interface HomePresentationViewModel<Article> {
   }[];
 }
 
+const HOME_LATEST_ARTICLE_LIMIT = 6;
+
 function compareLatest(
   left: HomePresentationArticle,
   right: HomePresentationArticle,
 ) {
   const updatedDifference = Date.parse(right.updatedAt) - Date.parse(left.updatedAt);
   return updatedDifference || left.id.localeCompare(right.id);
+}
+
+function selectLatestArticles<Article extends HomePresentationArticle>(
+  articles: readonly Article[],
+) {
+  return [...articles]
+    .sort(compareLatest)
+    .slice(0, HOME_LATEST_ARTICLE_LIMIT);
 }
 
 export function createHomePresentationViewModel<
@@ -57,7 +67,7 @@ export function createHomePresentationViewModel<
       featuredArticles: [],
       currentArticles: [],
       evergreenArticles: [],
-      latestArticles: [...source.articles].sort(compareLatest),
+      latestArticles: selectLatestArticles(source.articles),
       categoryHighlights: [],
     };
   }
@@ -74,9 +84,9 @@ export function createHomePresentationViewModel<
     featuredArticles,
     currentArticles,
     evergreenArticles,
-    latestArticles: source.articles
-      .filter(({ id }) => !placedIds.has(id))
-      .sort(compareLatest),
+    latestArticles: selectLatestArticles(
+      source.articles.filter(({ id }) => !placedIds.has(id)),
+    ),
     categoryHighlights: presentation.categoryHighlights.map(
       ({ categoryId, articleIds }) => ({
         categoryId,

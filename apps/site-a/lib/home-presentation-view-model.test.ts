@@ -59,6 +59,24 @@ describe("home presentation view model", () => {
     },
   );
 
+  it("bounds unclassified fallback to the newest six articles", () => {
+    const updatedAt = "2026-03-01T00:00:00Z";
+    const articles = ["H", "G", "F", "E", "D", "C", "B", "A"].map(
+      (suffix) => ({ id: `ART-${suffix}`, updatedAt }),
+    );
+
+    const model = createHomePresentationViewModel({ articles });
+
+    expect(model.latestArticles.map(({ id }) => id)).toEqual([
+      "ART-A",
+      "ART-B",
+      "ART-C",
+      "ART-D",
+      "ART-E",
+      "ART-F",
+    ]);
+  });
+
   it("projects explicit v4 groups and excludes every placement from latest", () => {
     const bundle = loadV4Fixture();
     const source = bundle.articles[0]!;
@@ -67,12 +85,17 @@ describe("home presentation view model", () => {
       id,
       updatedAt,
     });
+    const latestArticles = Array.from({ length: 7 }, (_, index) =>
+      article(
+        `ART-LATEST-${index + 1}`,
+        `2026-03-${String(index + 4).padStart(2, "0")}T00:00:00Z`,
+      ),
+    );
     const articles = [
       source,
       article("ART-CURRENT", "2026-03-02T00:00:00Z"),
       article("ART-EVERGREEN", "2026-03-03T00:00:00Z"),
-      article("ART-LATEST-OLD", "2026-03-04T00:00:00Z"),
-      article("ART-LATEST-NEW", "2026-03-05T00:00:00Z"),
+      ...latestArticles,
     ];
     const presentation = {
       ...bundle.presentation,
@@ -95,8 +118,12 @@ describe("home presentation view model", () => {
       "ART-EVERGREEN",
     ]);
     expect(model.latestArticles.map(({ id }) => id)).toEqual([
-      "ART-LATEST-NEW",
-      "ART-LATEST-OLD",
+      "ART-LATEST-7",
+      "ART-LATEST-6",
+      "ART-LATEST-5",
+      "ART-LATEST-4",
+      "ART-LATEST-3",
+      "ART-LATEST-2",
     ]);
     expect(model.categoryHighlights[0]).toMatchObject({
       categoryId: "daily-admin",
