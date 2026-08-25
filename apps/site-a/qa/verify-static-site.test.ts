@@ -1,13 +1,19 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
 
-import { verifyQaStaticSiteIdentity } from "./verify-static-site";
+import { qaArticles } from "./articles";
+import { qaMediaAssets } from "./media-assets";
+import {
+  verifyQaStaticSiteArtifacts,
+  verifyQaStaticSiteIdentity,
+} from "./verify-static-site";
 
 const roots: string[] = [];
 const checksum = `sha256:${"1".repeat(64)}`;
+const origin = "https://friendly-mobile-utility-calm-blue.qa.public-sites.example";
 const release = {
   releaseId: "REL-QA-20260825-000001",
   siteId: "site-a",
@@ -27,7 +33,23 @@ function fixture() {
     `<meta name="content-foundry-build-config-checksum" content="${checksum}">`,
     `<body data-theme="friendly-mobile-utility" data-skin="calm-blue">QA 비운영</body>`,
   ].join(""));
-  return { outputDirectory, theme: "friendly-mobile-utility", skin: "calm-blue" } as const;
+  writeFileSync(join(outputDirectory, "robots.txt"), "User-Agent: *\nDisallow: /\n\n");
+  writeFileSync(join(outputDirectory, "ads.txt"), "");
+  writeFileSync(join(outputDirectory, "sitemap.xml"), `<loc>${origin}/</loc>`);
+  writeFileSync(join(outputDirectory, "search-index.json"), JSON.stringify({
+    schemaVersion: "1.0.0",
+    locale: "ko-KR",
+    release: { bundleChecksum: checksum },
+    entries: qaArticles.map(({ title, seo }) => ({ title, path: seo.canonicalPath })),
+  }));
+  for (const asset of qaMediaAssets) {
+    const directory = join(outputDirectory, "_media", asset.sha256);
+    mkdirSync(directory, { recursive: true });
+    writeFileSync(join(directory, "source.webp"), "webp");
+  }
+  return {
+    outputDirectory, origin, theme: "friendly-mobile-utility", skin: "calm-blue",
+  } as const;
 }
 
 afterEach(() => {
@@ -49,5 +71,20 @@ describe("verifyQaStaticSiteIdentity", () => {
     const missing = fixture();
     rmSync(join(missing.outputDirectory, "index.html"));
     expect(() => verifyQaStaticSiteIdentity(missing)).toThrow(/missing index\.html/u);
+  });
+
+  it("accepts site-wide QA artifacts and rejects an incomplete search index", () => {
+    const valid = fixture();
+    expect(verifyQaStaticSiteArtifacts(valid)).toEqual({
+      searchCount: 17,
+      mediaCount: 5,
+    });
+    writeFileSync(join(valid.outputDirectory, "search-index.json"), JSON.stringify({
+      schemaVersion: "1.0.0",
+      locale: "ko-KR",
+      release: { bundleChecksum: checksum },
+      entries: [],
+    }));
+    expect(() => verifyQaStaticSiteArtifacts(valid)).toThrow(/search index mismatch/u);
   });
 });
