@@ -84,4 +84,23 @@ describe("Editorial Utility output styles", () => {
       expect(EDITORIAL_UTILITY_STYLES).toContain(rule);
     }
   });
+
+  it("presents reader actions as accessible editorial controls", () => {
+    for (const rule of [
+      ".editorial-reader-actions > section { display: grid; gap: 1.25rem; }",
+      ".editorial-reader-actions button { display: inline-flex; min-height: 44px;",
+      ".editorial-reader-actions button:focus-visible { outline: 3px solid var(--editorial-focus-ring);",
+      '.editorial-reader-actions button[aria-pressed="true"] { color: var(--editorial-on-primary);',
+      ".editorial-reader-actions button:disabled { cursor: not-allowed; opacity: .58; }",
+      ".article-share-action > [aria-live]",
+      ".article-feedback > p",
+      "overflow-wrap: anywhere; color: var(--editorial-text-muted);",
+      ".editorial-reader-actions .article-feedback > div { display: flex; flex-wrap: wrap; gap: .65rem; }",
+      ".editorial-reader-actions button { width: 100%; }",
+      ".editorial-reader-actions .article-feedback > div { display: grid; grid-template-columns: minmax(0, 1fr); }",
+      ".editorial-breadcrumbs, .editorial-reader-actions, .editorial-search-client form",
+    ]) {
+      expect(EDITORIAL_UTILITY_STYLES).toContain(rule);
+    }
+  });
 });
