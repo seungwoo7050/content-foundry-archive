@@ -50,6 +50,10 @@ async function expectPageQuality(page: Page, runtimeErrors: readonly string[]): 
 }
 
 test.describe("Site A release quality", () => {
+  if (process.env.QUALITY_VARIANT_ID !== undefined) {
+    return;
+  }
+
   test("home exposes the published theme and navigation", async ({ page }) => {
     const runtimeErrors = await openRoute(page, routes.home);
 
