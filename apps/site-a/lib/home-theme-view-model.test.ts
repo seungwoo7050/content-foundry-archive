@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import { isValidElement, type ReactNode } from "react";
 
 import {
   loadReleaseBundle,
@@ -35,6 +36,13 @@ const v4Fixture = resolve(
   process.cwd(),
   "../../packages/content-contract/vendor/4.0.0/fixtures/bundles/valid/site-a-minimal",
 );
+
+function hasPriority(artwork: ReactNode | null | undefined): boolean {
+  if (!isValidElement<{ readonly priority?: boolean }>(artwork)) {
+    throw new Error("Expected article artwork element");
+  }
+  return artwork.props.priority ?? false;
+}
 
 describe("home theme view model", () => {
   it("accepts v3 and returns the closed home route contract", () => {
@@ -118,6 +126,47 @@ describe("home theme view model", () => {
       articles: [{ link: { label: "정부24 주민등록등본 발급 방법" } }],
     });
     expect(model.articles).toHaveLength(1);
+  });
+
+  it("prioritizes only the Editorial lead artwork", () => {
+    const config = resolveBuildTargetConfig(
+      { CONTENT_RELEASE_DIR: v4Fixture },
+      {
+        siteId: "site-a",
+        templateReleaseDirectory: fixture,
+        allowedProductionOrigins: [],
+      },
+    );
+    const loaded = loadValidatedSiteReleaseV4(config).bundle;
+    const article = loaded.articles[0]!;
+    const source = {
+      ...loaded,
+      articles: [{ ...article, heroMediaId: "MED-000045" }],
+      mediaAssets: new Map(),
+    };
+    const model = createHomeThemeViewModel({
+      ...source,
+      site: { ...source.site, defaultTheme: "editorial-utility" },
+    });
+    const nonEditorialModel = createHomeThemeViewModel(source);
+    const currentLeadModel = createHomeThemeViewModel({
+      ...source,
+      presentation: {
+        ...source.presentation,
+        home: {
+          featuredArticleIds: [],
+          currentArticleIds: [article.id],
+          evergreenArticleIds: [],
+        },
+      },
+      site: { ...source.site, defaultTheme: "editorial-utility" },
+    });
+    expect([
+      hasPriority(model.featuredArticles[0]!.artwork),
+      hasPriority(model.categoryHighlights[0]!.articles[0]!.artwork),
+    ]).toEqual([true, false]);
+    expect(hasPriority(nonEditorialModel.featuredArticles[0]!.artwork)).toBe(false);
+    expect(hasPriority(currentLeadModel.currentArticles[0]!.artwork)).toBe(true);
   });
 
   it("sorts by material update and omits a disabled search action", () => {
