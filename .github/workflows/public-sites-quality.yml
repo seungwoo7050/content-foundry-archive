@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   quality:
-    runs-on: ubuntu-latest
+    runs-on: macos-26
     timeout-minutes: 120
     steps:
       - name: Check out the exact commit
@@ -33,7 +33,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install the pinned browser engines
-        run: pnpm exec playwright install --with-deps chromium firefox webkit
+        run: pnpm exec playwright install chromium firefox webkit
 
       - name: Run uncached workspace gates
         run: pnpm exec turbo run test typecheck lint build --force
