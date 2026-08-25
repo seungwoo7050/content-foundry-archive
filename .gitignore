@@ -16,3 +16,4 @@ next-env.d.ts
 /.playwright-cli/
 /output/playwright/
 /output/lighthouse/
+/output/quality-release/
