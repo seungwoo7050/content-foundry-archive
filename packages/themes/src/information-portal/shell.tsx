@@ -66,11 +66,27 @@ export function InformationPortalShell({
           <p className="ip-description">{shell.description}</p>
         </div>
         <div className="ip-nav-row">
-          <ThemeNavigation
-            ariaLabel="주요 메뉴"
-            currentPath={routePath}
-            items={shell.primaryNavigation}
-          />
+          {shell.primaryNavigation.length > 0 ? (
+            <>
+              <div className="ip-nav-wide">
+                <ThemeNavigation
+                  ariaLabel="주요 메뉴"
+                  currentPath={routePath}
+                  items={shell.primaryNavigation}
+                />
+              </div>
+              <details className="ip-menu">
+                <summary>메뉴</summary>
+                <div className="ip-nav-mobile">
+                  <ThemeNavigation
+                    ariaLabel="주요 메뉴"
+                    currentPath={routePath}
+                    items={shell.primaryNavigation}
+                  />
+                </div>
+              </details>
+            </>
+          ) : null}
           {shell.searchLink ? (
             <a className="ip-masthead-search" href={shell.searchLink.href}>
               {shell.searchLink.label}

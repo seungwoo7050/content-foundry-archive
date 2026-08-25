@@ -43,6 +43,10 @@ describe("Information Portal shell", () => {
     expect(html).toContain(
       '<a class="ip-masthead-search" href="/search">사이트 검색</a>',
     );
+    expect(html).toContain('<div class="ip-nav-wide">');
+    expect(html).toContain(
+      '<details class="ip-menu"><summary>메뉴</summary><div class="ip-nav-mobile">',
+    );
     expect(html).toContain(
       '<a aria-current="page" href="/category/life/apply">신청</a>',
     );
