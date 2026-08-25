@@ -8,6 +8,8 @@
     "dev": "pnpm run prepare:release && next dev",
     "lint": "eslint . && stylelint \"app/**/*.css\" --allow-empty-input",
     "prepare:release": "tsx scripts/prepare-site-release.ts",
+    "quality:browser:matrix": "tsx scripts/run-qa-browser-matrix.ts",
+    "quality:lighthouse:matrix": "tsx scripts/run-qa-lighthouse-matrix.ts",
     "quality:release": "tsx scripts/generate-qa-release-matrix.ts",
     "quality:sites": "tsx scripts/build-qa-site-matrix.ts",
     "test": "vitest run",
