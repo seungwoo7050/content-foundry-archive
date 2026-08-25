@@ -114,4 +114,18 @@ describe("Minimal Knowledge Base styles", () => {
       expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(rule);
     }
   });
+
+  it("completes reader action disabled and live status states", () => {
+    for (const rule of [
+      ".theme-minimal-knowledge-base button{min-height:44px;cursor:pointer}",
+      ":is(a,button,input,select,textarea,summary):focus-visible{outline:3px solid var(--focus-ring);",
+      ".kb-reader-actions :is(.article-bookmark,.article-share-action){display:flex;flex-wrap:wrap;",
+      '.kb-reader-actions button[aria-pressed="true"]{color:var(--color-primary);',
+      ".kb-reader-actions button:disabled{cursor:not-allowed;opacity:.58}",
+      '.kb-reader-actions :is([role="status"],[aria-live="polite"]){display:block;min-width:0;min-height:1.5em;margin:0;overflow-wrap:anywhere}',
+      ".kb-reader-actions,.theme-minimal-knowledge-base aside",
+    ]) {
+      expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(rule);
+    }
+  });
 });

@@ -160,7 +160,9 @@ export const MINIMAL_KNOWLEDGE_BASE_STYLES = `
 .kb-reader-actions :is(.article-bookmark,.article-share-action){display:flex;flex-wrap:wrap;align-items:center;gap:.75rem}
 .kb-reader-actions button,.kb-search-client button{padding:.6rem 1rem;color:var(--color-on-primary);font-weight:750;background:var(--color-primary);border:1px solid var(--color-primary);border-radius:.55rem}
 .kb-reader-actions button[aria-pressed="true"]{color:var(--color-primary);background:var(--color-surface)}
+.kb-reader-actions button:disabled{cursor:not-allowed;opacity:.58}
 .kb-reader-actions :is(p,span){color:var(--color-text-muted);font-size:.82rem}
+.kb-reader-actions :is([role="status"],[aria-live="polite"]){display:block;min-width:0;min-height:1.5em;margin:0;overflow-wrap:anywhere}
 .kb-reader-actions .article-feedback{padding-top:1rem;border-top:1px solid var(--color-border)}
 .kb-reader-actions .article-feedback h2{font-size:1rem}
 .kb-reader-actions .article-feedback div{display:flex;gap:.5rem}
