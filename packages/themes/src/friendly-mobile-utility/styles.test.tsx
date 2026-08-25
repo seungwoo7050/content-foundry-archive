@@ -167,6 +167,25 @@ describe("Friendly Mobile Utility styles", () => {
     );
   });
 
+  it("compacts factual home groups into a media-led desktop hierarchy", () => {
+    for (const rule of [
+      '.fmu-main[data-route-kind="home"]>.fmu-stack{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;',
+      '>.fmu-stack>:not(.fmu-list:has(>h2>a[href^="/category/"])){grid-column:1/-1}',
+      '.fmu-main[data-route-kind="home"] .fmu-grid{grid-template-columns:repeat(3,minmax(0,1fr))}',
+      '.fmu-list:has(>#fmu-home-featured)>ul{grid-template-columns:minmax(0,1fr)}',
+      "article:has(>.content-image){display:grid;grid-template-columns:minmax(0,1.15fr) minmax(18rem,.85fr);",
+      "article>.content-image{grid-column:1;grid-row:1/span 5;margin:0}",
+      "article>:not(.content-image){grid-column:2}",
+      '.fmu-list:has(>#fmu-home-current)>ul{grid-template-columns:repeat(2,minmax(0,1fr))}',
+      ':is(.fmu-list:has(>#fmu-home-evergreen),.fmu-list:has(>#fmu-home-latest))>ul{grid-template-columns:repeat(3,minmax(0,1fr))}',
+      '>.fmu-stack>.fmu-list:has(>h2>a[href^="/category/"])>ul{grid-template-columns:minmax(0,1fr)}',
+    ]) {
+      expect(FRIENDLY_MOBILE_STYLES).toContain(rule);
+    }
+    expect(FRIENDLY_MOBILE_STYLES).toContain("@media (max-width:30rem)");
+    expect(FRIENDLY_MOBILE_STYLES).not.toMatch(/object-fit:cover|aspect-ratio/);
+  });
+
   it("preserves readable content for print and reduced-motion readers", () => {
     expect(FRIENDLY_MOBILE_STYLES).toContain("prefers-reduced-motion:reduce");
     expect(FRIENDLY_MOBILE_STYLES).toContain(

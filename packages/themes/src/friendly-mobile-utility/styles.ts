@@ -95,6 +95,16 @@ export const FRIENDLY_MOBILE_STYLES = `
   .fmu-header-inner,.fmu-footer-inner{width:min(100%,72rem)}
   .fmu-main:is([data-route-kind="home"],[data-route-kind="category"],[data-route-kind="archive"],[data-route-kind="search"],[data-route-kind="static-page"]){width:min(100%,72rem)}
   .fmu-main[data-route-kind="article"]{width:min(100%,52rem)}
+  .fmu-main[data-route-kind="home"]>.fmu-stack{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:1.25rem}
+  .fmu-main[data-route-kind="home"]>.fmu-stack>:not(.fmu-list:has(>h2>a[href^="/category/"])){grid-column:1/-1}
+  .fmu-main[data-route-kind="home"] .fmu-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .fmu-main[data-route-kind="home"] .fmu-list:has(>#fmu-home-featured)>ul{grid-template-columns:minmax(0,1fr)}
+  .fmu-main[data-route-kind="home"] .fmu-list:has(>#fmu-home-featured) article:has(>.content-image){display:grid;grid-template-columns:minmax(0,1.15fr) minmax(18rem,.85fr);align-items:start;gap:.35rem 1.5rem}
+  .fmu-main[data-route-kind="home"] .fmu-list:has(>#fmu-home-featured) article>.content-image{grid-column:1;grid-row:1/span 5;margin:0}
+  .fmu-main[data-route-kind="home"] .fmu-list:has(>#fmu-home-featured) article>:not(.content-image){grid-column:2}
+  .fmu-main[data-route-kind="home"] .fmu-list:has(>#fmu-home-current)>ul{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .fmu-main[data-route-kind="home"] :is(.fmu-list:has(>#fmu-home-evergreen),.fmu-list:has(>#fmu-home-latest))>ul{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .fmu-main[data-route-kind="home"]>.fmu-stack>.fmu-list:has(>h2>a[href^="/category/"])>ul{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:30rem){:is(.fmu-list:has(>:is(#fmu-home-featured,#fmu-home-current,#fmu-home-evergreen,#fmu-home-latest)),.fmu-list:has(>h2>a[href^="/category/"])){padding:.8rem}:is(#fmu-home-featured,#fmu-home-current,#fmu-home-evergreen,#fmu-home-latest){font-size:1.25rem;overflow-wrap:anywhere}}
 @media (max-width:30rem){.fmu .search-controller form{grid-template-columns:1fr}.fmu .search-controller button{width:100%}}
