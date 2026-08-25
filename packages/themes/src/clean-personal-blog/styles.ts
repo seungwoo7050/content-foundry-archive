@@ -16,6 +16,7 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
 .personal-nav ul ul { margin-left: .6rem; }
 .personal-nav a { color: var(--personal-text); font-size: .92rem; }
 .personal-nav .personal-masthead-search { display: inline-flex; min-height: 44px; align-items: center; padding: .35rem .7rem; background: var(--personal-surface-muted); border: 1px solid var(--personal-border); border-radius: .35rem; font-weight: 700; text-decoration: none; }
+.personal-menu { display: none; }
 .personal-main { padding-block: 2rem 5rem; }
 .personal-breadcrumbs ol { display: flex; flex-wrap: wrap; gap: .35rem; margin: 0 0 2rem; padding: 0; color: var(--personal-text-muted); font-size: .82rem; list-style: none; }
 .personal-breadcrumbs li:not(:last-child)::after { content: "·"; margin-left: .35rem; }
@@ -122,6 +123,28 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
 .personal-state__action { display: inline-block; padding: .55rem .9rem; background: var(--personal-primary); color: var(--personal-on-primary) !important; }
 .personal-footer { padding-block: 2rem; background: var(--personal-surface); border-top: 1px solid var(--personal-border); color: var(--personal-text-muted); }
 @media (max-width: 30rem) {
+  .personal-masthead__inner { padding-block: .85rem .7rem; }
+  .personal-title { font-size: clamp(1.65rem, 8vw, 2rem); line-height: 1.15; overflow-wrap: anywhere; }
+  .personal-tagline { margin: .1rem 0 .5rem; font-size: .9rem; line-height: 1.4; }
+  .personal-nav--wide { display: none; }
+  .personal-menu { display: block; }
+  .personal-menu > summary { display: flex; min-height: 44px; align-items: center; padding: .45rem .7rem; color: var(--personal-text); background: var(--personal-surface-muted); border: 1px solid var(--personal-border); border-radius: .35rem; font-weight: 700; cursor: pointer; }
+  .personal-menu[open] > summary { margin-bottom: .4rem; }
+  .personal-menu > .personal-nav { display: grid; gap: .4rem; padding: .5rem; border: 1px solid var(--personal-border); border-radius: .35rem; }
+  .personal-menu .personal-nav :is(nav, ul) { width: 100%; min-width: 0; }
+  .personal-menu .personal-nav ul { display: grid; gap: .25rem; }
+  .personal-menu .personal-nav a { display: flex; min-height: 44px; align-items: center; padding: .4rem .55rem; overflow-wrap: anywhere; }
+  .personal-menu .personal-masthead-search { width: 100%; justify-content: flex-start; }
+  .personal-main { padding-block: 1.25rem 4rem; }
+  .personal-breadcrumbs ol { margin-bottom: 1rem; }
+  .personal-route-header { margin-bottom: 1.5rem; }
+  .personal-route-header h1 { font-size: clamp(1.8rem, 8vw, 2.25rem); overflow-wrap: anywhere; }
+  .personal-article-header h1 { font-size: clamp(2rem, 9vw, 2.5rem); overflow-wrap: anywhere; }
+  .personal-route-header p, .personal-article-summary { margin-block: .6rem 0; font-size: 1rem; }
+  .personal-section { margin-block: 2rem; }
+  .personal-home-featured { margin-block: 2.5rem; }
+  .personal-article-meta { margin-block: 1rem 1.5rem; padding: .85rem; }
+  .personal-hero, .personal-toc, .personal-evidence { margin-block: 1.5rem; }
   .personal-search-client .search-controller form { grid-template-columns: minmax(0, 1fr); }
   .personal-search-client .search-controller button { width: 100%; }
   .personal-blog nav[aria-label="목록 페이지 이동"] { display: grid; align-items: stretch; }
@@ -151,7 +174,7 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
 }
 @media print {
   .personal-blog { min-height: auto; background: #fff; color: #000; font-family: ui-serif, Georgia, serif; font-size: 11pt; line-height: 1.55; }
-  .personal-masthead, .personal-footer, .personal-skip, .personal-nav, .personal-breadcrumbs, .personal-search-link, .personal-blog aside[aria-label="광고"], .personal-blog button { display: none !important; }
+  .personal-masthead, .personal-footer, .personal-skip, .personal-nav, .personal-menu, .personal-breadcrumbs, .personal-search-link, .personal-blog aside[aria-label="광고"], .personal-blog button { display: none !important; }
   .personal-main { padding: 0; }
   .personal-reading-column { width: 100%; }
   .personal-main[data-route="home"] .personal-reading-column { width: 100%; }

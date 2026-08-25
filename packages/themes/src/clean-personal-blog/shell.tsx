@@ -19,6 +19,20 @@ export function CleanPersonalBlogShell({
   readonly children: ReactNode;
 }) {
   const { shell, route } = model;
+  const mastheadNavigation = shell.primaryNavigation.length > 0 || shell.searchLink ? (
+    <>
+      <ThemeNavigation
+        ariaLabel="주요 메뉴"
+        currentPath={route.path}
+        items={shell.primaryNavigation}
+      />
+      {shell.searchLink ? (
+        <a className="personal-masthead-search" href={shell.searchLink.href}>
+          {shell.searchLink.label}
+        </a>
+      ) : null}
+    </>
+  ) : null;
   return (
     <div
       className="personal-blog"
@@ -37,21 +51,15 @@ export function CleanPersonalBlogShell({
             {shell.brand.label}
           </a>
           <p className="personal-tagline">{shell.description}</p>
-          <div className="personal-nav">
-            <ThemeNavigation
-              ariaLabel="주요 메뉴"
-              currentPath={route.path}
-              items={shell.primaryNavigation}
-            />
-            {shell.searchLink ? (
-              <a
-                className="personal-masthead-search"
-                href={shell.searchLink.href}
-              >
-                {shell.searchLink.label}
-              </a>
-            ) : null}
-          </div>
+          {mastheadNavigation ? <>
+            <div className="personal-nav personal-nav--wide">
+              {mastheadNavigation}
+            </div>
+            <details className="personal-menu">
+              <summary>메뉴</summary>
+              <div className="personal-nav">{mastheadNavigation}</div>
+            </details>
+          </> : null}
         </div>
       </header>
       <main className="personal-main" data-route={route.kind} id="main-content" tabIndex={-1}>

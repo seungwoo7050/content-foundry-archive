@@ -7,6 +7,7 @@ import { SKIN_IDS, SKIN_TOKENS, type SkinId } from "../skin.js";
 import type { ThemeModule } from "../theme-module.js";
 import type { ThemeAdSlots } from "../theme-ad-slot.js";
 import { cleanPersonalBlogTheme } from "./module.js";
+import { CLEAN_PERSONAL_BLOG_STYLES } from "./styles.js";
 
 const shell: SiteShellViewModel = {
   locale: "ko-KR",
@@ -90,6 +91,32 @@ describe("Clean Personal Blog", () => {
     expect(html).toContain('class="personal-reading-column"');
     expect(html.indexOf("personal-title")).toBeLessThan(html.indexOf("personal-nav"));
     expect(html).toContain("한 사람이 정리하는 실생활 안내");
+  });
+
+  it("offers a native closed mobile menu and a compact first viewport", () => {
+    const html = render(routes[0]!, "warm-neutral");
+
+    expect(html).toContain('<div class="personal-nav personal-nav--wide">');
+    expect(html).toContain(
+      '<details class="personal-menu"><summary>메뉴</summary><div class="personal-nav">',
+    );
+    expect(html).not.toContain('<details class="personal-menu" open="">');
+    expect(html.match(/<nav aria-label="주요 메뉴">/g)).toHaveLength(2);
+    expect(html).toContain("<h1>홈</h1>");
+    for (const rule of [
+      ".personal-menu { display: none; }",
+      ".personal-masthead__inner { padding-block: .85rem .7rem; }",
+      ".personal-nav--wide { display: none; }",
+      ".personal-menu { display: block; }",
+      ".personal-menu > summary { display: flex; min-height: 44px;",
+      ".personal-menu .personal-nav a { display: flex; min-height: 44px;",
+      ".personal-route-header h1 { font-size: clamp(1.8rem, 8vw, 2.25rem);",
+      ".personal-article-header h1 { font-size: clamp(2rem, 9vw, 2.5rem);",
+      ".personal-home-featured { margin-block: 2.5rem; }",
+      ".personal-nav, .personal-menu, .personal-breadcrumbs",
+    ]) {
+      expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(rule);
+    }
   });
 
   it("renders release-provided home groups in an authorial column hierarchy", () => {
