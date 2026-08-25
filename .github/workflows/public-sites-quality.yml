@@ -55,5 +55,33 @@ jobs:
       - name: Run the browser matrix gates
         run: pnpm quality:browser:matrix
 
+  lighthouse:
+    needs: quality
+    runs-on: macos-26
+    timeout-minutes: 120
+    steps:
+      - name: Check out the exact commit
+        uses: actions/checkout@v4
+
+      - name: Use the pinned Node runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.19.0
+
+      - name: Enable the pinned package manager
+        run: corepack enable
+
+      - name: Install the locked workspace
+        run: pnpm install --frozen-lockfile
+
+      - name: Install the pinned Chromium engine
+        run: pnpm exec playwright install chromium
+
+      - name: Generate the non-operational QA matrix
+        run: pnpm quality:release
+
+      - name: Build and verify all static variants
+        run: pnpm quality:sites
+
       - name: Run three-sample Lighthouse gates
         run: pnpm quality:lighthouse:matrix
