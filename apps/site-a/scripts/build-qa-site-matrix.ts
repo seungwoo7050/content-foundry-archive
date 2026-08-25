@@ -37,6 +37,23 @@ let owned = false;
 try {
   mkdirSync(sitesDirectory);
   owned = true;
+  const dependencyEnvironment = createQaBuildEnvironment(
+    process.env,
+    plans[0]!.environment,
+  ) as NodeJS.ProcessEnv;
+  const dependencies = spawnSync(
+    "pnpm",
+    ["exec", "turbo", "run", "build", "--filter=@content-foundry/site-a^..."],
+    {
+      cwd: repositoryDirectory,
+      env: dependencyEnvironment,
+      stdio: "inherit",
+    },
+  );
+  if (dependencies.error) throw dependencies.error;
+  if (dependencies.status !== 0) {
+    throw new Error("QA workspace dependency build failed");
+  }
   for (const plan of plans) {
     const result = spawnSync("pnpm", ["run", "build"], {
       cwd: appDirectory,
