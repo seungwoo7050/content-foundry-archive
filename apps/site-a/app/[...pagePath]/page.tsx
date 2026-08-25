@@ -66,7 +66,7 @@ export async function generateMetadata({
 export default async function StaticPage({ params }: StaticPageProps) {
   const { pagePath } = await params;
   const context = getVersionedSiteReleaseContext();
-  const { bundle } = context;
+  const { bundle, mediaAssets } = context;
   const page = findPageByPathSegments(bundle, pagePath);
 
   if (page) {
@@ -82,16 +82,18 @@ export default async function StaticPage({ params }: StaticPageProps) {
 
   const pagination = resolveStaticPaginationCatchAll(bundle, pagePath);
   if (pagination?.kind === "archive") {
+    const routeSource = { ...bundle, mediaAssets };
     return renderThemePage(
       bundle,
-      createArchiveThemeViewModel(bundle, pagination.page),
+      createArchiveThemeViewModel(routeSource, pagination.page),
     );
   }
   if (pagination?.kind === "category") {
+    const routeSource = { ...bundle, mediaAssets };
     return renderThemePage(
       bundle,
       createCategoryThemeViewModel(
-        bundle,
+        routeSource,
         pagination.category,
         pagination.page,
       ),

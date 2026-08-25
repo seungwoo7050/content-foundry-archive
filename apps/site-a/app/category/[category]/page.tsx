@@ -42,7 +42,7 @@ export async function generateMetadata({
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category: slug } = await params;
-  const { bundle } = getVersionedSiteReleaseContext();
+  const { bundle, mediaAssets } = getVersionedSiteReleaseContext();
   const category = findCategoryBySlug(bundle, slug);
 
   if (!category) {
@@ -56,8 +56,9 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
+  const routeSource = { ...bundle, mediaAssets };
   return renderThemePage(
     bundle,
-    createCategoryThemeViewModel(bundle, category),
+    createCategoryThemeViewModel(routeSource, category),
   );
 }
