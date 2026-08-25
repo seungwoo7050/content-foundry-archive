@@ -1,7 +1,29 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const baseURL = "http://127.0.0.1:4173";
+const defaultBaseURL = "http://127.0.0.1:4173";
 const ci = process.env.CI === "true";
+
+function resolveQualityBaseURL(value: string | undefined): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const match = /^http:\/\/(?:127\.0\.0\.1|localhost):([1-9]\d{0,4})$/.exec(
+    value,
+  );
+  const port = Number(match?.[1]);
+
+  if (match === null || port > 65_535) {
+    throw new Error(
+      "QUALITY_BASE_URL must be a bare loopback HTTP origin with an explicit port, for example http://127.0.0.1:4173.",
+    );
+  }
+
+  return value;
+}
+
+const externalBaseURL = resolveQualityBaseURL(process.env.QUALITY_BASE_URL);
+const baseURL = externalBaseURL ?? defaultBaseURL;
 
 export default defineConfig({
   testDir: "./apps/site-a/e2e",
@@ -75,15 +97,19 @@ export default defineConfig({
       },
     },
   ],
-  webServer: {
-    command:
-      "pnpm build && pnpm exec serve apps/site-a/out --config ../../../serve.json --listen tcp://127.0.0.1:4173 --no-clipboard",
-    url: baseURL,
-    reuseExistingServer: !ci,
-    timeout: 120_000,
-    stdout: "ignore",
-    stderr: "pipe",
-    gracefulShutdown: { signal: "SIGTERM", timeout: 1_000 },
-    env: { ...process.env, NO_UPDATE_CHECK: "1" },
-  },
+  ...(externalBaseURL === undefined
+    ? {
+        webServer: {
+          command:
+            "pnpm build && pnpm exec serve apps/site-a/out --config ../../../serve.json --listen tcp://127.0.0.1:4173 --no-clipboard",
+          url: baseURL,
+          reuseExistingServer: !ci,
+          timeout: 120_000,
+          stdout: "ignore" as const,
+          stderr: "pipe" as const,
+          gracefulShutdown: { signal: "SIGTERM" as const, timeout: 1_000 },
+          env: { ...process.env, NO_UPDATE_CHECK: "1" },
+        },
+      }
+    : {}),
 });
