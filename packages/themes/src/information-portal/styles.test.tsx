@@ -31,6 +31,20 @@ describe("Information Portal styles", () => {
     expect(INFORMATION_PORTAL_STYLES).not.toMatch(/ranking|trending|popular/i);
   });
 
+  it("pins both article tracks to the first desktop grid row", () => {
+    const desktopArticleStyles = INFORMATION_PORTAL_STYLES.slice(
+      INFORMATION_PORTAL_STYLES.indexOf("@media (min-width:64rem){"),
+      INFORMATION_PORTAL_STYLES.indexOf("@media (max-width:30rem)"),
+    );
+
+    expect(desktopArticleStyles).toContain(
+      ".ip-article-main{grid-column:1;grid-row:1}",
+    );
+    expect(desktopArticleStyles).toContain(
+      ".ip-article-rail{grid-column:2;grid-row:1}",
+    );
+  });
+
   it("supports reduced motion and a main-first print layout", () => {
     expect(INFORMATION_PORTAL_STYLES).toContain("prefers-reduced-motion:reduce");
     expect(INFORMATION_PORTAL_STYLES).toContain("@media print");
