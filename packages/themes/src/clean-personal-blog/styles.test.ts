@@ -49,4 +49,20 @@ describe("Clean Personal Blog output styles", () => {
     );
     expect(groupStyles).not.toMatch(/#[0-9a-f]{3,8}|rgba?\(|hsla?\(/i);
   });
+
+  it("presents search as a warm responsive reading utility", () => {
+    for (const rule of [
+      ".personal-search-client .search-controller form { display: grid; grid-template-columns: minmax(0, 1fr) auto;",
+      ".personal-search-client .search-controller input { min-width: 0; min-height: 48px;",
+      ".personal-search-client .search-controller button { min-height: 48px;",
+      ".personal-search-client .search-controller button:disabled { cursor: wait; opacity: .58; }",
+      ".personal-search-client .search-results article { min-width: 0; padding: 1rem; overflow-wrap: anywhere;",
+      ".personal-search-client .search-fallback a { display: inline-flex; min-height: 44px;",
+      ".personal-search-client .search-controller form { grid-template-columns: minmax(0, 1fr); }",
+      ".personal-search-client .search-controller form, .personal-search-client .search-fallback { display: none !important; }",
+      ".personal-search-client .search-results article { break-inside: avoid; border-radius: 0; background: #fff; }",
+    ]) {
+      expect(CLEAN_PERSONAL_BLOG_STYLES).toContain(rule);
+    }
+  });
 });

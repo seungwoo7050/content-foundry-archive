@@ -79,11 +79,30 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
 .personal-faq dt { font-weight: 700; }
 .personal-faq dd { margin: .25rem 0 0; }
 .personal-search-client { padding: 1.2rem; background: var(--personal-surface); border: 1px solid var(--personal-border); border-radius: .5rem; }
+.personal-search-client .search-controller { min-width: 0; }
+.personal-search-client .search-controller form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: .7rem; }
+.personal-search-client .search-controller label { grid-column: 1 / -1; font-family: ui-serif, Georgia, serif; font-weight: 700; }
+.personal-search-client .search-controller input { min-width: 0; min-height: 48px; padding: .7rem .85rem; color: var(--personal-text); background: var(--personal-canvas); border: 1px solid var(--personal-border); border-radius: .4rem; font: inherit; }
+.personal-search-client .search-controller button { min-height: 48px; padding: .65rem 1rem; color: var(--personal-on-primary); background: var(--personal-primary); border: 1px solid var(--personal-primary); border-radius: .4rem; font: inherit; font-weight: 700; }
+.personal-search-client .search-controller :is(input, button):focus-visible { outline: 3px solid var(--personal-focus-ring); outline-offset: 2px; }
+.personal-search-client .search-controller button:disabled { cursor: wait; opacity: .58; }
+.personal-search-client #site-search-status { margin: .75rem 0 0; color: var(--personal-text-muted); font-size: .9rem; }
+.personal-search-client :is(.search-results, .search-fallback) { min-width: 0; overflow-wrap: anywhere; }
+.personal-search-client :is(.search-results, .search-fallback ul) { display: grid; gap: .85rem; margin: 1rem 0 0; padding: 0; list-style: none; }
+.personal-search-client .search-results article { min-width: 0; padding: 1rem; overflow-wrap: anywhere; background: var(--personal-canvas); border: 1px solid var(--personal-border); border-radius: .5rem; }
+.personal-search-client .search-results h3 { margin: .1rem 0; font-family: ui-serif, Georgia, serif; }
+.personal-search-client .search-results p { margin: .45rem 0 0; }
+.personal-search-client .search-results p:last-child { color: var(--personal-text-muted); font-size: .85rem; }
+.personal-search-client .search-fallback p { color: var(--personal-text-muted); }
+.personal-search-client .search-fallback ul { display: flex; flex-wrap: wrap; }
+.personal-search-client .search-fallback a { display: inline-flex; min-height: 44px; align-items: center; padding: .45rem .75rem; background: var(--personal-surface-muted); border: 1px solid var(--personal-border); border-radius: 999px; text-decoration: none; }
 .personal-state { margin-block: 4rem; text-align: center; }
 .personal-state__code { color: var(--personal-text-muted); font-size: .85rem; letter-spacing: .12em; }
 .personal-state__action { display: inline-block; padding: .55rem .9rem; background: var(--personal-primary); color: var(--personal-on-primary) !important; }
 .personal-footer { padding-block: 2rem; background: var(--personal-surface); border-top: 1px solid var(--personal-border); color: var(--personal-text-muted); }
 @media (max-width: 30rem) {
+  .personal-search-client .search-controller form { grid-template-columns: minmax(0, 1fr); }
+  .personal-search-client .search-controller button { width: 100%; }
   .personal-home-featured article, .personal-home-current article, .personal-home-category-highlight article { padding: .9rem; }
   .personal-home-category-highlight { padding: .9rem; }
 }
@@ -98,6 +117,10 @@ export const CLEAN_PERSONAL_BLOG_STYLES = `
   .personal-masthead, .personal-footer, .personal-skip, .personal-nav, .personal-breadcrumbs, .personal-search-link, .personal-blog aside[aria-label="광고"], .personal-blog button { display: none !important; }
   .personal-main { padding: 0; }
   .personal-reading-column { width: 100%; }
+  .personal-search-client .search-controller form, .personal-search-client .search-fallback { display: none !important; }
+  .personal-search-client .search-results { display: block; }
+  .personal-search-client .search-results > li + li { margin-top: .8rem; }
+  .personal-search-client .search-results article { break-inside: avoid; border-radius: 0; background: #fff; }
   .personal-article-meta, .personal-toc, .personal-evidence { break-inside: avoid; border: 1px solid #aaa; border-radius: 0; background: #fff; }
   .personal-body { font-size: inherit; }
   .personal-body a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; overflow-wrap: anywhere; }
