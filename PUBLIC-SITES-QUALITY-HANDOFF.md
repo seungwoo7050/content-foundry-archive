@@ -9,21 +9,24 @@ This checkpoint closes the provider-free Public Sites quality track. It is a non
 This addendum supersedes the pre-publication checkpoint values below while preserving that checkpoint as an audit record. This documentation-only atom records the immediately preceding implementation checkpoint and its completed remote runs; it does not attempt to record its own SHA or create a self-referential CI claim.
 
 - Archive remains clean and equal to `origin/main` at `a7e748a753ddd4d0751f5a4b84b27ec5c5a12b5e`.
-- The final Public implementation checkpoint before this documentation atom is `c696a50427aa068d14185aaa24908ec0d40b20da`; its tree is `dc92e183591b7e504341de18c1c6c76e07a36e45`.
+- The final visitor-facing implementation checkpoint remains `c696a50427aa068d14185aaa24908ec0d40b20da`; its tree is `dc92e183591b7e504341de18c1c6c76e07a36e45`.
+- The isolated Next.js 16.3.3 dependency/security checkpoint is `f1e2743140366fbd5ae84c5e617fc4a01bd01070`; its tree is `60ca48b3995c38444334621787af163d5b10af49`.
 - The original continuation handoff recorded Public `2b2d5982808435c9821b5eb8400aa5d3bb63fac0` and Archive `5dfb28514ed70b7fa3c1e3e15a06fb68a6eda7a0`. After the intervening published series was audited, the documentation-atom fetch confirmed the current heads above with both worktrees clean and `0 ahead / 0 behind`.
-- The final measured sequence preserved the ineffective eager/high experiment at `a4c1a3e`, then used `8cb44aa` for text-first Editorial semantics, `0332aa0` to restore lazy listing policy, `a29cb8e` for the 640w card derivative, `2cbf3da` and `40e895a` for reviewed mobile baselines, and `c696a50` to remove the resulting stale import warning. No published evidence was rewritten.
+- The final measured sequence preserved the ineffective eager/high experiment at `a4c1a3e`, then used `8cb44aa` for text-first Editorial semantics, `0332aa0` to restore lazy listing policy, `a29cb8e` for the 640w card derivative, `2cbf3da` and `40e895a` for reviewed mobile baselines, and `c696a50` to remove the resulting stale import warning. `f1e2743` later upgraded only the Next.js dependency family and lock/publish-age policy exceptions. No published evidence was rewritten.
 - Home latest remains an updated-date fallback, not an invented editorial classification. The full corpus remains available through archive, category, search, and 12-item static pagination.
 
-### Final local evidence
+### Final local evidence at the dependency checkpoint
 
+- Frozen installation resolved `next@16.3.3` and `eslint-config-next@16.3.3`; the installed CLI reported Next.js 16.3.3.
 - Uncached workspace graph: 28/28 tasks, zero cached, 1,261 tests, with lint, TypeScript, generated checks, Contract build, and Next static build passing.
 - Real v4/v3/v2 paired Next builds and the same static verifier passed. The standalone v2 consumer CLI reproduced checksum `sha256:0a8f03190b0a5d63fefc52e3efab08080a08263a6c8d716f0e4936382eee6f27`.
 - QA generation rebuilt all 15 provider-free variants at 40 route artifacts each.
 - Browser matrix: 1,348 passed, 626 intentional project-scope skips, zero failed.
 - Visual regression: 28/28 exact matches. `2cbf3da` approved only the Editorial calm-blue mobile home and `40e895a` approved the other six mobile homes; every desktop and all 14 rich-article baselines remained byte-identical.
 - Lighthouse inventory: 15 variants, 45 variant-route groups, three runs per group, 135 JSON reports, 135 HTML reports, 15 manifests, and 585 median assertions; every assertion passed.
-- Worst three-run medians were Performance 0.98, Accessibility 1.00, Best Practices 1.00, FCP 837.4733 ms, LCP 2,410.5466 ms, CLS 0, TBT 14 ms, and Interactive 2,433.0466 ms.
-- Maximum median budgets were script 142,778 B, CSS 0 B after inlining, font 0 B, image 93,473 B, and third-party requests 0.
+- Worst three-run medians were Performance 0.98, Accessibility 1.00, Best Practices 1.00, FCP 847.58185 ms, LCP 2,414.1934 ms, CLS 0, TBT 31 ms, and Interactive 2,436.6934 ms.
+- Maximum median budgets were script 142,715 B, CSS 0 B after inlining, font 0 B, image 93,473 B, and third-party requests 0.
+- `pnpm audit --prod --audit-level high` found no known production vulnerabilities. The full audit is not reported as clean: the latest pinned `@lhci/cli@0.15.1` retains two high-severity dev-only transitive findings in `tmp` and `extract-zip`, plus two low and one moderate finding. Those upstream tooling constraints are an explicit deferred gate below.
 
 ### Remote workflow evidence
 
@@ -31,7 +34,9 @@ This addendum supersedes the pre-publication checkpoint values below while prese
 - Run `32842108968` at `a4c1a3e` showed that eager/high did not reproduce a remote gain: quality job `97783692078` passed, while Lighthouse job `97789995349` failed the same median at 2,559.001 ms; artifact `9561970855` remains the evidence.
 - The follow-up commits fixed semantic order, loading policy, responsive transfer size, and visual expectations without rewriting either failure. Run `32855232537` at `40e895a` then passed quality job `97825460622` and Lighthouse job `97832636385`; artifact `9567982247` has digest `sha256:bdd7db2aaa9b553af5e91259d9a56d104ceec625e0e12c0f6fc1711bfd10d660`.
 - Final implementation run `32860785377` at `c696a50` passed quality job `97843946822` in 21m16s and Lighthouse job `97851420756` in 30m54s. Artifact `9570192346` is 44,975,657 B with digest `sha256:3eb7dfb9543d59329701436f1e4af229e8180640a84d3d446eba67b07e0a934d`.
-- The final run has no error or failure annotation. Its two warnings are the acknowledged GitHub Actions Node 20 deprecation notices for `actions/checkout@v4`, `actions/setup-node@v4`, and, in Lighthouse, `actions/upload-artifact@v4`, all forced onto Node 24 by the runner.
+- Documentation run `32866690644` at `85fd489` passed quality job `97863597618` in 21m30s and Lighthouse job `97870892067` in 31m03s. Artifact `9572431724` is 45,478,134 B with digest `sha256:7363371649aada390d2ee047205f85207c59ddd6455703977e03e27d37b4beec`.
+- Dependency/security run [`32874912479`](https://github.com/seungwoo7050/content-foundry-archive/actions/runs/32874912479) at `f1e2743` passed quality job `97890418015` in 24m00s and Lighthouse job `97898220001` in 30m38s. Artifact `9575497238` (`public-sites-lighthouse-32874912479-1`) is 45,244,693 B with digest `sha256:a8c42d982470c3f133f7b7a3ed6e8d40f3d5e266d8685b225796105678f6e6ac`.
+- The dependency run has no error or failure annotation. Its two warnings are the acknowledged GitHub Actions Node 20 deprecation notices for `actions/checkout@v4`, `actions/setup-node@v4`, and, in Lighthouse, `actions/upload-artifact@v4`, all forced onto Node 24 by the runner.
 
 ### Visual baseline reproduction
 
@@ -63,6 +68,9 @@ Approved variants are `friendly-mobile-utility--calm-blue`, `friendly-mobile-uti
 - Remote runs proved that `a4c1a3e` was measured but ineffective; `8cb44aa` and `0332aa0` superseded it without hiding the published attempt, so its isolated rollback is no longer a meaningful claim for the current tree.
 - Product and expectation responsibilities are separate but intentionally coupled at `8cb44aa` ↔ `2cbf3da` and `a29cb8e` ↔ `2cbf3da`/`40e895a`; reverting only one side makes the visual gate fail until its pair is also reverted.
 - Workflow actions use mutable major tags rather than immutable commit SHAs, and the remote Node deprecation annotations remain. Pinning those tools is a separate tooling atom, not part of the visitor-facing product closure.
+- The registry initially returned 404 at 00:06:29 KST, then officially published [`next@16.3.3`](https://registry.npmjs.org/next/16.3.3) at 00:32:19 KST. The audited [official source range](https://github.com/vercel/next.js/compare/d0ac8828...a9a1cb7859f178f830ad3773b303130c21b19586) contains incremental-cache root-containment/backslash-escaping and AVIF decode/bypass hardening; no public GHSA or CVE currently names 16.3.3 as its patched version, so none is claimed here.
+- `f1e2743` is an independently reversible dependency atom. Its twelve exact `minimumReleaseAgeExclude` entries are the lock-consistent exceptions required by the existing pnpm release-age policy because the official packages had just been published; they do not weaken the policy for unlisted versions.
+- The remaining LHCI audit findings are not fixed with unsupported overrides: LHCI still declares pre-patch `tmp` ranges, while no patched `extract-zip` release exists. Replacement or an upstream LHCI update belongs in a separate tooling/security atom with the entire Lighthouse matrix rerun.
 - Inline CSS will require a hash or nonce only after an approved hosting/CSP policy exists. No CSP policy or provider value was invented in this track.
 - The baseline regeneration command, previously missing from the repository, is recorded above. The generated reports and sites remain ignored; only reviewed lossless WebP evidence is tracked.
 
@@ -83,7 +91,7 @@ Approved variants are `friendly-mobile-utility--calm-blue`, `friendly-mobile-uti
 4. Archive/category pagination is complete through view models, routes, metadata, collision claims, sitemap, and static verification.
 5. The QA release, neutral assets, 15-variant generator, inert preview gallery, browser tooling, Lighthouse tooling, and deterministic CI are complete.
 6. All five themes have completed shell, home, article, structured-content, responsive, print, and approved visual-baseline atoms.
-7. Implementation, local gates, remote deterministic quality, Lighthouse, and normal fast-forward publication are complete through `c696a50`. This handoff atom changes documentation only.
+7. Visitor implementation is complete through `c696a50`; the isolated Next.js 16.3.3 dependency/security atom, local gates, remote deterministic quality, Lighthouse, and normal fast-forward publication are complete through `f1e2743`. This handoff atom changes documentation only.
 
 ContentOps was not changed. Its Contract 4 producer support remains a separate follow-up; its pre-existing local/remote state was not touched.
 
@@ -128,5 +136,6 @@ Perfect historical compliance is not claimed. The original handoff section 8 rem
 
 - Real content, domains, brand assets, legal copy, advertising, analytics, consent, comments, provider IDs/secrets, deployment, and DNS need approval.
 - Actual Safari manual review, VoiceOver core flow, 200% zoom, and OS print preview remain manual acceptance evidence. Automated WebKit mobile, Axe, reduced motion, JavaScript-off, reflow, and print layout checks did pass.
-- At 2026-08-26 00:06:29 KST the official npm registry returned 404 for `next@16.3.3`, npm `latest` remained 16.3.2, and the official GitHub Release endpoint was still 404. Vercel had created source tag commit `a9a1cb7859f178f830ad3773b303130c21b19586`, but no installable official package/release was public, so the isolated dependency/security atom remains deferred and does not block this quality track.
+- The Next.js release gate is closed by `f1e2743`. The dev-only LHCI transitive audit findings and mutable/deprecated GitHub Actions majors remain separate tooling gates; neither is included in production static output, but neither is represented as remediated.
+- ContentOps Contract 4 producer support remains a separate six-commit-ahead follow-up and was not changed in this track.
 - Production readiness must not be reported until these gates close.
