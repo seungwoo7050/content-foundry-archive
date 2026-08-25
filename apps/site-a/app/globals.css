@@ -334,9 +334,69 @@ body > footer {
   background: var(--surface-soft);
 }
 
+.content-image,
+.content-image picture,
+.content-image img,
+.content-gallery,
+.content-gallery-items {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.content-image picture,
+.content-image img {
+  display: block;
+}
+
+.content-image img {
+  width: auto;
+  height: auto;
+}
+
+.content-gallery-items {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.content-gallery-items > .content-image {
+  margin: 0;
+}
+
+.content-code-command,
+.content-code-command pre {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.content-code-command pre {
+  margin: 0;
+  overflow-x: auto;
+}
+
 .content-embed {
   margin-block: 1.75rem;
   padding: 1rem;
   background: var(--surface);
   border: 1px solid var(--line);
+}
+
+@media (width >= 40rem) {
+  .content-gallery-items {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media print {
+  .content-image,
+  .content-gallery,
+  .content-code-command {
+    break-inside: avoid;
+  }
+
+  .content-code-command pre {
+    overflow: visible;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
 }

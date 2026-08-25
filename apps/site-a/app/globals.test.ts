@@ -18,4 +18,21 @@ describe("responsive CSS invariants", () => {
     expect(tableRule).toContain("max-width: 100%");
     expect(tableRule).toContain("overflow-x: auto");
   });
+
+  it("contains intrinsic media and code without forcing a crop", () => {
+    expect(css).toContain(".content-image img {\n  width: auto;\n  height: auto;");
+    expect(css).toContain(".content-gallery-items {\n  display: grid;");
+    expect(css).toContain("grid-template-columns: minmax(0, 1fr)");
+    expect(css).toContain("repeat(2, minmax(0, 1fr))");
+    expect(css).toContain(".content-code-command pre {\n  margin: 0;\n  overflow-x: auto;");
+    expect(css).not.toMatch(/\.content-(?:image|gallery)[^{]*\{[^}]*object-fit:\s*cover/s);
+  });
+
+  it("keeps structured media legible in print", () => {
+    const printRule = css.match(/@media print\s*\{([\s\S]*)\}\s*$/)?.[1];
+
+    expect(printRule).toContain("break-inside: avoid");
+    expect(printRule).toContain("white-space: pre-wrap");
+    expect(printRule).toContain("overflow-wrap: anywhere");
+  });
 });
