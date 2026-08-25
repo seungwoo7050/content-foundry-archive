@@ -4,6 +4,56 @@ Date: 2026-08-25 KST
 
 This checkpoint closes the provider-free Public Sites quality track. It is a non-operational QA release, not approval to deploy or substitute synthetic content, origins, branding, policy copy, or provider identifiers for real ones.
 
+## Final local closure addendum
+
+This addendum supersedes the pre-publication checkpoint values below while preserving that checkpoint as an audit record. Remote CI status belongs to the post-push report because recording it here would require another commit and another circular CI run.
+
+- Archive remains clean and equal to `origin/main` at `a7e748a753ddd4d0751f5a4b84b27ec5c5a12b5e`.
+- The final Public implementation checkpoint before this documentation atom is `1cec71d68d6fc8e6ec716f8fa6ca74a1d90598a5`.
+- The fetched `public-sites` remote remained `0d61f1dd7d9096c28f519e9097ea039b71774bfb`; Public was clean, six commits ahead, and zero behind.
+- The six closure atoms inline the 2,012 B render-blocking CSS, select the 16,550 B favicon derivative instead of the 188,872 B source, preserve Lighthouse failure evidence, exclude inline CSS from legacy visitor-marker checks, cap residual home latest discovery at six, and approve only the 14 affected home baselines.
+- Home latest remains an updated-date fallback, not an invented editorial classification. The full corpus remains available through archive, category, search, and 12-item static pagination.
+
+### Final local evidence
+
+- Uncached workspace graph: 28/28 tasks, zero cached, 1,260 tests, with lint, TypeScript, generated checks, Contract build, and Next static build passing.
+- Real v4/v3/v2 paired Next builds and the same static verifier passed. The standalone v2 consumer CLI reproduced checksum `sha256:0a8f03190b0a5d63fefc52e3efab08080a08263a6c8d716f0e4936382eee6f27`.
+- QA generation rebuilt all 15 provider-free variants at 40 route artifacts each.
+- Browser matrix: 1,348 passed, 626 intentional project-scope skips, zero failed.
+- Visual regression: 28/28 exact matches. The 14 article baselines remained byte-identical; the reviewed home heights changed from 7,974–9,940 px to 6,243–7,560 px on desktop and from 12,042–14,502 px to 8,876–10,716 px on mobile.
+- Lighthouse inventory: 15 variants, 45 variant-route groups, three runs per group, 135 JSON reports, 135 HTML reports, 15 manifests, and 585 median assertions; every assertion passed.
+- Worst three-run medians were Performance 0.98, Accessibility 1.00, Best Practices 1.00, FCP 839.27 ms, LCP 2,486.46 ms, CLS 0, TBT 13.5 ms, and Interactive 2,531.46 ms.
+- Maximum median budgets were script 142,778 B, CSS 0 B after inlining, font 0 B, image 126,994 B, and third-party requests 0.
+
+### Visual baseline reproduction
+
+Generate fresh ignored QA inputs first:
+
+```sh
+fnm exec --using=24.19.0 -- pnpm quality:release
+fnm exec --using=24.19.0 -- pnpm quality:sites
+```
+
+For each approved variant below, serve its static directory in one terminal and run the pinned Playwright comparison in another. Add `--update-snapshots` only after reviewing the product change; omit it for the required zero-diff confirmation.
+
+```sh
+QA_BASELINE_VARIANT=friendly-mobile-utility--calm-blue
+fnm exec --using=24.19.0 -- pnpm exec serve "output/quality-release/sites/${QA_BASELINE_VARIANT}" --config serve.json --listen tcp://127.0.0.1:4174 --no-clipboard
+
+QA_BASELINE_VARIANT=friendly-mobile-utility--calm-blue
+QUALITY_BASE_URL=http://127.0.0.1:4174 QUALITY_VARIANT_ID="${QA_BASELINE_VARIANT}" fnm exec --using=24.19.0 -- pnpm exec playwright test apps/site-a/e2e/qa-visual.spec.ts --project=chromium-desktop --project=chromium-mobile --update-snapshots
+```
+
+Approved variants are `friendly-mobile-utility--calm-blue`, `friendly-mobile-utility--forest-green`, `friendly-mobile-utility--warm-neutral`, `editorial-utility--calm-blue`, `clean-personal-blog--calm-blue`, `information-portal--calm-blue`, and `minimal-knowledge-base--calm-blue`.
+
+### Additional rules audit notes
+
+- Current HEAD has no security or correctness blocker, but perfect atom independence is not claimed.
+- `3ad5900` exposed a v2 verifier false positive repaired by `953f7eb`; reverting only the repair reintroduces that failure while inline CSS remains.
+- `ed86691` and baseline atom `1cec71d` are deliberately split product/test responsibilities, but reverting only one makes visual expectations disagree with product output.
+- The first-paint and home-height performance measurements are preserved across their paired implementation/evidence commits rather than entirely in each implementation body. No history was rewritten to conceal these exceptions.
+- The baseline regeneration command, previously missing from the repository, is recorded above. The generated reports and sites remain ignored; only reviewed lossless WebP evidence is tracked.
+
 ## Immutable checkpoints
 
 - Archive Contract 4 commit: `a7e748a753ddd4d0751f5a4b84b27ec5c5a12b5e`.
@@ -52,13 +102,13 @@ ContentOps was not changed. Its Contract 4 producer support remains a separate f
 - Editorial Magazine has a deliberate masthead, media-led hierarchy, evidence and TOC rail, dense tables/quotes/sources, and credible editorial rhythm.
 - Personal Column uses an author-led home, generous canvas, narrow reading measure, warm trust/summary blocks, and restrained reader actions.
 - News Portal has the intended high-density header and current/category/latest hierarchy while single category panels now use the available width cleanly.
-- Minimal Knowledge Base retains the strongest search/navigation and mature body system; the desktop QA home fell from 13,404 px to 9,940 px (-25.8%) without crop, overflow, mobile regression, or print-flow regression.
+- Minimal Knowledge Base retains the strongest search/navigation and mature body system; across both density passes the desktop QA home fell from 13,404 px to 7,313 px (-45.4%) without crop, overflow, mobile regression, or print-flow regression.
 
 The synthetic QA scope is visually polished enough to justify a WordPress replacement direction. It is not yet an operational WordPress replacement until approved content, identity, legal, origin, and provider inputs are added.
 
 ## DEVELOPMENT-RULES audit
 
-No rewrite, rebase, reset, force-push, or merge was used. Post-audit closure atoms are single-responsibility, independently tested, and independently revertible. Archive and Public changes are separated; ContentOps and external policies were not inferred.
+No rewrite, rebase, reset, force-push, or merge was used. Post-audit closure atoms are single-responsibility and explicitly tested; the final addendum records the strict rollback/validation couplings that prevent a claim of perfect independence. Archive and Public changes are separated; ContentOps and external policies were not inferred.
 
 Perfect historical compliance is not claimed. The original handoff section 8 remains the audit ledger for inherited published exceptions. Additional track exceptions preserved without rewrite are: `3294ceb` literal escaped newlines; `a9b6eed` coupled helper/reading-time repair; `5b5f7ad` incorrect body line count; `fa162e1` noisy/contradictory validation; `e47c30c` full test listing; `149ca03` stale deferred wording; `f6556ab` non-strict fix headings; `126f958` 141 additions without the required size rationale; and the first 23 new Public commits lacking every exact pre-plan field. Later atoms use the strict fields, staged-diff checks, secret scans, focused validation, and explicit rollback.
 
