@@ -305,7 +305,8 @@ const expectedArticleLastModified =
   identity.contractVersion !== "2.0.0"
     ? "2026-08-24T02:30:00Z"
     : "2026-08-20T01:00:00Z";
-const hasIndexedFixtureArticle = identity.contractVersion !== "4.0.0";
+const hasExternallyDiscoverableFixtureArticle =
+  identity.contractVersion !== "4.0.0";
 assert.deepEqual(searchIndex.release, {
   releaseId: identity.releaseId,
   siteId: identity.siteId,
@@ -314,31 +315,32 @@ assert.deepEqual(searchIndex.release, {
 });
 assert.equal(searchIndex.schemaVersion, "1.0.0");
 assert.equal(searchIndex.locale, "ko-KR");
-assert.equal(searchIndex.entries.length, hasIndexedFixtureArticle ? 1 : 0);
-if (hasIndexedFixtureArticle) {
-  assert.deepEqual(
-    {
-      id: searchIndex.entries[0].id,
-      path: searchIndex.entries[0].path,
-      updatedAt: searchIndex.entries[0].updatedAt,
-      categoryKeys: Object.keys(searchIndex.entries[0].category).sort(),
-      tagKeys: Object.keys(searchIndex.entries[0].tags[0]).sort(),
-      headingKeys: Object.keys(searchIndex.entries[0].headings[0]).sort(),
-    },
-    {
-      id: "ART-000123",
-      path: `/article/${articleSlug}`,
-      updatedAt: expectedArticleLastModified,
-      categoryKeys: ["id", "label", "slug"],
-      tagKeys: ["id", "label", "slug"],
-      headingKeys: ["id", "text"],
-    },
-  );
-}
+assert.equal(searchIndex.entries.length, 1);
+assert.deepEqual(
+  {
+    id: searchIndex.entries[0].id,
+    path: searchIndex.entries[0].path,
+    updatedAt: searchIndex.entries[0].updatedAt,
+    categoryKeys: Object.keys(searchIndex.entries[0].category).sort(),
+    tagKeys: Object.keys(searchIndex.entries[0].tags[0]).sort(),
+    headingKeys: Object.keys(searchIndex.entries[0].headings[0]).sort(),
+  },
+  {
+    id: "ART-000123",
+    path: `/article/${articleSlug}`,
+    updatedAt: expectedArticleLastModified,
+    categoryKeys: ["id", "label", "slug"],
+    tagKeys: ["id", "label", "slug"],
+    headingKeys: ["id", "text"],
+  },
+);
 assert.match(rss, /^<\?xml version="1\.0" encoding="UTF-8"\?>\n<rss version="2\.0">/);
 assert.match(rss, /<title>생활메모<\/title>/);
-assert.equal([...rss.matchAll(/<item>/g)].length, hasIndexedFixtureArticle ? 1 : 0);
-if (hasIndexedFixtureArticle) {
+assert.equal(
+  [...rss.matchAll(/<item>/g)].length,
+  hasExternallyDiscoverableFixtureArticle ? 1 : 0,
+);
+if (hasExternallyDiscoverableFixtureArticle) {
   assert.match(
     rss,
     new RegExp(`<link>https://example\\.com/article/${articleSlug}</link>`),
@@ -351,7 +353,7 @@ if (hasIndexedFixtureArticle) {
 }
 assert.deepEqual(
   sitemapEntries,
-  hasIndexedFixtureArticle
+  hasExternallyDiscoverableFixtureArticle
     ? [
         { url: "https://example.com/" },
         { url: "https://example.com/archive" },
