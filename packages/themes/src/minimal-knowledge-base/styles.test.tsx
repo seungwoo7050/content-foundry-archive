@@ -96,4 +96,22 @@ describe("Minimal Knowledge Base styles", () => {
       ".kb-home-article-group>ul>li{margin-bottom:1rem;break-inside:avoid}",
     );
   });
+
+  it("presents pagination as a responsive knowledge utility that does not print", () => {
+    for (const rule of [
+      '.theme-minimal-knowledge-base nav[aria-label="목록 페이지 이동"]{display:grid;min-width:0;grid-template-columns:minmax(0,1fr) auto;',
+      'nav[aria-label="목록 페이지 이동"] p{min-width:0;margin:0;color:var(--color-text-muted);overflow-wrap:anywhere}',
+      '[aria-current="page"]{display:inline-block;padding:.25rem .6rem;color:var(--color-primary);',
+      'nav[aria-label="목록 페이지 이동"] ul{display:flex;min-width:0;flex-wrap:wrap;',
+      'nav[aria-label="목록 페이지 이동"] a{display:inline-flex;min-height:44px;max-width:100%;',
+      'padding:.5rem .8rem;overflow-wrap:anywhere;',
+      'nav[aria-label="목록 페이지 이동"] a:focus-visible{outline:3px solid var(--focus-ring);',
+      '@media(max-width:30rem){',
+      'nav[aria-label="목록 페이지 이동"]{grid-template-columns:minmax(0,1fr);align-items:stretch}',
+      'nav[aria-label="목록 페이지 이동"] ul{display:grid;grid-template-columns:minmax(0,1fr);width:100%}',
+      'nav[aria-label="목록 페이지 이동"]{display:none!important}',
+    ]) {
+      expect(MINIMAL_KNOWLEDGE_BASE_STYLES).toContain(rule);
+    }
+  });
 });

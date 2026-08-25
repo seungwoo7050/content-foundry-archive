@@ -40,6 +40,13 @@ export const MINIMAL_KNOWLEDGE_BASE_STYLES = `
 .theme-minimal-knowledge-base nav[aria-label="현재 위치"] ol{display:flex;flex-wrap:wrap;gap:.4rem;margin:0 0 1.6rem;padding:0;color:var(--color-text-muted);font-size:.82rem;list-style:none}
 .theme-minimal-knowledge-base nav[aria-label="현재 위치"] a{color:var(--color-text-muted);font-weight:600}
 .theme-minimal-knowledge-base nav[aria-label="현재 위치"] li+li:before{margin-right:.4rem;color:var(--color-border);content:"/"}
+.theme-minimal-knowledge-base nav[aria-label="목록 페이지 이동"]{display:grid;min-width:0;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.8rem;margin-top:2rem;padding:1rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem}
+.theme-minimal-knowledge-base nav[aria-label="목록 페이지 이동"] p{min-width:0;margin:0;color:var(--color-text-muted);overflow-wrap:anywhere}
+.theme-minimal-knowledge-base nav[aria-label="목록 페이지 이동"] [aria-current="page"]{display:inline-block;padding:.25rem .6rem;color:var(--color-primary);background:var(--color-surface-muted);border:1px solid var(--color-border);border-radius:.45rem;font-weight:800}
+.theme-minimal-knowledge-base nav[aria-label="목록 페이지 이동"] ul{display:flex;min-width:0;flex-wrap:wrap;justify-content:flex-end;gap:.5rem;margin:0;padding:0;list-style:none}
+.theme-minimal-knowledge-base nav[aria-label="목록 페이지 이동"] li{min-width:0}
+.theme-minimal-knowledge-base nav[aria-label="목록 페이지 이동"] a{display:inline-flex;min-height:44px;max-width:100%;align-items:center;justify-content:center;padding:.5rem .8rem;overflow-wrap:anywhere;color:var(--color-text);background:var(--color-surface-muted);border:1px solid var(--color-border);border-radius:.55rem;text-decoration:none}
+.theme-minimal-knowledge-base nav[aria-label="목록 페이지 이동"] a:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px}
 
 .kb-home-route>header{max-width:50rem;padding:clamp(1.5rem,4vw,3.25rem) 0 1rem}
 .kb-home-route>header h1{max-width:12ch}
@@ -177,6 +184,11 @@ export const MINIMAL_KNOWLEDGE_BASE_STYLES = `
 .kb-not-found-route h1,.kb-retired-route h1{margin:.5rem 0;font-size:clamp(2rem,7vw,3.5rem)}
 .kb-not-found-route nav ul,.kb-retired-route nav ul{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;margin:1.25rem 0 0;padding:0;list-style:none}
 
+@media(max-width:30rem){
+  .theme-minimal-knowledge-base nav[aria-label="목록 페이지 이동"]{grid-template-columns:minmax(0,1fr);align-items:stretch}
+  .theme-minimal-knowledge-base nav[aria-label="목록 페이지 이동"] ul{display:grid;grid-template-columns:minmax(0,1fr);width:100%}
+  .theme-minimal-knowledge-base nav[aria-label="목록 페이지 이동"] a{width:100%}
+}
 @media(min-width:40rem){
   .kb-category-grid>ul,.kb-home-article-group>ul,.kb-latest-articles>ul,.kb-category-articles>ul,.kb-related-articles>ul{grid-template-columns:repeat(2,minmax(0,1fr))}
   .kb-home-current>ul{grid-template-columns:minmax(0,1fr)}
@@ -210,6 +222,7 @@ export const MINIMAL_KNOWLEDGE_BASE_STYLES = `
   .kb-article-body :is(figure,table,aside){break-inside:avoid}
   .kb-home-article-group>ul{display:block}
   .kb-home-article-group>ul>li{margin-bottom:1rem;break-inside:avoid}
+  .theme-minimal-knowledge-base nav[aria-label="목록 페이지 이동"]{display:none!important}
   .kb-article-body a[href^="http"]:after{font-size:.8em;font-weight:400;content:" (" attr(href) ")"}
 }
 `;
