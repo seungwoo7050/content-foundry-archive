@@ -8,7 +8,6 @@ import {
   createHomePresentationViewModel,
   type HomePresentationSource,
 } from "./home-presentation-view-model";
-import { renderArticleCardArtwork } from "./article-card-artwork";
 import {
   createThemeArticleListItem,
   type ThemeArticleListRecord,
