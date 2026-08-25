@@ -99,7 +99,7 @@ describe("theme article list item", () => {
     expect(html).toContain('width="1536"');
     expect(html).toContain('height="1024"');
     expect(html).toContain(
-      'sizes="(min-width: 64rem) 24rem, (min-width: 48rem) 44vw, 100vw"',
+      'sizes="(min-width: 64rem) 24rem, (min-width: 48rem) 44vw, calc(100vw - 4rem)"',
     );
     expect(html).not.toMatch(/object-fit|object-position/);
   });

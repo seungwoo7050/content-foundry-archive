@@ -5,7 +5,7 @@ import {
 } from "./project-static-image-asset.js";
 
 export const RESPONSIVE_WEBP_QUALITY = 82;
-const TARGET_WIDTHS = [480, 960, 1440] as const;
+const TARGET_WIDTHS = [480, 640, 960, 1440] as const;
 
 export interface ResponsiveImageDerivative {
   readonly relativePath: string;

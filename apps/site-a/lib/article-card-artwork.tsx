@@ -4,7 +4,7 @@ import { ImageBlock } from "../components/image-block";
 import type { ResponsiveImageAssetRegistry } from "./responsive-image-asset-registry";
 
 const articleCardSizes =
-  "(min-width: 64rem) 24rem, (min-width: 48rem) 44vw, 100vw";
+  "(min-width: 64rem) 24rem, (min-width: 48rem) 44vw, calc(100vw - 4rem)";
 
 export function renderArticleCardArtwork(
   mediaId: string | null,

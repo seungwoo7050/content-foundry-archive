@@ -72,6 +72,7 @@ describe("projectResponsiveImageAsset", () => {
 
     expect(asset.derivatives.map(({ width, height }) => [width, height])).toEqual([
       [480, 270],
+      [640, 360],
       [960, 540],
       [1280, 720],
     ]);
@@ -89,6 +90,6 @@ describe("projectResponsiveImageAsset", () => {
       recordPath,
     );
 
-    expect(asset.derivatives.map(({ width }) => width)).toEqual([480, 960]);
+    expect(asset.derivatives.map(({ width }) => width)).toEqual([480, 640, 960]);
   });
 });
