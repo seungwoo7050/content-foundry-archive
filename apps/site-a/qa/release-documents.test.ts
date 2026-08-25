@@ -8,6 +8,8 @@ import { describe, expect, it } from "vitest";
 import { qaCorpus } from "./corpus";
 import { qaMediaAssets } from "./media-assets";
 import { projectQaReleaseDocuments } from "./release-documents";
+import { validateSiteLaunchDiscovery } from "../lib/site-launch-discovery-policy";
+import { validateSiteLaunchOrigin } from "../lib/site-launch-origin-policy";
 
 const variant = {
   theme: "editorial-utility",
@@ -73,5 +75,12 @@ describe("QA Contract 4 release document projection", () => {
         path: `media/${sourcePath}`,
       })),
     );
+  });
+
+  it("cannot satisfy the production origin or discovery gates", () => {
+    expect(() => validateSiteLaunchOrigin("production", bundle.site.origin))
+      .toThrow("production origin must not use reserved hostname");
+    expect(() => validateSiteLaunchDiscovery("production", bundle))
+      .toThrow("production taxonomy must match the five Site A launch categories");
   });
 });
