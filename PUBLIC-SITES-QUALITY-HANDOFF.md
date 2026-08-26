@@ -4,6 +4,20 @@ Date: 2026-08-26 KST
 
 This checkpoint closes the provider-free Public Sites quality track. It is a non-operational QA release, not approval to deploy or substitute synthetic content, origins, branding, policy copy, or provider identifiers for real ones.
 
+## Final cleanup handoff
+
+This documentation atom records the completed remote checkpoint and the disposable local-output cleanup that must run only after this atom's own remote workflow passes. It does not claim that cleanup has already happened or attempt to record its own SHA.
+
+- The pre-handoff Public checkpoint is `e0cff8d00c2833794412a9e542ef543178321d49`; Archive remains `a7e748a753ddd4d0751f5a4b84b27ec5c5a12b5e`. The final pre-edit fetch found both worktrees clean and exactly equal to `origin/public-sites` and `origin/main`.
+- Run [`32880631479`](https://github.com/seungwoo7050/content-foundry-archive/actions/runs/32880631479) at `e0cff8d` passed quality job `97908963407` in 16m55s and Lighthouse job `97914414629` in 30m25s. Artifact `9577314233` (`public-sites-lighthouse-32880631479-1`) is 44,630,039 B with digest `sha256:c345fc42fff9f5e75b9dd4802c1932046d2fefcbcdeab50f9e09db757d2018cd`.
+- The 79-SHA rules-audit universe contained one false positive: `703a354` has all six exact pre-plan fields. The complete-field omission is the 22-commit range `ac4da12..8eb1e35`, not 23 commits.
+- There are 67 primary exception or coupling commits: 11 substantive atom/validation exceptions, 53 procedural/body/evidence defects, and three intentional product-to-visual-baseline coupling primaries. The first two groups are 64 historical noncompliances; they are not reclassified as compliant or presented as precedent.
+- Nine repair/pair commits are remediation rather than originating violations. The measured but ineffective `a4c1a3e` experiment and the independently compliant `f1e2743` dependency atom are also not originating violations.
+- Preserving the 64 defects without rewriting published history is reasonable because later repairs and the complete local/remote matrix close current product risk. The three baseline couplings and nine repair/pairs are reasonable bounded exceptions because product output and reviewed expectations must move or roll back together; one-sided reversal is expected to fail the visual gate.
+- After this documentation atom passes its remote quality and Lighthouse jobs, cleanup may remove the 32 exact ignored roots (about 9.28 GiB), two empty generated-route trees, and the frozen 149-entry Public-specific `/private/tmp` manifest (7.623 GiB), plus the identified static server, three named Playwright sessions, three private browser profiles, and 18 project-named daemon-state files.
+- Cleanup must preserve this checkout, `.git`, all tracked source and 33 tracked WebP evidence assets, global pnpm/npm/Playwright/MCP caches, ambiguous shared temporary paths, and every ContentOps resource. The Docker audit found zero Public-owned containers, images, volumes, networks, or attributable builder-cache records, so no Docker deletion or prune is authorized.
+- The ignored outputs are reproducible with the frozen install and quality commands below. Ad hoc local reports and screenshots are permanently disposable; tracked baselines, source, published commits, and remote workflow evidence remain the durable record.
+
 ## Final implementation and remote closure addendum
 
 This addendum supersedes the pre-publication checkpoint values below while preserving that checkpoint as an audit record. This documentation-only atom records the immediately preceding implementation checkpoint and its completed remote runs; it does not attempt to record its own SHA or create a self-referential CI claim.
@@ -130,7 +144,7 @@ The synthetic QA scope is visually polished enough to justify a WordPress replac
 
 No rewrite, rebase, reset, force-push, or merge was used. Post-audit closure atoms are single-responsibility and explicitly tested; the final addendum records the strict rollback/validation couplings that prevent a claim of perfect independence. Archive and Public changes are separated; ContentOps and external policies were not inferred.
 
-Perfect historical compliance is not claimed. The original handoff section 8 remains the audit ledger for inherited published exceptions. Additional track exceptions preserved without rewrite are: `3294ceb` literal escaped newlines; `a9b6eed` coupled helper/reading-time repair; `5b5f7ad` incorrect body line count; `fa162e1` noisy/contradictory validation; `e47c30c` full test listing; `149ca03` stale deferred wording; `f6556ab` non-strict fix headings; `126f958` 141 additions without the required size rationale; and the first 23 new Public commits lacking every exact pre-plan field. Later atoms use the strict fields, staged-diff checks, secret scans, focused validation, and explicit rollback.
+Perfect historical compliance is not claimed. The original handoff section 8 remains the audit ledger for inherited published exceptions. Additional track exceptions preserved without rewrite are: `3294ceb` literal escaped newlines; `a9b6eed` coupled helper/reading-time repair; `5b5f7ad` incorrect body line count; `fa162e1` noisy/contradictory validation; `e47c30c` full test listing; `149ca03` stale deferred wording; `f6556ab` non-strict fix headings; `126f958` 141 additions without the required size rationale; and the 22-commit range `ac4da12..8eb1e35` lacking every exact pre-plan field. `703a354` has all six fields and is not part of that exception. Later atoms use the strict fields, staged-diff checks, secret scans, focused validation, and explicit rollback.
 
 ## Open gates
 
